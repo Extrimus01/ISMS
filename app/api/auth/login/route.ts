@@ -3,10 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET must be defined in .env");
-}
-
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
