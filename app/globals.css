@@ -1,22 +1,60 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
+  --background: #dae1f0;
+  --surface: #ffffff;
   --foreground: #1f2937;
-  --primary: #3b82f6;
-  --secondary: #10b981;
-  --text-red: #991b1b;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  /* --secondary: #059669; */
+  --secondary: #34d399;
+  --secondary-hover: #047857;
+  --accent: #f59e0b;
+  --border: #e5e7eb;
+  --text-muted: #6b7280;
+  --text-red: #b91c1c;
+  --text-big: skyblue;
 }
 
 .dark {
   --background: #111827;
+  --surface: #1f2937;
   --foreground: #f3f4f6;
   --primary: #3b82f6;
+  --primary-hover: #2563eb;
   --secondary: #34d399;
+  --secondary-hover: #10b981;
+  --accent: #fbbf24;
+  --border: #374151;
+  --text-muted: #9ca3af;
   --text-red: #fecaca;
+  --text-big: #f3f4f6;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
   transition: background-color 0.3s, color 0.3s;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-y: scroll;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s, color 0.3s;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
