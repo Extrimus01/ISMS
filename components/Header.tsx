@@ -7,17 +7,7 @@ import { Menu, X } from "lucide-react";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(true);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!visible) return null;
   return (
     <header
       className="fixed top-0 left-0 w-full px-4 sm:px-6 py-3 flex items-center justify-between 
