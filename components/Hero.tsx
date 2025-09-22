@@ -1,10 +1,11 @@
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowDownIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import React from "react";
+import Link from "next/link";
 
 const Hero: React.FC = () => {
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-[var(--background)] text-gray-200 transition-colors duration-500">
+    <div id="home" className="relative h-screen w-full overflow-hidden bg-[var(--background)] text-gray-200 transition-colors duration-500">
       <video
         autoPlay
         loop
@@ -28,16 +29,18 @@ const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
-            className="font-roboto-slab text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-wide leading-tight"
+            className="font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter leading-tight"
           >
-            STUDENT INTERNSHIPS
+            Maharashtra Remote Sensing
+            <br />
+            Application Centre
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="mt-4 text-lg sm:text-xl md:text-2xl text-[var(--foreground-secondary)] tracking-wider max-w-2xl"
+            className="mt-4 text-lg sm:text-xl md:text-2xl text-[#9ca3af] tracking-wider max-w-2xl"
           >
             Discover and apply to internships that elevate your career journey.
           </motion.p>
@@ -45,8 +48,8 @@ const Hero: React.FC = () => {
 
         <footer className="w-full p-6 sm:p-8 lg:p-12">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end border-t border-[var(--border)] pt-4 gap-4 sm:gap-0">
-              <p className="max-w-xs text-[var(--foreground-secondary)] text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end border-t border-[#374151] pt-4 gap-4 sm:gap-0">
+              <p className="max-w-xs text-[#9ca3af] text-center sm:text-left">
                 AS A STUDENT, YOU CAN TRACK, APPLY, AND MANAGE YOUR INTERNSHIP
                 OPPORTUNITIES SEAMLESSLY
               </p>
@@ -56,9 +59,11 @@ const Hero: React.FC = () => {
                   backgroundColor: "rgba(255,255,255,0.1)",
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-shrink-0 w-16 h-16 border border-[var(--border)] rounded-full flex items-center justify-center transition-colors duration-300"
+                className="flex-shrink-0 w-12 h-12  rounded-full flex items-center justify-center transition-colors duration-300"
               >
-                <ArrowRightIcon className="text-[var(--foreground)]" />
+                <Link href="#about-us" className="animate-bounce">
+                  <ArrowDownIcon className="text-[#f3f4f6]" />
+                </Link>
               </motion.button>
             </div>
           </div>

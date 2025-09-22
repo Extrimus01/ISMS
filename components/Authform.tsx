@@ -205,7 +205,6 @@ const AuthForm: React.FC = () => {
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-[var(--background)] text-[var(--foreground)] transition-colors duration-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-[var(--card-bg)] rounded-2xl shadow-2xl transition-all duration-500">
-        {/* Role Toggle */}
         <div className="relative flex rounded-lg bg-gray-100 dark:bg-gray-900 p-1">
           <div
             className={`absolute top-1 bottom-1 w-1/2 bg-[var(--primary)] rounded-md shadow-lg transform transition-transform duration-300 ease-in-out
@@ -243,9 +242,7 @@ const AuthForm: React.FC = () => {
           </p>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <InputField
             id="email"
             label="Email Address"
@@ -255,7 +252,7 @@ const AuthForm: React.FC = () => {
             error={errors.email}
             icon={<MailIcon className="w-5 h-5" />}
           />
-          {/* Password */}
+
           <InputField
             id="password"
             label="Password"
@@ -266,7 +263,6 @@ const AuthForm: React.FC = () => {
             icon={<LockIcon className="w-5 h-5" />}
           />
 
-          {/* Conditional signup fields */}
           {mode === Mode.Signup && (
             <div className="transition-all duration-500 space-y-4 pt-4">
               {role === Role.Student ? (

@@ -10,14 +10,13 @@ interface IntersectionObserverOptions {
 export const useIntersectionObserver = <T extends HTMLElement>(
   options: IntersectionObserverOptions = {}
 ): [RefObject<T | null>, boolean] => {
-  // allow null
   const {
     threshold = 0.1,
     root = null,
     rootMargin = "0px",
     triggerOnce = true,
   } = options;
-  const targetRef = useRef<T | null>(null); // allow null
+  const targetRef = useRef<T | null>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
   useEffect(() => {
