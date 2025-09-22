@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ISMS",
-  description: "Manage internships and track progress with SIMS.",
+  description: "Manage internships and track progress with ISMS.",
 };
 
 export default function RootLayout({
