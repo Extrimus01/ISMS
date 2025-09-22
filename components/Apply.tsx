@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import animationData from "@/public/animation/bubble.json";
+import Link from "next/link";
 
 export default function Contact() {
   return (
@@ -90,6 +91,9 @@ export default function Contact() {
               >
                 Submit
               </button>
+              <Link href="/auth" className="mt-4 inline-block text-sm text-[var(--foreground-secondary)] hover:text-[var(--accent)] transition-colors">
+                <p>Login if already have an account!</p>
+              </Link>
             </div>
           </form>
         </motion.div>
