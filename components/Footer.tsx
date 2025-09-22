@@ -100,10 +100,13 @@ const Footer: React.FC = () => {
           }}
           whileTap={{ scale: 0.95 }}
           className="w-12 h-12 rounded-full flex items-center justify-center transition-colors duration-300"
+          onClick={() => {
+            document.getElementById("home")?.scrollIntoView({
+              behavior: "smooth",
+            });
+          }}
         >
-          <Link href="#home" className="animate-bounce">
-            <ArrowUpIcon style={{ color: "var(--primary)" }} />
-          </Link>
+          <ArrowUpIcon style={{ color: "var(--primary)" }} />
         </motion.button>
       </div>
     </footer>

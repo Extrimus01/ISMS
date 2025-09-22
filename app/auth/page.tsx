@@ -1,12 +1,89 @@
 "use client";
-import React, { useState } from "react";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import Lottie from "lottie-react";
+import animationData from "@/public/animation/internship-lottie.json";
+
+interface BeamsBackgroundProps {
+  className?: string;
+  intensity?: "subtle" | "medium" | "strong";
+}
+
+interface Beam {
+  x: number;
+  y: number;
+  width: number;
+  length: number;
+  angle: number;
+  speed: number;
+  opacity: number;
+  hue: number;
+  pulse: number;
+  pulseSpeed: number;
+}
+
+const opacityMap = {
+  subtle: 0.7,
+  medium: 0.85,
+  strong: 1,
+};
+
+const createBeam = (width: number, height: number): Beam => {
+  const angle = -35 + Math.random() * 10;
+  return {
+    x: Math.random() * width * 1.5 - width * 0.25,
+    y: Math.random() * height * 1.5 - height * 0.25,
+    width: 30 + Math.random() * 60,
+    length: height * 2.5,
+    angle,
+    speed: 0.6 + Math.random() * 1.2,
+    opacity: 0.12 + Math.random() * 0.16,
+    hue: 190 + Math.random() * 70,
+    pulse: Math.random() * Math.PI * 2,
+    pulseSpeed: 0.02 + Math.random() * 0.03,
+  };
+};
+
+const Icon = ({
+  path,
+  className = "w-5 h-5",
+}: {
+  path: string;
+  className?: string;
+}) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d={path}
+    />
+  </svg>
+);
+
+const icons = {
+  user: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+  lock: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+  mail: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+  college:
+    "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0v-4m0 4h5m0 0v-4m0 4h5m0 0v-4m-5 4v-4m-5 4v-4m14-8l-7-4-7 4m14 0V5",
+  phone:
+    "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
+};
 
 interface FormInputProps {
   id: string;
   type: string;
   placeholder: string;
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  icon: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -15,125 +92,285 @@ const FormInput: React.FC<FormInputProps> = ({
   placeholder,
   value,
   onChange,
+  icon,
 }) => (
-  <input
-    id={id}
-    type={type}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    className="w-full px-4 py-3 bg-[#2D2D2D] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition-shadow"
-  />
-);
-
-interface FormSelectProps {
-  id: string;
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  children: React.ReactNode;
-}
-
-const FormSelect: React.FC<FormSelectProps> = ({
-  id,
-  value,
-  onChange,
-  children,
-}) => (
-  <div className="relative w-full">
-    <select
+  <div className="relative group">
+    <label htmlFor={id} className="sr-only">
+      {placeholder}
+    </label>
+    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
+      <Icon path={icon} />
+    </span>
+    <motion.input
+      suppressHydrationWarning // 🟢 Prevent hydration mismatch
+      whileFocus={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       id={id}
+      type={type}
+      placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="w-full px-4 py-3 bg-[#2D2D2D] text-white rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-gray-500 transition-shadow"
-    >
-      {children}
-    </select>
-    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
-      <svg
-        className="fill-current h-4 w-4"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-      >
-        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-      </svg>
-    </div>
+      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg placeholder-slate-500 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all hover:border-slate-600"
+    />
   </div>
 );
 
-const AuthPage: React.FC = () => {
-  const [username, setUsername] = useState("jyoti");
-  const [password, setPassword] = useState("••••••••••");
-  const [role, setRole] = useState("Faculty");
+export default function AuthPage({
+  intensity = "strong",
+}: BeamsBackgroundProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const beamsRef = useRef<Beam[]>([]);
+  const animationRef = useRef<number | null>(null);
+
+  const [isRegister, setIsRegister] = useState(false);
+
+  const [form, setForm] = useState({
+    loginUsername: "",
+    loginPassword: "",
+    regFullName: "",
+    regCollege: "",
+    regEmail: "",
+    regPhone: "",
+    regMessage: "",
+  });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const updateSize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      beamsRef.current = Array.from({ length: 30 }, () =>
+        createBeam(canvas.width, canvas.height)
+      );
+    };
+
+    const resetBeam = (beam: Beam) => {
+      beam.y = canvas.height + 100;
+      beam.x = Math.random() * canvas.width;
+    };
+
+    const drawBeam = (b: Beam) => {
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate((b.angle * Math.PI) / 180);
+      const pulseOpacity =
+        b.opacity * (0.8 + Math.sin(b.pulse) * 0.2) * opacityMap[intensity];
+      const gradient = ctx.createLinearGradient(0, 0, 0, b.length);
+      gradient.addColorStop(0, `hsla(${b.hue},85%,65%,0)`);
+      gradient.addColorStop(0.4, `hsla(${b.hue},85%,65%,${pulseOpacity})`);
+      gradient.addColorStop(1, `hsla(${b.hue},85%,65%,0)`);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(-b.width / 2, 0, b.width, b.length);
+      ctx.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      beamsRef.current.forEach((b) => {
+        b.y -= b.speed;
+        b.pulse += b.pulseSpeed;
+        if (b.y + b.length < -50) resetBeam(b);
+        drawBeam(b);
+      });
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    animate();
+
+    return () => {
+      window.removeEventListener("resize", updateSize);
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [intensity]);
+
+  const handleInput =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm({ ...form, [field]: e.target.value });
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center font-sans bg-gray-200 overflow-hidden p-4">
-      <div className="absolute inset-0 -z-10 bg-[#D6D6D6]">
-        <div
-          className="absolute inset-y-0 left-0 w-3/4 bg-[#E0E0E0]"
-          style={{ clipPath: "polygon(0 0, 100% 0, 75% 100%, 0% 100%)" }}
-        ></div>
-        <div
-          className="absolute inset-y-0 right-0 w-3/4 bg-[#C0C0C0]"
-          style={{ clipPath: "polygon(25% 0, 100% 0, 100% 100%, 0% 100%)" }}
-        ></div>
-      </div>
-
-      <main className="relative z-10 w-full max-w-4xl">
-        <div className="flex flex-col lg:flex-row rounded-xl shadow-2xl overflow-hidden">
-          <div className="w-full lg:w-5/12 bg-[#2D2D2D] flex flex-col justify-center items-center p-12 text-center min-h-[300px] lg:min-h-0">
-            <h1
-              className="text-white text-5xl font-serif leading-tight"
-              style={{ textShadow: "1px 1px 3px rgba(255,255,255,0.2)" }}
-            >
-              Internship Management System
-            </h1>
+    <div className="relative min-h-screen overflow-hidden bg-neutral-950 flex items-center justify-center">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 blur-[15px] block w-full"
+      />
+      <motion.div
+        className="absolute inset-0 bg-neutral-950/5 overflow-hidden"
+        animate={{ opacity: [0.05, 0.15, 0.05] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        style={{ backdropFilter: "blur(50px)" }}
+      />
+      <main className="relative z-10 w-full max-w-5xl px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col lg:flex-row rounded-2xl shadow-2xl overflow-hidden bg-slate-800/30 backdrop-blur-xl border border-white/10"
+        >
+          <div className="hidden lg:flex w-full lg:w-5/12 bg-black/20 flex-col items-center p-10 text-center">
+            <Lottie animationData={animationData} loop className="max-w-xs" />
+            <h3 className="text-white font-semibold text-xl mt-6">
+              {isRegister
+                ? "Embark on a New Journey"
+                : "Welcome Back, Innovator!"}
+            </h3>
+            <p className="text-slate-400 text-sm mt-2 max-w-xs">
+              {isRegister
+                ? "Unlock your potential. Register now to connect with opportunities."
+                : "Your next great idea is just a login away. Let's get started."}
+            </p>
           </div>
 
-          <div className="w-full lg:w-7/12 bg-[#F0F0F0] p-12 flex flex-col justify-center">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-8 tracking-[0.2em]">
-              SIGN IN
-            </h2>
-
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="w-full max-w-sm mx-auto"
-            >
-              <div className="space-y-5">
-                <FormInput
-                  id="username"
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <FormInput
-                  id="password"
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <div className="text-right mt-4">
-                <a href="#" className="text-sm text-gray-600 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-
-              <div className="flex items-center justify-center space-x-4 mt-8">
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-[#BDBDBD] text-[#2D2D2D] font-semibold rounded-lg shadow-md hover:bg-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-all transform hover:scale-105"
+          <div className="w-full lg:w-7/12 p-8 sm:p-12 bg-black/10">
+            <AnimatePresence mode="wait">
+              {isRegister ? (
+                <motion.form
+                  suppressHydrationWarning
+                  key="register"
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-4"
+                  onSubmit={(e) => e.preventDefault()}
                 >
-                  Login
-                </button>
-              </div>
-            </form>
+                  <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
+                    Create Account
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormInput
+                      id="regFullName"
+                      type="text"
+                      placeholder="Full Name"
+                      value={form.regFullName}
+                      onChange={handleInput("regFullName")}
+                      icon={icons.user}
+                    />
+                    <FormInput
+                      id="regCollege"
+                      type="text"
+                      placeholder="College Name"
+                      value={form.regCollege}
+                      onChange={handleInput("regCollege")}
+                      icon={icons.college}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormInput
+                      id="regEmail"
+                      type="email"
+                      placeholder="Email"
+                      value={form.regEmail}
+                      onChange={handleInput("regEmail")}
+                      icon={icons.mail}
+                    />
+                    <FormInput
+                      id="regPhone"
+                      type="tel"
+                      placeholder="Phone"
+                      value={form.regPhone}
+                      onChange={handleInput("regPhone")}
+                      icon={icons.phone}
+                    />
+                  </div>
+                  <textarea
+                    rows={3}
+                    placeholder="Tell us about your interests..."
+                    value={form.regMessage}
+                    onChange={handleInput("regMessage")}
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg"
+                  >
+                    Register
+                  </motion.button>
+                  <p className="text-center text-sm text-slate-400">
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsRegister(false)}
+                      className="text-cyan-400 hover:underline"
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </motion.form>
+              ) : (
+                <motion.form
+                  suppressHydrationWarning
+                  key="login"
+                  initial={{ opacity: 0, x: -100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 100 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
+                    Sign In
+                  </h2>
+                  <FormInput
+                    id="loginUsername"
+                    type="text"
+                    placeholder="Username or Email"
+                    value={form.loginUsername}
+                    onChange={handleInput("loginUsername")}
+                    icon={icons.user}
+                  />
+                  <FormInput
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Password"
+                    value={form.loginPassword}
+                    onChange={handleInput("loginPassword")}
+                    icon={icons.lock}
+                  />
+                  <div className="text-right">
+                    <a
+                      href="#"
+                      className="text-sm text-slate-400 hover:underline"
+                    >
+                      Forgot password?
+                    </a>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg"
+                  >
+                    Login
+                  </motion.button>
+                  <p className="text-center text-sm text-slate-400">
+                    Don’t have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsRegister(true)}
+                      className="text-cyan-400 hover:underline"
+                    >
+                      Register
+                    </button>
+                  </p>
+                </motion.form>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </main>
     </div>
   );
-};
-export default AuthPage;
+}

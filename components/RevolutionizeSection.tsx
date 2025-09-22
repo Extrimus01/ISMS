@@ -178,7 +178,7 @@ With real-time notifications, everyone stays updated about last-minute changes, 
             onClick={() => setActiveModal(null)}
           >
             <div
-              className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 max-w-2xl w-full p-6 rounded-2xl shadow-xl overflow-y-auto max-h-[80vh]"
+              className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 max-w-2xl w-full p-6 rounded-2xl shadow-xl overflow-y-auto no-scrollbar max-h-[80vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <img

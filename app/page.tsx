@@ -9,12 +9,12 @@ import AboutUs from "@/components/AboutUs";
 
 export default function Page() {
   return (
-    <main className="scroll-none">
+    <main className=" no-scrollbar">
       <Header />
       <Hero />
       <AboutUs />
-      <Features />
       <RevolutionizeSection />
+      <Features />
       <Apply />
       <Footer />
     </main>

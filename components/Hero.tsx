@@ -1,11 +1,14 @@
-import { ArrowDownIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import React from "react";
 import Link from "next/link";
 
 const Hero: React.FC = () => {
   return (
-    <div id="home" className="relative h-screen w-full overflow-hidden bg-[var(--background)] text-gray-200 transition-colors duration-500">
+    <div
+      id="home"
+      className="relative h-screen w-full overflow-hidden bg-[var(--background)] text-gray-200 transition-colors duration-500"
+    >
       <video
         autoPlay
         loop
@@ -60,10 +63,13 @@ const Hero: React.FC = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex-shrink-0 w-12 h-12  rounded-full flex items-center justify-center transition-colors duration-300"
+                onClick={() => {
+                  document.getElementById("about-us")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
               >
-                <Link href="#about-us" className="animate-bounce">
-                  <ArrowDownIcon className="text-[#f3f4f6]" />
-                </Link>
+                <ArrowRightIcon className="text-[#f3f4f6]" />
               </motion.button>
             </div>
           </div>
