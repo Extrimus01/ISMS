@@ -136,7 +136,7 @@ With real-time notifications, everyone stays updated about last-minute changes, 
   ];
 
   return (
-    <section className="bg-[rgb(var(--bg-primary))] py-24 sm:py-32 overflow-x-hidden">
+    <section className="bg-[rgb(var(--bg-primary))] py-12 sm:py-24 overflow-x-hidden">
       <div className="container mx-auto px-6 lg:px-8">
         <AnimatedFeature>
           <div className="max-w-3xl mx-auto text-center">
