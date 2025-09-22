@@ -10,6 +10,7 @@
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@tailwindcss/cli": "^4.1.13",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.23.16",
     "gsap": "^3.13.0",
@@ -19,14 +20,18 @@
     "lucide-react": "^0.544.0",
     "mongodb": "^6.20.0",
     "next": "15.5.3",
+    "next-auth": "^4.24.11",
     "next-themes": "^0.4.6",
+    "nodemailer": "^6.10.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
+    "@types/bcrypt": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",

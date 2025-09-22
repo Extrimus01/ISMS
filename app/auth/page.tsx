@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation/internship-lottie.json";
+import { useRouter } from "next/navigation";
+import Toast from "@/components/Toast";
 
 interface BeamsBackgroundProps {
   className?: string;
@@ -102,7 +104,7 @@ const FormInput: React.FC<FormInputProps> = ({
       <Icon path={icon} />
     </span>
     <motion.input
-      suppressHydrationWarning // 🟢 Prevent hydration mismatch
+      suppressHydrationWarning
       whileFocus={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       id={id}
@@ -123,7 +125,7 @@ export default function AuthPage({
   const animationRef = useRef<number | null>(null);
 
   const [isRegister, setIsRegister] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     loginUsername: "",
     loginPassword: "",
@@ -133,6 +135,34 @@ export default function AuthPage({
     regPhone: "",
     regMessage: "",
   });
+
+  const router = useRouter();
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role) {
+      if (role === "admin") router.push("/admin");
+      else if (role === "project_manager") router.push("/pm");
+      else router.push("/student");
+    }
+  }, [router]);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -198,12 +228,100 @@ export default function AuthPage({
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm({ ...form, [field]: e.target.value });
 
+  const handleRegister = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.regFullName,
+          college: form.regCollege,
+          email: form.regEmail,
+          phone: form.regPhone,
+          message: form.regMessage,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(
+          "Registration successful! Check your email for credentials.",
+          "success"
+        );
+        setIsRegister(false);
+        setForm({
+          loginUsername: "",
+          loginPassword: "",
+          regFullName: "",
+          regCollege: "",
+          regEmail: "",
+          regPhone: "",
+          regMessage: "",
+        });
+      } else {
+        showToast(data.error || "Registration failed.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong.", "error");
+    }
+    setLoading(false);
+  };
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.loginUsername,
+          password: form.loginPassword,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem("role", data.role);
+        if (data.role === "admin") router.push("/admin");
+        else if (data.role === "project_manager") router.push("/pm");
+        else router.push("/student");
+      } else {
+        showToast(data.error || "Login failed", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong.", "error");
+    }
+    setLoading(false);
+  };
+
+  const handleForgotPassword = async () => {
+    const email = form.loginUsername;
+    if (!email) return showToast("Please enter your email.", "error");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) showToast(data.message, "success");
+      else showToast(data.error || "Failed to send password.", "error");
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong.", "error");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-neutral-950 flex items-center justify-center">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 blur-[15px] block w-full"
       />
+
       <motion.div
         className="absolute inset-0 bg-neutral-950/5 overflow-hidden"
         animate={{ opacity: [0.05, 0.15, 0.05] }}
@@ -242,7 +360,10 @@ export default function AuthPage({
                   exit={{ opacity: 0, x: -100 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-4"
-                  onSubmit={(e) => e.preventDefault()}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleRegister();
+                  }}
                 >
                   <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
                     Create Account
@@ -294,9 +415,10 @@ export default function AuthPage({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     type="submit"
+                    disabled={loading}
                     className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg"
                   >
-                    Register
+                    {loading ? "Processing..." : "Register"}
                   </motion.button>
                   <p className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
@@ -318,7 +440,10 @@ export default function AuthPage({
                   exit={{ opacity: 0, x: 100 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-6"
-                  onSubmit={(e) => e.preventDefault()}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLogin();
+                  }}
                 >
                   <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
                     Sign In
@@ -340,20 +465,22 @@ export default function AuthPage({
                     icon={icons.lock}
                   />
                   <div className="text-right">
-                    <a
-                      href="#"
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
                       className="text-sm text-slate-400 hover:underline"
                     >
                       Forgot password?
-                    </a>
+                    </button>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     type="submit"
+                    disabled={loading}
                     className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg"
                   >
-                    Login
+                    {loading ? "Processing..." : "Login"}
                   </motion.button>
                   <p className="text-center text-sm text-slate-400">
                     Don’t have an account?{" "}
@@ -371,6 +498,13 @@ export default function AuthPage({
           </div>
         </motion.div>
       </main>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

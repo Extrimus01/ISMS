@@ -183,7 +183,6 @@ const AuthForm: React.FC = () => {
       } else {
         setMessage(data.message || "Success!");
         if (mode === Mode.Login && data.token) {
-          // store JWT
           localStorage.setItem("authToken", data.token);
         }
         resetForm();
