@@ -108,18 +108,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMouseEnter = () => {
-    if (!isMobile) {
-      setSidebarExpanded(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (!isMobile) {
-      setSidebarExpanded(false);
-    }
-  };
-
   return (
     <div className="relative min-h-screen">
       {isMobile && (

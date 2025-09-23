@@ -1,33 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserIcon, BriefcaseIcon, FileTextIcon } from "lucide-react";
 import Sidebar from "@/components/admin/Sidebar";
 
 const AdminDashboardPage: React.FC = () => {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar
-        isMobile={false}
-        mobileOpen={mobileOpen}
-        onMouseEnter={() => setSidebarExpanded(true)}
-        onMouseLeave={() => setSidebarExpanded(false)}
-        isExpanded={sidebarExpanded}
+        isMobile={isMobile}
+        isMobileMenuOpen={isMobileMenuOpen}
+        isExpanded={isSidebarExpanded}
+        setIsSidebarExpanded={setIsSidebarExpanded}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
       <div
         className={`flex-1 flex flex-col transition-all duration-300`}
         style={{
-          marginLeft: sidebarExpanded ? "16rem" : "5rem",
+          marginLeft: isMobile ? "16rem" : "5rem",
         }}
       >
         <header className="flex items-center justify-between h-16 bg-white shadow px-6">
           <button
             className="lg:hidden p-2 rounded-md hover:bg-gray-200"
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <span className="sr-only">Open sidebar</span>
 

@@ -91,8 +91,8 @@ const MainContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [isSidebarExpanded, setSidebarExpanded] = useState(false);
-  const [isMobileOpen, setMobileOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ const App: React.FC = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       if (!mobile) {
-        setMobileOpen(false);
+        setIsMobileMenuOpen(false);
       }
     };
     handleResize();
@@ -108,17 +108,7 @@ const App: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMouseEnter = () => {
-    if (!isMobile) {
-      setSidebarExpanded(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (!isMobile) {
-      setSidebarExpanded(false);
-    }
-  };
+  
 
   return (
     <div className="relative min-h-screen">
@@ -126,9 +116,9 @@ const App: React.FC = () => {
         <header className="fixed top-0 left-0 right-0 h-16 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-sm flex items-center px-4 z-30 border-b border-slate-200 dark:border-slate-800">
           <button
             className="p-2 text-slate-600 dark:text-slate-300"
-            onClick={() => setMobileOpen(!isMobileOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileOpen ? (
+            {isMobileMenuOpen  ? (
               <XIcon className="w-6 h-6" />
             ) : (
               <MenuIcon className="w-6 h-6" />
@@ -140,18 +130,18 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <Sidebar
+     <Sidebar
         isMobile={isMobile}
-        mobileOpen={isMobileOpen}
+        isMobileMenuOpen={isMobileMenuOpen}
         isExpanded={isSidebarExpanded}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        setIsSidebarExpanded={setIsSidebarExpanded}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
-      {isMobile && isMobileOpen && (
+      {isMobile && isMobileMenuOpen  && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setMobileOpen(false)}
+          onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
