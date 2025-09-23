@@ -1,11 +1,11 @@
 "use client";
-import Apply from "@/components/Apply";
-import Features from "@/components/Features";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import RevolutionizeSection from "@/components/RevolutionizeSection";
-import AboutUs from "@/components/AboutUs";
+import Apply from "@/components/landing/Apply";
+import Features from "@/components/landing/Features";
+import Footer from "@/components/landing/Footer";
+import Header from "@/components/landing/Header";
+import Hero from "@/components/landing/Hero";
+import RevolutionizeSection from "@/components/landing/RevolutionizeSection";
+import AboutUs from "@/components/landing/AboutUs";
 
 export default function Page() {
   return (

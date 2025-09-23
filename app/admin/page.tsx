@@ -1,138 +1,138 @@
 "use client";
 
-import LogoutButton from "@/components/Logout";
-import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import { UserIcon, BriefcaseIcon, FileTextIcon } from "lucide-react";
+import Sidebar from "@/components/admin/Sidebar";
 
-interface BeamsBackgroundProps {
-  className?: string;
-  intensity?: "subtle" | "medium" | "strong";
-}
-
-interface Beam {
-  x: number;
-  y: number;
-  width: number;
-  length: number;
-  angle: number;
-  speed: number;
-  opacity: number;
-  hue: number;
-  pulse: number;
-  pulseSpeed: number;
-}
-
-const opacityMap = {
-  subtle: 0.7,
-  medium: 0.85,
-  strong: 1,
-};
-
-const createBeam = (width: number, height: number): Beam => {
-  const angle = -35 + Math.random() * 10;
-  return {
-    x: Math.random() * width * 1.5 - width * 0.25,
-    y: Math.random() * height * 1.5 - height * 0.25,
-    width: 30 + Math.random() * 60,
-    length: height * 2.5,
-    angle,
-    speed: 0.6 + Math.random() * 1.2,
-    opacity: 0.12 + Math.random() * 0.16,
-    hue: 190 + Math.random() * 70,
-    pulse: Math.random() * Math.PI * 2,
-    pulseSpeed: 0.02 + Math.random() * 0.03,
-  };
-};
-
-export default function AdminPage({
-  intensity = "strong",
-}: BeamsBackgroundProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const beamsRef = useRef<Beam[]>([]);
-  const animationRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const updateSize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      beamsRef.current = Array.from({ length: 30 }, () =>
-        createBeam(canvas.width, canvas.height)
-      );
-    };
-
-    const resetBeam = (beam: Beam) => {
-      beam.y = canvas.height + 100;
-      beam.x = Math.random() * canvas.width;
-    };
-
-    const drawBeam = (b: Beam) => {
-      ctx.save();
-      ctx.translate(b.x, b.y);
-      ctx.rotate((b.angle * Math.PI) / 180);
-      const pulseOpacity =
-        b.opacity * (0.8 + Math.sin(b.pulse) * 0.2) * opacityMap[intensity];
-      const gradient = ctx.createLinearGradient(0, 0, 0, b.length);
-      gradient.addColorStop(0, `hsla(${b.hue},85%,65%,0)`);
-      gradient.addColorStop(0.4, `hsla(${b.hue},85%,65%,${pulseOpacity})`);
-      gradient.addColorStop(1, `hsla(${b.hue},85%,65%,0)`);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(-b.width / 2, 0, b.width, b.length);
-      ctx.restore();
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      beamsRef.current.forEach((b) => {
-        b.y -= b.speed;
-        b.pulse += b.pulseSpeed;
-        if (b.y + b.length < -50) resetBeam(b);
-        drawBeam(b);
-      });
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", updateSize);
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    };
-  }, [intensity]);
+const AdminDashboardPage: React.FC = () => {
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-neutral-950 flex items-center justify-center">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 blur-[15px] block w-full"
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar
+        isMobile={false}
+        mobileOpen={mobileOpen}
+        onMouseEnter={() => setSidebarExpanded(true)}
+        onMouseLeave={() => setSidebarExpanded(false)}
+        isExpanded={sidebarExpanded}
       />
-      <motion.div
-        className="absolute inset-0 bg-neutral-950/5 overflow-hidden"
-        animate={{ opacity: [0.05, 0.15, 0.05] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        style={{ backdropFilter: "blur(50px)" }}
-      />
-      <main className="relative z-10 w-full max-w-5xl px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col lg:flex-row rounded-2xl shadow-2xl overflow-hidden bg-slate-800/30 backdrop-blur-xl border border-white/10"
-        >
-          <h1>Dashboard Comming Soon</h1>
-          <LogoutButton />
-        </motion.div>
-      </main>
+
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300`}
+        style={{
+          marginLeft: sidebarExpanded ? "16rem" : "5rem",
+        }}
+      >
+        <header className="flex items-center justify-between h-16 bg-white shadow px-6">
+          <button
+            className="lg:hidden p-2 rounded-md hover:bg-gray-200"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            <span className="sr-only">Open sidebar</span>
+
+            <div className="space-y-1">
+              <span className="block w-6 h-0.5 bg-gray-600"></span>
+              <span className="block w-6 h-0.5 bg-gray-600"></span>
+              <span className="block w-6 h-0.5 bg-gray-600"></span>
+            </div>
+          </button>
+          <h1 className="text-xl font-semibold text-gray-700">
+            Admin Dashboard
+          </h1>
+          <div className="flex items-center space-x-4">
+            <UserIcon className="w-6 h-6 text-gray-700" />
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-4 rounded-lg shadow flex items-center space-x-4">
+              <UserIcon className="w-8 h-8 text-sky-500" />
+              <div>
+                <p className="text-gray-500 text-sm">Total Students</p>
+                <p className="text-xl font-semibold">125</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow flex items-center space-x-4">
+              <BriefcaseIcon className="w-8 h-8 text-green-500" />
+              <div>
+                <p className="text-gray-500 text-sm">Active Internships</p>
+                <p className="text-xl font-semibold">42</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow flex items-center space-x-4">
+              <FileTextIcon className="w-8 h-8 text-yellow-500" />
+              <div>
+                <p className="text-gray-500 text-sm">Pending Approvals</p>
+                <p className="text-xl font-semibold">8</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Recent Internship Activities
+              </h2>
+            </div>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Student Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Company
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap">John Doe</td>
+                  <td className="px-6 py-4 whitespace-nowrap">Google</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-green-600">
+                    Active
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 cursor-pointer">
+                    View
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap">Jane Smith</td>
+                  <td className="px-6 py-4 whitespace-nowrap">Microsoft</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-yellow-600">
+                    Pending
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 cursor-pointer">
+                    View
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap">Alice Johnson</td>
+                  <td className="px-6 py-4 whitespace-nowrap">Amazon</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-red-600">
+                    Rejected
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 cursor-pointer">
+                    View
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
     </div>
   );
-}
+};
+
+export default AdminDashboardPage;

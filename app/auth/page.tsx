@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation/internship-lottie.json";
 import { useRouter } from "next/navigation";
-import Toast from "@/components/Toast";
+import Toast from "@/components/global/Toast";
 
 interface BeamsBackgroundProps {
   className?: string;

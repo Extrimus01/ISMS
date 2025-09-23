@@ -43,7 +43,7 @@ const Features: React.FC = () => {
                 />
                 <span
                   className="text-sm sm:text-base md:text-lg font-medium"
-                  style={{ color: "var(--text-big)" }}
+                  style={{ color: "white" }}
                 >
                   {feature}
                 </span>
@@ -61,7 +61,7 @@ const Features: React.FC = () => {
           >
             <h2
               className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 transition-colors duration-500"
-              style={{ color: "var(--text-big)" }}
+              style={{ color: "white" }}
             >
               Your Internship Journey Starts Here
             </h2>
@@ -69,7 +69,7 @@ const Features: React.FC = () => {
               className="group inline-flex items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 w-full sm:w-auto rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--background)] focus:ring-[var(--secondary)]"
               style={{
                 backgroundColor: "var(--secondary)/20",
-                color: "var(--text-big)",
+                color: "white",
               }}
             >
               <div className="flex -space-x-2">
