@@ -69,100 +69,12 @@ const Icon = ({
   </svg>
 );
 
-const icons = {
-  user: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-  lock: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
-  mail: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-  college:
-    "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0v-4m0 4h5m0 0v-4m0 4h5m0 0v-4m-5 4v-4m-5 4v-4m14-8l-7-4-7 4m14 0V5",
-  phone:
-    "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
-};
-
-interface FormInputProps {
-  id: string;
-  type: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  icon: string;
-}
-
-const FormInput: React.FC<FormInputProps> = ({
-  id,
-  type,
-  placeholder,
-  value,
-  onChange,
-  icon,
-}) => (
-  <div className="relative group">
-    <label htmlFor={id} className="sr-only">
-      {placeholder}
-    </label>
-    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
-      <Icon path={icon} />
-    </span>
-    <motion.input
-      suppressHydrationWarning
-      whileFocus={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      id={id}
-      type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg placeholder-slate-500 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all hover:border-slate-600"
-    />
-  </div>
-);
-
-export default function AuthPage({
+const BeamsBackground: React.FC<BeamsBackgroundProps> = ({
   intensity = "strong",
-}: BeamsBackgroundProps) {
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const beamsRef = useRef<Beam[]>([]);
   const animationRef = useRef<number | null>(null);
-
-  const [isRegister, setIsRegister] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    loginUsername: "",
-    loginPassword: "",
-    regFullName: "",
-    regCollege: "",
-    regEmail: "",
-    regPhone: "",
-    regMessage: "",
-  });
-
-  const router = useRouter();
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
-  const showToast = (
-    message: string,
-    type: "success" | "error" = "success"
-  ) => {
-    setToast({ message, type });
-  };
-
-  useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role) {
-      if (role === "admin") router.push("/admin");
-      else if (role === "project_manager") router.push("/pm");
-      else router.push("/student");
-    }
-  }, [router]);
-
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -222,6 +134,103 @@ export default function AuthPage({
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [intensity]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 blur-[15px] block w-full"
+    />
+  );
+};
+
+const icons = {
+  user: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+  lock: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+  mail: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+  college:
+    "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0v-4m0 4h5m0 0v-4m0 4h5m0 0v-4m-5 4v-4m-5 4v-4m14-8l-7-4-7 4m14 0V5",
+  phone:
+    "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
+};
+
+interface FormInputProps {
+  id: string;
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  icon: string;
+}
+
+const FormInput: React.FC<FormInputProps> = ({
+  id,
+  type,
+  placeholder,
+  value,
+  onChange,
+  icon,
+}) => (
+  <div className="relative group">
+    <label htmlFor={id} className="sr-only">
+      {placeholder}
+    </label>
+    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
+      <Icon path={icon} />
+    </span>
+    <motion.input
+      suppressHydrationWarning
+      whileFocus={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      id={id}
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg placeholder-slate-500 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all hover:border-slate-600"
+    />
+  </div>
+);
+
+export default function AuthPage() {
+  const [isRegister, setIsRegister] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    loginUsername: "",
+    loginPassword: "",
+    regFullName: "",
+    regCollege: "",
+    regEmail: "",
+    regPhone: "",
+    regMessage: "",
+  });
+
+  const router = useRouter();
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role) {
+      if (role === "admin") router.push("/admin");
+      else if (role === "project_manager") router.push("/pm");
+      else router.push("/student");
+    }
+  }, [router]);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleInput =
     (field: string) =>
@@ -317,10 +326,7 @@ export default function AuthPage({
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-neutral-950 flex items-center justify-center">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 blur-[15px] block w-full"
-      />
+      <BeamsBackground intensity="strong" />
 
       <motion.div
         className="absolute inset-0 bg-neutral-950/5 overflow-hidden"
