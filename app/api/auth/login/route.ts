@@ -42,14 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userData = {
-      id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-    };
-
-    return NextResponse.json({ success: true, user: userData });
+    return NextResponse.json({ success: true, user: user });
   } catch (err) {
     console.error("Login error:", err);
     return NextResponse.json(

@@ -31,7 +31,7 @@ const navigationItems: NavItem[] = [
     name: "Dashboard",
     icon: BarChart3Icon,
     subItems: [
-      { name: "Overview", path: "#/admin/dashboard/overview" },
+      { name: "Overview", path: "/admin/notification" },
       { name: "Internship Stats", path: "#/admin/dashboard/stats" },
       { name: "Placement Insights", path: "#/admin/dashboard/placements" },
     ],

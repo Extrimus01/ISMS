@@ -100,6 +100,7 @@ export async function POST(req: NextRequest) {
       phone,
       password: hashedPassword,
       role: "student",
+      verified: false,
       createdAt: new Date(),
     });
 
