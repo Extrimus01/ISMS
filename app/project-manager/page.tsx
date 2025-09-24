@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { MenuIcon } from "lucide-react";
-import Sidebar from "@/components/students/Sidebar";
+import Sidebar from "@/components/project-manager/Sidebar";
 
-const StudentDashboardPage: React.FC = () => {
+const ProjectManagerDashboardPage: React.FC = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -49,4 +49,4 @@ const StudentDashboardPage: React.FC = () => {
   );
 };
 
-export default StudentDashboardPage;
+export default ProjectManagerDashboardPage;

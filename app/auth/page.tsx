@@ -6,6 +6,7 @@ import Lottie from "lottie-react";
 import animationData from "@/public/animation/internship-lottie.json";
 import { useRouter } from "next/navigation";
 import Toast from "@/components/global/Toast";
+import { BouncingDots } from "@/components/global/Loader";
 
 interface BeamsBackgroundProps {
   className?: string;
@@ -194,6 +195,7 @@ const FormInput: React.FC<FormInputProps> = ({
 export default function AuthPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [checkingUser, setCheckingUser] = useState(true);
   const [form, setForm] = useState({
     loginUsername: "",
     loginPassword: "",
@@ -218,12 +220,45 @@ export default function AuthPage() {
   };
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role) {
-      if (role === "admin") router.push("/admin");
-      else if (role === "project_manager") router.push("/pm");
-      else router.push("/student");
-    }
+    const checkUser = async () => {
+      const userData = localStorage.getItem("user");
+      if (!userData) {
+        setCheckingUser(false);
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userData);
+
+        if (!user || !user.role) {
+          localStorage.removeItem("user");
+          setCheckingUser(false);
+          return;
+        }
+
+        // Redirect based on role
+        switch (user.role) {
+          case "admin":
+            router.push("/admin");
+            break;
+          case "project_manager":
+            router.push("/project-manager");
+            break;
+          case "student":
+            router.push("/student");
+            break;
+          default:
+            localStorage.removeItem("user");
+            setCheckingUser(false);
+        }
+      } catch (err) {
+        console.error("Invalid user data in localStorage", err);
+        localStorage.removeItem("user");
+        setCheckingUser(false);
+      }
+    };
+
+    checkUser();
   }, [router]);
 
   const [mounted, setMounted] = useState(false);
@@ -278,6 +313,10 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
+    if (!form.loginUsername || !form.loginPassword) {
+      showToast("Please enter both username and password.", "error");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -289,19 +328,21 @@ export default function AuthPage() {
         }),
       });
       const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("role", data.role);
-        if (data.role === "admin") router.push("/admin");
-        else if (data.role === "project_manager") router.push("/pm");
+      if (res.ok && data.user?.role) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (data.user.role === "admin") router.push("/admin");
+        else if (data.user.role === "project_manager") router.push("/project-manager");
         else router.push("/student");
       } else {
-        showToast(data.error || "Login failed", "error");
+        showToast(data.error || "Invalid username or password", "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("Something went wrong.", "error");
+      showToast("Something went wrong. Try again later.", "error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleForgotPassword = async () => {
@@ -323,6 +364,16 @@ export default function AuthPage() {
     }
     setLoading(false);
   };
+
+  if (checkingUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-neutral-950 text-white">
+        <div className="text-center">
+          <BouncingDots />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-neutral-950 flex items-center justify-center">

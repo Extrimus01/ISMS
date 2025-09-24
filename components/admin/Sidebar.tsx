@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, ElementType } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart3Icon,
   BriefcaseIcon,
   ChevronDownIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
   LibraryIcon,
   LogOutIcon,
   SearchIcon,
@@ -14,6 +12,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import ThemeToggle from "../global/ThemeToggle";
+import { useRouter } from "next/navigation";
 
 export interface SubNavItem {
   name: string;
@@ -22,7 +21,7 @@ export interface SubNavItem {
 
 export interface NavItem {
   name: string;
-  icon: ElementType;
+  icon: React.ElementType;
   path?: string;
   subItems?: SubNavItem[];
 }
@@ -77,22 +76,19 @@ const navigationItems: NavItem[] = [
 interface SidebarProps {
   isMobile: boolean;
   isMobileMenuOpen: boolean;
-  isExpanded: boolean;
   setIsMobileMenuOpen: (isOpen: boolean) => void;
-  setIsSidebarExpanded: (isExpanded: boolean) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   isMobile,
   isMobileMenuOpen,
-  isExpanded,
-  setIsSidebarExpanded,
   setIsMobileMenuOpen,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
   const [activeSubItem, setActiveSubItem] = useState<string>(
     "#/admin/dashboard/overview"
   );
+  const router = useRouter();
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -108,11 +104,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleLogout = () => {
-    console.log("User logged out");
-    window.location.hash = "#/auth";
+    localStorage.removeItem("user");
+    router.push("/auth");
   };
 
-  const effectiveExpanded = isExpanded || isMobileMenuOpen;
+  const sidebarWidthClass = isMobile
+    ? isMobileMenuOpen
+      ? "translate-x-0 w-64"
+      : "-translate-x-full w-64"
+    : "w-64";
 
   return (
     <>
@@ -124,17 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 border-r border-gray-200 dark:border-gray-800 shadow-lg z-40
-        transform transition-transform duration-300 ease-in-out
-        ${
-          isMobile
-            ? isMobileMenuOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-            : ""
-        }
-        ${!isMobile ? (effectiveExpanded ? "w-64" : "w-20") : "w-64"}
-        `}
+        className={`fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 border-r border-gray-200 dark:border-gray-800 shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${sidebarWidthClass}`}
       >
         <div className="flex items-center justify-between h-16 border-b border-gray-200 dark:border-gray-800 px-4 shrink-0">
           <div className="flex items-center overflow-hidden">
@@ -143,44 +133,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               width={32}
               height={32}
               src="/logo.png"
-              className={`rounded-full object-cover transition-transform duration-300 flex-shrink-0 ${
-                effectiveExpanded ? "scale-100" : "scale-90"
-              }`}
+              className="rounded-full object-cover flex-shrink-0"
             />
-            <span
-              className={`ml-3 text-lg font-bold whitespace-nowrap transition-opacity duration-300 ${
-                effectiveExpanded ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              MRSAC Admin
+            <span className="ml-3 text-lg font-bold whitespace-nowrap">
+              Admin Panel
             </span>
-          </div>
-          {!isMobile && (
-            <button
-              onClick={() => setIsSidebarExpanded(!isExpanded)}
-              className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-            >
-              {isExpanded ? (
-                <ChevronsLeftIcon className="w-4 h-4" />
-              ) : (
-                <ChevronsRightIcon className="w-4 h-4" />
-              )}
-            </button>
-          )}
-        </div>
-
-        <div
-          className={`px-4 pt-4 pb-2 transition-opacity duration-200 ${
-            effectiveExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-            <SearchIcon className="w-4 h-4 mr-2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="bg-transparent outline-none text-sm w-full placeholder-gray-500 dark:placeholder-gray-400"
-            />
           </div>
         </div>
 
@@ -192,36 +149,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className="group flex items-center w-full p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200 text-left"
               >
                 <item.icon className="w-5 h-5 mr-4 shrink-0 text-gray-500 dark:text-gray-400" />
-                <span
-                  className={`flex-1 text-sm font-medium whitespace-nowrap transition-opacity duration-200 ${
-                    effectiveExpanded
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }`}
-                >
+                <span className="flex-1 text-sm font-medium whitespace-nowrap">
                   {item.name}
                 </span>
                 {item.subItems && (
                   <ChevronDownIcon
                     className={`w-4 h-4 transition-transform duration-300 ease-in-out ${
                       openMenu === item.name ? "rotate-180" : ""
-                    } ${effectiveExpanded ? "opacity-100" : "opacity-0"}`}
+                    }`}
                   />
-                )}
-                {!effectiveExpanded && (
-                  <span className="absolute left-full ml-4 px-2 py-1 text-sm bg-gray-800 text-white rounded-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap transition-all duration-300 z-50">
-                    {item.name}
-                  </span>
                 )}
               </button>
 
-              {effectiveExpanded && (
-                <div
-                  className={`mt-1 overflow-hidden transition-[max-height] duration-300 ${
-                    openMenu === item.name ? "max-h-96" : "max-h-0"
-                  } pl-8 pr-2`}
-                >
-                  {item.subItems?.map((subItem) => (
+              {item.subItems && openMenu === item.name && (
+                <div className="mt-1 pl-8 pr-2">
+                  {item.subItems.map((subItem) => (
                     <a
                       key={subItem.name}
                       href={subItem.path}
@@ -237,7 +179,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             ? "bg-sky-500"
                             : "bg-transparent"
                         }`}
-                      ></span>
+                      />
                       {subItem.name}
                     </a>
                   ))}
@@ -247,26 +189,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 shrink-0 flex flex-col space-y-3">
-          <ThemeToggle />
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 shrink-0 flex content-center items-center space-x-3">
           <button
             onClick={handleLogout}
             className="group flex items-center w-full p-3 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative"
           >
             <LogOutIcon className="w-5 h-5 mr-4" />
-            <span
-              className={`whitespace-nowrap transition-opacity duration-200 ${
-                effectiveExpanded ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              Logout
-            </span>
-            {!effectiveExpanded && (
-              <span className="absolute left-full ml-4 px-2 py-1 text-sm bg-gray-800 text-white rounded-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap transition-all duration-300">
-                Logout
-              </span>
-            )}
+            <span className="whitespace-nowrap">Logout</span>
           </button>
+          <ThemeToggle />
         </div>
       </aside>
     </>

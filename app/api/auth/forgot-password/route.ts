@@ -11,6 +11,37 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const generateTempPasswordEmail = (fullName: string, tempPassword: string) => {
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #2a3f54;">ISMS Portal – Temporary Password for Account Access</h2>
+
+        <p>Dear <b>${fullName}</b>,</p>
+
+        <p>
+          This is a notification from the <b>ISMS Internship Portal</b>, developed for the 
+          <b>MRSAC internship program</b>. Your temporary password is provided below; please use it 
+          to log into your account. For security reasons, you’ll be prompted to set a new password 
+          after your first login.
+        </p>
+
+        <p>
+          <b>Temporary Password:</b> <span style="background-color:#f0f0f0; padding:4px 8px; border-radius:4px;">${tempPassword}</span>
+        </p>
+
+        <p>
+          If you need any assistance or have questions, the ISMS support team is here to help. 
+          Wishing you a smooth and successful internship journey with MRSAC.
+        </p>
+
+        <p>Best regards,<br/>
+        <b>ISMS Support Team</b></p>
+      </body>
+    </html>
+  `;
+};
+
 const generateTempPassword = (length = 10) => {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
@@ -47,10 +78,8 @@ export async function POST(req: NextRequest) {
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
-      subject: "Your ISMS Temporary Password",
-      html: `<p>Hello ${user.fullName},</p>
-             <p>Your temporary password is: <b>${tempPassword}</b></p>
-             <p>Please log in and change your password immediately.</p>`,
+      subject: "ISMS Portal – Temporary Password for Account Access",
+      html: generateTempPasswordEmail(user.fullName, tempPassword),
     });
 
     return NextResponse.json({

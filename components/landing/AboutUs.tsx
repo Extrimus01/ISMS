@@ -112,17 +112,8 @@ const AboutUs: React.FC = () => {
                     exit={{ scale: 0.8, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto 
-                         bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl"
+                         bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl no-scrollbar"
                   >
-                    <button
-                      onClick={() => setIsOpen(false)}
-                      className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 
-                           dark:hover:text-gray-200 transition"
-                      aria-label="Close modal"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-
                     <h2 className="text-2xl font-bold text-blue-600 mb-4">
                       What is MRSAC?
                     </h2>
@@ -273,6 +264,12 @@ const AboutUs: React.FC = () => {
                         </tbody>
                       </table>
                     </div>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Close
+                    </button>
                   </motion.div>
                 </motion.div>
               )}

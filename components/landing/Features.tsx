@@ -1,4 +1,5 @@
 import { CheckCircleIcon, CompassIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const features = [
@@ -9,6 +10,7 @@ const features = [
 ];
 
 const Features: React.FC = () => {
+  const router = useRouter();
   return (
     <section
       className="relative w-full py-20 sm:py-24 px-4 sm:px-6 lg:px-8 flex items-center justify-center bg-cover bg-center transition-all duration-500"
@@ -70,6 +72,9 @@ const Features: React.FC = () => {
               style={{
                 backgroundColor: "var(--secondary)/20",
                 color: "white",
+              }}
+              onClick={() => {
+                router.push("/admin");
               }}
             >
               <div className="flex -space-x-2">

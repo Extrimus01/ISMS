@@ -23,7 +23,7 @@ export default function AdminLayout({
     try {
       const user = JSON.parse(userData);
 
-      if (!user.role || user.role !== "admin") {
+      if (!user.role || user.role !== "project-manager") {
         router.replace("/unauthorized");
         return;
       }

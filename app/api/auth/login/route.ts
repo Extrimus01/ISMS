@@ -4,8 +4,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { username, password } = body;
+    const { username, password } = await req.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -14,15 +13,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const normalizedUsername = username.trim().toLowerCase();
+
     const client = await clientPromise;
     const db = client.db("isms");
+    const users = db.collection("users");
 
-    const user = await db.collection("users").findOne({
-      $or: [{ email: username }, { username }],
+    const user = await users.findOne({
+      $or: [{ email: normalizedUsername }, { username: normalizedUsername }],
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "User record is incomplete" },
+        { status: 500 }
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -40,9 +49,9 @@ export async function POST(req: NextRequest) {
       role: user.role,
     };
 
-    return NextResponse.json({ success: true, ...userData });
+    return NextResponse.json({ success: true, user: userData });
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

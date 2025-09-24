@@ -29,30 +29,46 @@ export interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    name: "Dashboard Types",
+    name: "Dashboard",
     icon: BarChart3Icon,
     subItems: [
-      { name: "Overview", path: "#" },
-      { name: "Executive Summary", path: "#" },
-      { name: "Operations", path: "#" },
-      { name: "Financial", path: "#" },
+      { name: "Overview", path: "#/project-manager/dashboard/overview" },
+      { name: "Project Stats", path: "#/project-manager/dashboard/stats" },
+      { name: "Task Progress", path: "#/project-manager/dashboard/tasks" },
     ],
   },
   {
-    name: "Report Summaries",
+    name: "Projects",
+    icon: BriefcaseIcon,
+    subItems: [
+      { name: "All Projects", path: "#/project-manager/projects" },
+      { name: "Add New Project", path: "#/project-manager/projects/add" },
+      { name: "Project Reports", path: "#/project-manager/projects/reports" },
+    ],
+  },
+  {
+    name: "Tasks",
     icon: FileTextIcon,
     subItems: [
-      { name: "Weekly Reports", path: "#" },
-      { name: "Monthly Insights", path: "#" },
-      { name: "Quarterly Analysis", path: "#" },
+      { name: "My Tasks", path: "#/project-manager/tasks" },
+      { name: "Assign Tasks", path: "#/project-manager/tasks/assign" },
+      { name: "Task Reports", path: "#/project-manager/tasks/reports" },
     ],
   },
   {
-    name: "Business Intelligence",
+    name: "Team",
+    icon: UsersIcon,
+    subItems: [
+      { name: "Team Members", path: "#/project-manager/team" },
+      { name: "Assign Roles", path: "#/project-manager/team/roles" },
+    ],
+  },
+  {
+    name: "System Settings",
     icon: SettingsIcon,
     subItems: [
-      { name: "Performance Metrics", path: "#" },
-      { name: "Predictive Analytics", path: "#" },
+      { name: "Notifications", path: "#/project-manager/settings/notifications" },
+      { name: "Preferences", path: "#/project-manager/settings/preferences" },
     ],
   },
 ];
@@ -70,15 +86,13 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
   const [activeSubItem, setActiveSubItem] = useState<string>(
-    "#/student/dashboard/overview"
+    "#/project-manager/dashboard/overview"
   );
   const router = useRouter();
 
   useEffect(() => {
     const handleHashChange = () => {
-      setActiveSubItem(
-        window.location.hash || "#/student/dashboard/overview"
-      );
+      setActiveSubItem(window.location.hash || "#/project-manager/dashboard/overview");
     };
     window.addEventListener("hashchange", handleHashChange);
     handleHashChange();
@@ -122,7 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className="rounded-full object-cover flex-shrink-0"
             />
             <span className="ml-3 text-lg font-bold whitespace-nowrap">
-              Student Panel
+              Manager Panel
             </span>
           </div>
         </div>
