@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Update user with verification info
     await users.updateOne(
       { email: normalizedEmail },
       {

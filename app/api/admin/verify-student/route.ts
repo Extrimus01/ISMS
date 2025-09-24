@@ -12,15 +12,14 @@ async function generateOfferLetterPdf(
   projectTitle: string,
   startDate: string,
   endDate: string,
-  imageBytes: Uint8Array // pass logo image bytes here
+  imageBytes: Uint8Array 
 ): Promise<Buffer> {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595.28, 841.89]); // A4
+  const page = pdfDoc.addPage([595.28, 841.89]); 
   const { height } = page.getSize();
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // --- Embed the image ---
   let image;
   try {
     image = await pdfDoc.embedPng(imageBytes);
@@ -30,8 +29,8 @@ async function generateOfferLetterPdf(
 
   const imgWidth = 120;
   const imgHeight = (image.height / image.width) * imgWidth;
-  const imgX = (page.getWidth() - imgWidth) / 2; // center horizontally
-  const imgY = height - 120; // adjust vertical placement
+  const imgX = (page.getWidth() - imgWidth) / 2;
+  const imgY = height - 120; 
 
   page.drawImage(image, {
     x: imgX,
@@ -40,7 +39,6 @@ async function generateOfferLetterPdf(
     height: imgHeight,
   });
 
-  // Title (placed just below image)
   page.drawText("To Whom So Ever It May Concern", {
     x: 50,
     y: imgY - 40,
@@ -49,7 +47,6 @@ async function generateOfferLetterPdf(
     color: rgb(0, 0, 0),
   });
 
-  // Body text
   const text = `Subject: Offer of Internship for Mr./Ms. ${studentName}.
 
 This is to certify that ${studentName} offered an internship at Maharashtra 
@@ -79,7 +76,6 @@ Thank You`;
   return Buffer.from(pdfBytes);
 }
 
-// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -121,7 +117,6 @@ export async function POST(req: NextRequest) {
       );
       const pdfBase64 = pdfBuffer.toString("base64");
 
-      // Update DB
       await users.updateOne(
         { _id: new ObjectId(userId) },
         {
@@ -138,7 +133,6 @@ export async function POST(req: NextRequest) {
         }
       );
 
-      // Send email with attachment
       await transporter.sendMail({
         from: process.env.SMTP_FROM,
         to: existingUser.email,

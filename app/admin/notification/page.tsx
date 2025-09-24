@@ -102,7 +102,7 @@ const AdminPendingVerifications: React.FC = () => {
     userName?: string
   ) => {
     if (!doc) return null;
-    const isImage = doc.startsWith("/9j/") || doc.startsWith("iVBOR"); // jpg/png
+    const isImage = doc.startsWith("/9j/") || doc.startsWith("iVBOR");
     if (isImage) {
       return (
         <img
@@ -170,7 +170,6 @@ const AdminPendingVerifications: React.FC = () => {
                 )}
               </div>
 
-              {/* Verification Form */}
               {selectedUserId === user._id ? (
                 <div className="mt-4 space-y-2">
                   <input

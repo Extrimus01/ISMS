@@ -236,7 +236,6 @@ export default function AuthPage() {
           return;
         }
 
-        // Redirect based on role
         switch (user.role) {
           case "admin":
             router.push("/admin");

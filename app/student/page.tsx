@@ -69,7 +69,6 @@ const StudentDashboardPage: React.FC = () => {
     sentinelRefs.current[i] = el;
   };
 
-  // Scroll-activated timeline
   useEffect(() => {
     const handleScroll = () => {
       let bestIndex = 0;
@@ -78,7 +77,6 @@ const StudentDashboardPage: React.FC = () => {
         if (!node) return;
         const rect = node.getBoundingClientRect();
 
-        // If the top of this section is above 1/3 of viewport height, consider it active
         if (rect.top < window.innerHeight / 3) {
           bestIndex = i;
         }
@@ -88,11 +86,10 @@ const StudentDashboardPage: React.FC = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // initial check
+    handleScroll(); 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mobile detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -100,7 +97,6 @@ const StudentDashboardPage: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Load user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -168,7 +164,6 @@ const StudentDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Verification Timeline */}
           {!user?.verified ? (
             <section className="py-16 max-w-4xl mx-auto">
               <div className="relative space-y-16">
@@ -186,7 +181,6 @@ const StudentDashboardPage: React.FC = () => {
                     >
                       <div className="absolute left-5 md:left-1/2 -translate-x-1/2 top-0 md:top-1/2 md:-translate-y-1/2 w-4 h-4 rounded-full bg-white dark:bg-gray-950 border-2 border-gray-300 dark:border-gray-700 z-10" />
 
-                      {/* Left sticky panel */}
                       <div className="md:sticky md:top-24 flex items-center gap-4 md:w-64 md:justify-end md:text-right pr-8">
                         <div
                           className={`p-3 rounded-full flex items-center justify-center transition-transform duration-500 ${
