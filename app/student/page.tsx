@@ -34,14 +34,14 @@ const StudentDashboardPage: React.FC = () => {
               <MenuIcon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
             </button>
             <h1 className="ml-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Project Manager Dashboard
+              Student Dashboard
             </h1>
           </div>
         )}
 
         <div className="flex-1 p-4 overflow-auto">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            Welcome to the Project Manager Dashboard
+            Welcome to the Student Dashboard
           </h2>
         </div>
       </div>
