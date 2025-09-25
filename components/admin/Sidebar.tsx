@@ -7,7 +7,6 @@ import {
   ChevronDownIcon,
   LibraryIcon,
   LogOutIcon,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
@@ -31,44 +30,43 @@ const navigationItems: NavItem[] = [
     name: "Dashboard",
     icon: BarChart3Icon,
     subItems: [
-      { name: "Overview", path: "/admin/notification" },
-      { name: "Internship Stats", path: "#/admin/dashboard/stats" },
-      { name: "Placement Insights", path: "#/admin/dashboard/placements" },
+      { name: "Pending Verification", path: "/admin/notification" },
+      { name: "Internship Stats", path: "/admin/dashboard/stats" },
+      { name: "Placement Insights", path: "/admin/dashboard/placements" },
+    ],
+  },
+  {
+    name: "Project Manager",
+    icon: BriefcaseIcon,
+    subItems: [
+      { name: "All Managers", path: "/admin/project-manager" },
+      { name: "Add New Manager", path: "/admin/project-manager/create" },
     ],
   },
   {
     name: "Student Management",
     icon: UsersIcon,
     subItems: [
-      { name: "All Students", path: "#/admin/students" },
-      { name: "Approve Registrations", path: "#/admin/students/approve" },
-      { name: "Student Reports", path: "#/admin/students/reports" },
+      { name: "All Students", path: "/admin/students" },
+      { name: "Approve Registrations", path: "/admin/students/approve" },
+      { name: "Student Reports", path: "/admin/students/reports" },
     ],
   },
   {
-    name: "Company Management",
+    name: "Project Management",
     icon: LibraryIcon,
     subItems: [
-      { name: "All Companies", path: "#/admin/companies" },
-      { name: "Add New Company", path: "#/admin/companies/add" },
-      { name: "Company Reports", path: "#/admin/companies/reports" },
-    ],
-  },
-  {
-    name: "Internship Management",
-    icon: BriefcaseIcon,
-    subItems: [
-      { name: "Active Internships", path: "#/admin/internships/active" },
-      { name: "Pending Approvals", path: "#/admin/internships/pending" },
-      { name: "Completed Internships", path: "#/admin/internships/completed" },
+      { name: "All Projects", path: "/admin/projects" },
+      { name: "Add New Project", path: "/admin/projects/create" },
+      { name: "Project Reports", path: "/admin/project/reports" },
     ],
   },
   {
     name: "System Settings",
     icon: SettingsIcon,
     subItems: [
-      { name: "Roles & Permissions", path: "#/admin/settings/roles" },
-      { name: "Notification Settings", path: "#/admin/settings/notifications" },
+      { name: "Roles & Permissions", path: "/admin/settings/roles" },
+      { name: "Notification Settings", path: "/admin/settings/notifications" },
     ],
   },
 ];
@@ -86,13 +84,13 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
   const [activeSubItem, setActiveSubItem] = useState<string>(
-    "#/admin/dashboard/overview"
+    "/admin/notificaition"
   );
   const router = useRouter();
 
   useEffect(() => {
     const handleHashChange = () => {
-      setActiveSubItem(window.location.hash || "#/admin/dashboard/overview");
+      setActiveSubItem(window.location.hash || "/admin/notification");
     };
     window.addEventListener("hashchange", handleHashChange);
     handleHashChange();
