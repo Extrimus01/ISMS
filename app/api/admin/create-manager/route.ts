@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const generateWelcomeEmail = (
+const generateManagerEmail = (
   fullName: string,
   email: string,
   password: string
@@ -29,19 +29,19 @@ const generateWelcomeEmail = (
   return `
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <h2 style="color: #2a3f54;">Welcome to ISMS Internship Portal – Your Account Details</h2>
+        <h2 style="color: #2a3f54;">ISMS Portal – Project Manager Account Created</h2>
 
         <p>Dear <b>${fullName}</b>,</p>
 
         <p>
-          Warm greetings from the <b>Maharashtra Remote Sensing Application Center (MRSAC)</b>.
+          We are pleased to inform you that your <b>Project Manager account</b> has been successfully created on the 
+          <b>ISMS Internship Management System</b>, developed for the Maharashtra Remote Sensing Application Center (MRSAC).
         </p>
 
         <p>
-          Your account has been successfully created on the <b>ISMS Internship Management System</b>, 
-          the official portal developed for MRSAC internship programs. You can now log in, explore 
-          available roles within the company, apply for internships, and stay updated with important 
-          alerts and notifications related to your application journey.
+          This account has been set up and assigned to you by the company to facilitate project oversight, intern 
+          management, and collaborative coordination with HR. You now have access to monitor intern progress, assign 
+          project tasks, and support the success of our internship program.
         </p>
 
         <p>
@@ -51,17 +51,15 @@ const generateWelcomeEmail = (
         </p>
 
         <p>
-          Please use these details to access your profile. For your security, kindly update your 
-          password after your first login.
+          For your security, please change your password after your first login. Should you have any questions or 
+          require assistance, the company’s support resources are available to help.
         </p>
 
         <p>
-          We look forward to supporting your internship journey and wish you success as you begin 
-          your experience with MRSAC through the ISMS portal.
+          Welcome to the ISMS portal, and thank you for your leadership in our projects.
         </p>
 
-        <p>Best regards,<br/>
-        <b>ISMS Support Team</b></p>
+        <p>Best regards,<br/>MRSAC (on behalf of Company Management)</p>
       </body>
     </html>
   `;
@@ -69,7 +67,7 @@ const generateWelcomeEmail = (
 
 export async function POST(req: NextRequest) {
   try {
-    const { fullName, college, email, phone } = await req.json();
+    const { fullName, email, phone } = await req.json();
     if (!email || !fullName) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -95,11 +93,10 @@ export async function POST(req: NextRequest) {
 
     const result = await users.insertOne({
       fullName,
-      college,
       email: normalizedEmail,
       phone,
       password: hashedPassword,
-      role: "student",
+      role: "project_manager",
       verified: false,
       createdAt: new Date(),
     });
@@ -108,23 +105,23 @@ export async function POST(req: NextRequest) {
       await transporter.sendMail({
         from: `"ISMS" <${process.env.SMTP_USER}>`,
         to: normalizedEmail,
-        subject: "Welcome to ISMS Internship Portal – Your Account Details",
-        html: generateWelcomeEmail(fullName, normalizedEmail, password),
+        subject: "ISMS Portal – Project Manager Account Created",
+        html: generateManagerEmail(fullName, normalizedEmail, password),
       });
     } catch (mailErr) {
       console.error("Email send failed:", mailErr);
       return NextResponse.json({
-        message: "User created, but email failed to send",
+        message: "Manager created, but email failed to send",
         userId: result.insertedId,
       });
     }
 
     return NextResponse.json({
-      message: "User created successfully",
+      message: "Project Manager created successfully",
       userId: result.insertedId,
     });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Manager creation error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
