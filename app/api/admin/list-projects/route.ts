@@ -6,7 +6,6 @@ export async function GET() {
     const client = await clientPromise;
     const db = client.db("isms");
 
-    Join projects with manager details
     const projects = await db
       .collection("projects")
       .aggregate([
