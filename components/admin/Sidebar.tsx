@@ -58,7 +58,7 @@ const navigationItems: NavItem[] = [
     subItems: [
       { name: "All Projects", path: "/admin/projects" },
       { name: "Add New Project", path: "/admin/projects/create" },
-      { name: "Project Reports", path: "/admin/project/reports" },
+      { name: "Assign Intern", path: "/admin/projects/assign" },
     ],
   },
   {

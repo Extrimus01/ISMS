@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 export async function GET() {
   try {
@@ -18,6 +19,16 @@ export async function GET() {
           },
         },
         { $unwind: "$manager" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "students",
+            foreignField: "_id",
+            as: "students",
+          },
+        },
+
         {
           $project: {
             name: 1,
@@ -27,6 +38,8 @@ export async function GET() {
             createdAt: 1,
             "manager.fullName": 1,
             "manager.email": 1,
+            "students.fullName": 1,
+            "students.email": 1,
           },
         },
         { $sort: { createdAt: -1 } },
