@@ -48,11 +48,11 @@ const navigationItems: NavItem[] = [
     ],
   },
   {
-    name: "Business Intelligence",
+    name: "Settings",
     icon: SettingsIcon,
     subItems: [
-      { name: "Performance Metrics", path: "#" },
-      { name: "Predictive Analytics", path: "#" },
+      { name: "Profile", path: "/student/profile" },
+      { name: "Attendence", path: "/student/attendence" },
     ],
   },
 ];

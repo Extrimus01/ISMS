@@ -1,52 +1,96 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MenuIcon } from "lucide-react";
-import Sidebar from "@/components/project-manager/Sidebar";
 
-const ProjectManagerDashboardPage: React.FC = () => {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+interface Student {
+  _id: string;
+  fullName: string;
+  email: string;
+}
+
+interface Project {
+  _id: string;
+  name: string;
+  description: string;
+  deadline?: string;
+  status: string;
+  assignedStudents: Student[];
+}
+
+const ManagerProjectsPage: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const userData = localStorage.getItem("user");
+    if (!userData) return;
+
+    try {
+      const user = JSON.parse(userData);
+      if (user.role === "project_manager") {
+        setEmail(user.email);
+      }
+    } catch (err) {
+      console.error("Invalid user data", err);
+    }
   }, []);
 
+  useEffect(() => {
+    if (!email) return;
+
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch(`/api/project-manager/projects?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (res.ok) setProjects(data);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [email]);
+
+  if (loading) return <p className="p-6 text-center">Loading projects...</p>;
+  if (!email) return <p className="p-6 text-center">Unable to determine manager email.</p>;
+  if (projects.length === 0) return <p className="p-6 text-center">No projects assigned.</p>;
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar
-        isMobile={isMobile}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-      />
+    <div className="max-w-5xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-200">
+        My Projects
+      </h2>
 
-      <div className="flex-1 flex flex-col">
-        {isMobile && (
-          <div className="flex items-center h-16 px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <MenuIcon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-            </button>
-            <h1 className="ml-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Project Manager Dashboard
-            </h1>
+      {projects.map((project) => (
+        <div key={project._id} className="mb-6 p-4 border rounded-md border-slate-300 dark:border-slate-700">
+          <h3 className="text-xl font-semibold mb-2 text-slate-800 dark:text-slate-200">{project.name}</h3>
+          <p className="mb-2 text-slate-600 dark:text-slate-300">{project.description}</p>
+          <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
+            Deadline: {project.deadline ? new Date(project.deadline).toLocaleDateString("en-GB") : "—"}
+          </p>
+          <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">Status: {project.status}</p>
+
+          <div>
+            <strong className="text-slate-700 dark:text-slate-200">Assigned Students:</strong>
+            {project.assignedStudents.length > 0 ? (
+              <ul className="list-disc list-inside text-sm text-slate-600 dark:text-slate-300">
+                {project.assignedStudents.map((s) => (
+                  <li key={s._id}>
+                    {s.fullName} ({s.email})
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-500 dark:text-slate-400">No students assigned.</p>
+            )}
           </div>
-        )}
-
-        <div className="flex-1 p-4 overflow-auto">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            Welcome to the Project Manager Dashboard
-          </h2>
         </div>
-      </div>
+      ))}
     </div>
   );
 };
 
-export default ProjectManagerDashboardPage;
+export default ManagerProjectsPage;

@@ -1,0 +1,31 @@
+{
+    "_id": {
+        "$oid": "68d425fe112b49c433f1d695"
+    },
+    "fullName": "Yash Gajbhiye",
+    "college": "NIT",
+    "email": "yashgajbhiye03@gmail.com",
+    "phone": "7218633615",
+    "password": "$2b$10$l.omnSXS0WdzbEtRSEYnVOrpcWnd1aLnyvGV7uba345OJXsRqPyuC",
+    "role": "student",
+    "verified": true,
+    "createdAt": {
+        "$date": {
+            "$numberLong": "1758733822028"
+        }
+    },
+    "course": "cs",
+   "verifiedAt": {
+        "$date": {
+            "$numberLong": "1758754247439"
+        }
+    },
+    "year": "1",
+    "interviewDate": "2025-10-02",
+    "interviewSlot": "11:30 AM - 12:30 PM",
+    "internship": {
+        "projectTitle": "Internship Platform",
+        "startDate": "2025-09-25",
+        "endDate": "2025-12-25"
+    }
+}

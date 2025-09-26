@@ -65,6 +65,7 @@ const navigationItems: NavItem[] = [
     name: "System Settings",
     icon: SettingsIcon,
     subItems: [
+      { name: "Profile", path: "/admin/profile" },
       { name: "Roles & Permissions", path: "/admin/settings/roles" },
       { name: "Notification Settings", path: "/admin/settings/notifications" },
     ],

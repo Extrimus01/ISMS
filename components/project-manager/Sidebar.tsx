@@ -59,13 +59,14 @@ const navigationItems: NavItem[] = [
     icon: UsersIcon,
     subItems: [
       { name: "Teams", path: "/project-manager/team" },
-      { name: "Attendance", path: "/project-manager/team/roles" },
+      { name: "Attendance", path: "/project-manager/attendance" },
     ],
   },
   {
     name: "System Settings",
     icon: SettingsIcon,
     subItems: [
+      { name: "Profile", path: "/project-manager/profile" },
       { name: "Notifications", path: "/project-manager/settings/notifications" },
       { name: "Preferences", path: "/project-manager/settings/preferences" },
     ],
