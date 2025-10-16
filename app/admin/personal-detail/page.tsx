@@ -2,10 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-interface PageProps {
-  params: { id: string };
-}
-
 interface AdminDetails {
   _id: string;
   fullName: string;
@@ -16,7 +12,7 @@ interface AdminDetails {
   createdAt?: string;
 }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function AdminPage() {
   const [admin, setAdmin] = useState<AdminDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,12 +20,26 @@ export default function Page({ params }: { params: { id: string } }) {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) {
+      setError("No logged-in user found");
+      setLoading(false);
+      return;
+    }
+
+    const parsedUser = JSON.parse(storedUser);
+    const adminId = parsedUser._id;
+
+    if (!adminId) {
+      setError("Admin ID not found");
+      setLoading(false);
+      return;
+    }
+
     async function fetchAdmin() {
       try {
         setLoading(true);
-        setError("");
-
-        const res = await fetch(`/api/admin/${params.id}`);
+        const res = await fetch(`/api/admin/${adminId}`);
         if (!res.ok) {
           const errData = await res.json();
           throw new Error(errData.error || "Failed to load admin details");
@@ -38,14 +48,14 @@ export default function Page({ params }: { params: { id: string } }) {
         const data: AdminDetails = await res.json();
         setAdmin(data);
       } catch (err: any) {
-        setError(err.message || "An unexpected error occurred");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     }
 
-    if (params.id) fetchAdmin();
-  }, [params.id]);
+    fetchAdmin();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -80,7 +90,7 @@ export default function Page({ params }: { params: { id: string } }) {
       setAdmin(updatedAdmin);
       setSuccess("Details updated successfully!");
     } catch (err: any) {
-      setError(err.message || "Error updating admin details");
+      setError(err.message);
     } finally {
       setSaving(false);
     }
