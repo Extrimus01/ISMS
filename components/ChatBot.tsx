@@ -122,7 +122,7 @@ export default function Chatbot() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-0 sm:p-3 space-y-2 text-sm">
+          <div className="flex-1 overflow-y-auto p-0 sm:p-3 space-y-2 text-sm bg-white">
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -154,11 +154,11 @@ export default function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="flex border-t border-white/20 dark:border-black/30 p-1 sm:p-2 bg-white/10 dark:bg-black/20 backdrop-blur-md">
+          <div className="flex border-t border-white/20 dark:border-black/30 p-1 sm:p-2 bg-white/10 dark:bg-black/20 backdrop-blur-md bg-white">
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 glass-input text-sm focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 rounded-lg px-2 py-1"
+              className="flex-1 glass-input text-sm focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 rounded-lg px-2 py-1 bg-white"
               placeholder="Ask your question..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
