@@ -115,13 +115,13 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {modalOpen && (
-        // <ProjectModal
-        //   project={editProject}
-        //   onClose={() => setModalOpen(false)}
-        //   onSave={fetchProjects}
-        // />
-      )}
+      {/* {modalOpen && (
+        <ProjectModal
+          project={editProject}
+          onClose={() => setModalOpen(false)}
+          onSave={fetchProjects}
+        />
+      )} */}
     </div>
   );
 }
