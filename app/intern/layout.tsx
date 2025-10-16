@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BouncingDots } from "@/components/global/Loader";
-import Sidebar from "@/components/students/Sidebar";
+import Sidebar from "@/components/intern/Sidebar";
 import { MenuIcon } from "lucide-react";
 
 import type React from "react";

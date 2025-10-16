@@ -9,7 +9,7 @@ import {
   Package,
   CheckCircle,
 } from "lucide-react";
-import Sidebar from "@/components/students/Sidebar";
+import Sidebar from "@/components/intern/Sidebar";
 import { useRouter } from "next/navigation";
 
 interface User {

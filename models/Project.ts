@@ -23,8 +23,8 @@ export interface IProject {
   description: string;
   manager: mongoose.Types.ObjectId;
   interns: (typeof internAssignmentSchema)[];
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;   
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;

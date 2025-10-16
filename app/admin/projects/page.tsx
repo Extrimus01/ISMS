@@ -1,99 +1,112 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-
-interface Student {
-  _id: string;
-  fullName: string;
-  email: string;
-}
+import { useEffect, useState } from "react";
+import ProjectModal from "@/components/admin/ProjectModels";
+import Toast from "@/components/global/Toast";
 
 interface Project {
   _id: string;
-  name: string;
+  title: string;
   description: string;
-  deadline?: string;
-  status: string;
-  manager: {
-    fullName: string;
-    email: string;
-  };
-  students: Student[];
+  manager: { _id: string; fullName: string };
+  interns: { _id: string; fullName: string }[];
+  startDate?: string;
+  endDate?: string;
+  isActive: boolean;
 }
 
-const ProjectListPage: React.FC = () => {
+export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editProject, setEditProject] = useState<Project | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/project");
+      const data: Project[] = await res.json();
+      setProjects(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/admin/list-projects");
-        const data = await res.json();
-        console.log(data);
-        if (res.ok) setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProjects();
   }, []);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this project?")) return;
+    try {
+      const res = await fetch(`/api/project?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setToast({ message: "Project deleted successfully", type: "success" });
+        fetchProjects();
+      } else {
+        throw new Error(data.error || "Failed to delete");
+      }
+    } catch (err: any) {
+      setToast({ message: err.message, type: "error" });
+    }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-200">
-        Projects
-      </h2>
+    <div className="p-6">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold">Projects</h1>
+        <button
+          onClick={() => { setEditProject(null); setModalOpen(true); }}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Create Project
+        </button>
+      </div>
 
       {loading ? (
-        <p>Loading projects...</p>
-      ) : projects.length === 0 ? (
-        <p>No projects found.</p>
+        <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-slate-300 dark:border-slate-700">
-            <thead>
-              <tr className="bg-slate-100 dark:bg-slate-800">
-                <th className="border px-4 py-2">Project Name</th>
-                <th className="border px-4 py-2">Manager</th>
-                <th className="border px-4 py-2">Deadline</th>
-                <th className="border px-4 py-2">Status</th>
-                <th className="border px-4 py-2">Assigned Students</th>
+          <table className="w-full border border-gray-300 rounded">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 border">Title</th>
+                <th className="p-2 border">Manager</th>
+                <th className="p-2 border">Interns</th>
+                <th className="p-2 border">Start Date</th>
+                <th className="p-2 border">End Date</th>
+                <th className="p-2 border">Actions</th>
               </tr>
             </thead>
             <tbody>
               {projects.map((p) => (
-                <tr
-                  key={p._id}
-                  className="text-center hover:bg-slate-50 dark:hover:bg-slate-800"
-                >
-                  <td className="border px-4 py-2 font-medium">{p.name}</td>
-                  <td className="border px-4 py-2">
-                    {p.manager?.fullName} <br />
-                    <span className="text-sm text-slate-500">
-                      {p.manager?.email}
-                    </span>
-                  </td>
-                  <td className="border px-4 py-2">
-                    {p.deadline
-                      ? new Date(p.deadline).toLocaleDateString("en-GB")
-                      : "—"}
-                  </td>
-                  <td className="border px-4 py-2 capitalize">{p.status}</td>
-                  <td className="border px-4 py-2 text-left">
-                    {p.students?.length > 0 ? (
-                      <ul className="text-sm">
-                        {p.students.map((s) => (
-                          <li key={s._id ?? s.email}>
-                            {s.fullName} ({s.email})
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      "—"
-                    )}
+                <tr key={p._id} className="hover:bg-gray-50">
+                  <td className="p-2 border">{p.title}</td>
+                  <td className="p-2 border">{p.manager?.fullName || "N/A"}</td>
+                  <td className="p-2 border">{p.interns.map(i => i.fullName).join(", ") || "N/A"}</td>
+                  <td className="p-2 border">{p.startDate ? new Date(p.startDate).toLocaleDateString() : "-"}</td>
+                  <td className="p-2 border">{p.endDate ? new Date(p.endDate).toLocaleDateString() : "-"}</td>
+                  <td className="p-2 border flex gap-2">
+                    <button
+                      onClick={() => { setEditProject(p); setModalOpen(true); }}
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p._id)}
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -101,8 +114,14 @@ const ProjectListPage: React.FC = () => {
           </table>
         </div>
       )}
+
+      {modalOpen && (
+        // <ProjectModal
+        //   project={editProject}
+        //   onClose={() => setModalOpen(false)}
+        //   onSave={fetchProjects}
+        // />
+      )}
     </div>
   );
-};
-
-export default ProjectListPage;
+}

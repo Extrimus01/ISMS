@@ -158,7 +158,7 @@ export default function Chatbot() {
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 glass-input text-sm focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 rounded-lg px-2 py-1 bg-white"
+              className="flex-1 glass-input text-sm focus:outline-none text-gray-500 dark:text-gray-400 placeholder-gray-500 dark:placeholder-gray-400 rounded-lg px-2 py-1 bg-white"
               placeholder="Ask your question..."
               value={input}
               onChange={(e) => setInput(e.target.value)}

@@ -1,82 +1,215 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Pencil, Trash2, PlusCircle } from "lucide-react";
+import Toast from "@/components/global/Toast";
 
 interface Manager {
   _id: string;
   fullName: string;
   email: string;
   phone: string;
-  createdAt: string;
+  isActive: boolean;
 }
 
-const ProjectManagersListPage: React.FC = () => {
+export default function ManagerPage() {
   const [managers, setManagers] = useState<Manager[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingManager, setEditingManager] = useState<Manager | null>(null);
+  const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
 
   useEffect(() => {
-    const fetchManagers = async () => {
-      try {
-        const res = await fetch("/api/admin/project-managers");
-        const data = await res.json();
-        if (res.ok) {
-          setManagers(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch managers", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchManagers();
   }, []);
 
+  const fetchManagers = async () => {
+    setLoading(true);
+    const res = await fetch("/api/manager");
+    const data = await res.json();
+    setManagers(data);
+    setLoading(false);
+  };
+
+  const openCreateModal = () => {
+    setEditingManager(null);
+    setForm({ fullName: "", email: "", phone: "", password: "" });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (manager: Manager) => {
+    setEditingManager(manager);
+    setForm({ fullName: manager.fullName, email: manager.email, phone: manager.phone, password: "" });
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = editingManager ? "PUT" : "POST";
+    const url = editingManager ? `/api/manager/${editingManager._id}` : "/api/manager";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    if (res.ok) {
+      await fetchManagers();
+      setModalOpen(false);
+      setToast({ message: editingManager ? "Manager updated successfully!" : "Manager created!", type: "success" });
+    } else {
+      const err = await res.json();
+      setToast({ message: err.error || "An error occurred", type: "error" });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this manager?")) return;
+    const res = await fetch(`/api/manager/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      await fetchManagers();
+      setToast({ message: "Manager deleted successfully!", type: "success" });
+    } else {
+      setToast({ message: "Failed to delete manager", type: "error" });
+    }
+  };
+
+  const toggleActive = async (manager: Manager) => {
+    const res = await fetch(`/api/manager/${manager._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !manager.isActive }),
+    });
+
+    if (res.ok) {
+      await fetchManagers();
+      setToast({
+        message: manager.isActive ? "Manager deactivated!" : "Manager activated!",
+        type: "success",
+      });
+    } else {
+      setToast({ message: "Action failed", type: "error" });
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">
-        Project Managers
-      </h2>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Manage Managers</h2>
+        <button
+          onClick={openCreateModal}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+        >
+          <PlusCircle /> Add Manager
+        </button>
+      </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
-      ) : managers.length === 0 ? (
-        <p className="text-gray-500">No project managers found.</p>
+        <p className="text-gray-500 text-center mt-10">Loading managers...</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-300 dark:border-gray-700 rounded-lg">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-800">
-                <th className="px-4 py-2 text-left">Name</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Phone</th>
-                <th className="px-4 py-2 text-left">Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {managers.map((m) => (
-                <tr
-                  key={m._id}
-                  className="border-t border-gray-200 dark:border-gray-700"
+        <div className="grid gap-4 md:grid-cols-2">
+          {managers.map((manager) => (
+            <div
+              key={manager._id}
+              className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow flex justify-between items-center hover:shadow-lg transition"
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{manager.fullName}</h3>
+                <p className="text-sm text-gray-500">{manager.email}</p>
+                <p className="text-sm text-gray-500">{manager.phone}</p>
+              </div>
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => toggleActive(manager)}
+                  className={`px-3 py-1 rounded-md ${
+                    manager.isActive ? "bg-green-500" : "bg-gray-400"
+                  } text-white`}
                 >
-                  <td className="px-4 py-2">{m.fullName}</td>
-                  <td className="px-4 py-2">{m.email}</td>
-                  <td className="px-4 py-2">{m.phone}</td>
-                  <td className="px-4 py-2">
-                    {new Date(m.createdAt).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  {manager.isActive ? "Active" : "Inactive"}
+                </button>
+                <button onClick={() => openEditModal(manager)} className="text-blue-500 hover:text-blue-600">
+                  <Pencil />
+                </button>
+                <button onClick={() => handleDelete(manager._id)} className="text-red-500 hover:text-red-600">
+                  <Trash2 />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+      )}
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg">
+            <h3 className="text-xl font-semibold mb-4">
+              {editingManager ? "Edit Manager" : "Add Manager"}
+            </h3>
+            <form className="grid gap-4" onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="border p-2 rounded-md bg-gray-50 dark:bg-gray-700"
+                value={form.fullName}
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                className="border p-2 rounded-md bg-gray-50 dark:bg-gray-700"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Phone"
+                className="border p-2 rounded-md bg-gray-50 dark:bg-gray-700"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                required
+              />
+              {!editingManager && (
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="border p-2 rounded-md bg-gray-50 dark:bg-gray-700"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                />
+              )}
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {editingManager ? "Update" : "Create"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
-};
-
-export default ProjectManagersListPage;
+}

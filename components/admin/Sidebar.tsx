@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  BarChart3Icon,
-  BriefcaseIcon,
+  UserCircle2,
+  Briefcase,
+  FolderKanban,
+  GraduationCap,
   ChevronDownIcon,
-  LibraryIcon,
   LogOutIcon,
-  SettingsIcon,
-  UsersIcon,
+  ShieldCheck,
 } from "lucide-react";
 import ThemeToggle from "../global/ThemeToggle";
 import { useRouter } from "next/navigation";
@@ -27,48 +27,39 @@ export interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    name: "Dashboard",
-    icon: BarChart3Icon,
-    subItems: [
-      { name: "Pending Verification", path: "/admin/notification" },
-      { name: "Internship Stats", path: "/admin/dashboard/stats" },
-      { name: "Placement Insights", path: "/admin/dashboard/placements" },
-    ],
+    name: "Profile",
+    icon: UserCircle2,
+    subItems: [{ name: "Personal Details", path: "/admin/personal-detail" }],
   },
   {
-    name: "Project Manager",
-    icon: BriefcaseIcon,
+    name: "Internship",
+    icon: Briefcase,
     subItems: [
-      { name: "All Managers", path: "/admin/project-manager" },
-      { name: "Add New Manager", path: "/admin/project-manager/create" },
-    ],
-  },
-  {
-    name: "Student Management",
-    icon: UsersIcon,
-    subItems: [
-      { name: "All Students", path: "/admin/students" },
-      { name: "Approve Registrations", path: "/admin/students/approve" },
-      { name: "Student Reports", path: "/admin/students/reports" },
+      { name: "Verification", path: "/admin/verification" },
+      // { name: "Post Internship", path: "/admin/post-internship" },
     ],
   },
   {
     name: "Project Management",
-    icon: LibraryIcon,
+    icon: FolderKanban,
     subItems: [
-      { name: "All Projects", path: "/admin/projects" },
-      { name: "Add New Project", path: "/admin/projects/create" },
-      { name: "Assign Intern", path: "/admin/projects/assign" },
+      { name: "Manager", path: "/admin/manager" },
+      { name: "Project", path: "/admin/project" },
     ],
   },
   {
-    name: "System Settings",
-    icon: SettingsIcon,
+    name: "Students",
+    icon: GraduationCap,
     subItems: [
-      { name: "Profile", path: "/admin/profile" },
-      { name: "Roles & Permissions", path: "/admin/settings/roles" },
-      { name: "Notification Settings", path: "/admin/settings/notifications" },
+      { name: "Student List", path: "/admin/students" },
+      { name: "Assign Project", path: "/admin/assign-project" },
+      { name: "Attendance", path: "/admin/student-attendance" },
     ],
+  },
+  {
+    name: "Guidelines",
+    icon: ShieldCheck,
+    subItems: [{ name: "View Guidelines", path: "/admin/guidelines" }],
   },
 ];
 
