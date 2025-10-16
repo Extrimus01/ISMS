@@ -14,7 +14,7 @@ interface Manager {
   fullName: string;
 }
 
-interface Project {
+export interface Project {
   _id?: string;
   title: string;
   description: string;
@@ -24,15 +24,13 @@ interface Project {
   endDate?: string;
 }
 
-export default function ProjectModal({
-  project,
-  onClose,
-  onSave,
-}: {
+interface ProjectModalProps {
   project: Project | null;
   onClose: () => void;
   onSave: () => void;
-}) {
+}
+
+export default function ProjectModal({ project, onClose, onSave }: ProjectModalProps) {
   const [title, setTitle] = useState(project?.title || "");
   const [description, setDescription] = useState(project?.description || "");
   const [manager, setManager] = useState(project?.manager || "");
@@ -42,23 +40,21 @@ export default function ProjectModal({
   const [startDate, setStartDate] = useState(project?.startDate || "");
   const [endDate, setEndDate] = useState(project?.endDate || "");
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  // Fetch managers & interns
   useEffect(() => {
     const fetchManagers = async () => {
       const res = await fetch("/api/manager");
       const data: Manager[] = await res.json();
       setAllManagers(data);
     };
+
     const fetchInterns = async () => {
       const res = await fetch("/api/intern?isActive=true");
       const data: Intern[] = await res.json();
       setAllInterns(data);
     };
+
     fetchManagers();
     fetchInterns();
   }, []);
@@ -68,19 +64,11 @@ export default function ProjectModal({
       setToast({ message: "Please fill all required fields", type: "error" });
       return;
     }
+
     setLoading(true);
     try {
-      const payload = {
-        title,
-        description,
-        manager,
-        interns,
-        startDate,
-        endDate,
-      };
-      const url = project?._id
-        ? `/api/project?id=${project._id}`
-        : "/api/project";
+      const payload = { title, description, manager, interns, startDate, endDate };
+      const url = project?._id ? `/api/project?id=${project._id}` : "/api/project";
       const method = project?._id ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -90,18 +78,14 @@ export default function ProjectModal({
       });
 
       const data = await res.json();
-      if (data.success) {
-        setToast({
-          message: `Project ${
-            project?._id ? "updated" : "created"
-          } successfully`,
-          type: "success",
-        });
-        onSave();
-        onClose();
-      } else {
-        throw new Error(data.error || "Failed");
-      }
+      if (!data.success) throw new Error(data.error || "Failed");
+
+      setToast({
+        message: `Project ${project?._id ? "updated" : "created"} successfully`,
+        type: "success",
+      });
+      onSave();
+      onClose();
     } catch (err: any) {
       setToast({ message: err.message, type: "error" });
     } finally {
@@ -116,13 +100,7 @@ export default function ProjectModal({
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
     >
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg relative">
         <h2 className="text-xl font-semibold mb-4">
           {project?._id ? "Edit Project" : "Create Project"}
@@ -171,9 +149,7 @@ export default function ProjectModal({
               className="w-full p-2 border rounded h-32"
               value={interns}
               onChange={(e) =>
-                setInterns(
-                  Array.from(e.target.selectedOptions, (option) => option.value)
-                )
+                setInterns(Array.from(e.target.selectedOptions, (option) => option.value))
               }
             >
               {allInterns.map((i) => (

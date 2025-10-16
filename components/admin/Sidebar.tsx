@@ -44,7 +44,7 @@ const navigationItems: NavItem[] = [
     icon: FolderKanban,
     subItems: [
       { name: "Manager", path: "/admin/manager" },
-      { name: "Project", path: "/admin/project" },
+      { name: "Project", path: "/admin/projects" },
     ],
   },
   {
