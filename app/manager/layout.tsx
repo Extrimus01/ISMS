@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BouncingDots } from "@/components/global/Loader";
 import { MenuIcon } from "lucide-react";
-import Sidebar from "@/components/project-manager/Sidebar";
+import Sidebar from "@/components/manager/Sidebar";
 
 export default function ManagerLayout({
   children,
