@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Admin from "@/models/Admin";
 
-// ✅ Correct type for context
-interface RouteContext {
-  params: { id: string };
-}
-
-export async function GET(req: NextRequest, { params }: RouteContext) {
-  const { id } = params;
+// ✅ DO NOT define a custom interface
+// ✅ Let Next.js handle the context typing automatically
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
+  const id = context.params.id;
 
   if (!id) {
     return NextResponse.json({ error: "Missing admin ID" }, { status: 400 });
@@ -27,8 +27,11 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
-  const { id } = params;
+export async function PATCH(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
+  const id = context.params.id;
 
   if (!id) {
     return NextResponse.json({ error: "Missing admin ID" }, { status: 400 });
