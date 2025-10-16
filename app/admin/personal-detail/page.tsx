@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface AdminDetails {
   _id: string;
@@ -15,14 +16,12 @@ interface AdminDetails {
 export default function AdminPage() {
   const [admin, setAdmin] = useState<AdminDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
-      setError("No logged-in user found");
+      toast.error("No logged-in user found");
       setLoading(false);
       return;
     }
@@ -31,7 +30,7 @@ export default function AdminPage() {
     const adminId = parsedUser._id;
 
     if (!adminId) {
-      setError("Admin ID not found");
+      toast.error("Admin ID not found");
       setLoading(false);
       return;
     }
@@ -48,7 +47,7 @@ export default function AdminPage() {
         const data: AdminDetails = await res.json();
         setAdmin(data);
       } catch (err: any) {
-        setError(err.message);
+        toast.error(err.message || "Failed to fetch admin");
       } finally {
         setLoading(false);
       }
@@ -64,10 +63,7 @@ export default function AdminPage() {
 
   const handleSave = async () => {
     if (!admin) return;
-
     setSaving(true);
-    setError("");
-    setSuccess("");
 
     try {
       const res = await fetch(`/api/admin/${admin._id}`, {
@@ -88,9 +84,9 @@ export default function AdminPage() {
 
       const updatedAdmin: AdminDetails = await res.json();
       setAdmin(updatedAdmin);
-      setSuccess("Details updated successfully!");
+      toast.success("Details updated successfully!");
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message || "Error updating details");
     } finally {
       setSaving(false);
     }
@@ -100,13 +96,6 @@ export default function AdminPage() {
     return (
       <div className="flex justify-center items-center h-64">
         <p className="text-gray-500 dark:text-gray-400">Loading...</p>
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-red-500">{error}</p>
       </div>
     );
 
@@ -153,11 +142,6 @@ export default function AdminPage() {
             </p>
           )}
         </div>
-      </div>
-
-      <div className="mt-6 text-center">
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
       </div>
 
       <div className="mt-8 flex justify-center">
