@@ -38,7 +38,12 @@ export default function AdminPage() {
     async function fetchAdmin() {
       try {
         setLoading(true);
-        const res = await fetch(`/api/admin/${adminId}`);
+        const res = await fetch(`/api/admin/detail`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: adminId }),
+        });
+
         if (!res.ok) {
           const errData = await res.json();
           throw new Error(errData.error || "Failed to load admin details");
@@ -66,10 +71,11 @@ export default function AdminPage() {
     setSaving(true);
 
     try {
-      const res = await fetch(`/api/admin/${admin._id}`, {
+      const res = await fetch(`/api/admin/detail`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: admin._id,
           fullName: admin.fullName,
           companyName: admin.companyName,
           email: admin.email,
