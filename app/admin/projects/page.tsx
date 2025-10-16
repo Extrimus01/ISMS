@@ -245,12 +245,12 @@ export default function ProjectsPage() {
           <table className="w-full border border-gray-300 rounded">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 border">Title</th>
-                <th className="p-2 border">Manager</th>
-                <th className="p-2 border">Interns</th>
-                <th className="p-2 border">Start Date</th>
-                <th className="p-2 border">End Date</th>
-                <th className="p-2 border">Actions</th>
+                <th className="p-2 border text-black">Title</th>
+                <th className="p-2 border text-black">Manager</th>
+                <th className="p-2 border text-black">Interns</th>
+                <th className="p-2 border text-black">Start Date</th>
+                <th className="p-2 border text-black">End Date</th>
+                <th className="p-2 border text-black">Actions</th>
               </tr>
             </thead>
             <tbody>
