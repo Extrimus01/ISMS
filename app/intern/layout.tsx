@@ -61,8 +61,8 @@ export default function StudentLayout({
 
   return (
     <div className="flex">
-      <main className="flex-1 ml-0 md:ml-64 p-6">
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-500">
+      <main className="flex-1 ml-0 md:ml-64 p-6 ">
+        <div className="flex h-screen">
           <Sidebar
             isMobile={isMobile}
             isMobileMenuOpen={isMobileMenuOpen}

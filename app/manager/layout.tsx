@@ -26,7 +26,7 @@ export default function ManagerLayout({
 
     try {
       const user = JSON.parse(userData);
-      if (!user.role || user.role !== "project_manager") {
+      if (!user.role || user.role !== "manager") {
         router.replace("/unauthorized");
         return;
       }

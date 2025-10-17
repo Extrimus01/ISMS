@@ -2,15 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  BarChart3Icon,
-  BriefcaseIcon,
+  BookOpen,
+  CalendarCheck,
   ChevronDownIcon,
-  FileTextIcon,
-  LibraryIcon,
+  ClipboardList,
+  FileUser,
+  GanttChart,
+  GraduationCap,
+  Group,
+  ListTodo,
   LogOutIcon,
-  SearchIcon,
-  SettingsIcon,
-  UsersIcon,
+  User,
+  Users2,
 } from "lucide-react";
 import ThemeToggle from "../global/ThemeToggle";
 import { useRouter } from "next/navigation";
@@ -27,48 +30,53 @@ export interface NavItem {
   subItems?: SubNavItem[];
 }
 
-const navigationItems: NavItem[] = [
+export const navigationItems: NavItem[] = [
   {
-    name: "Dashboard",
-    icon: BarChart3Icon,
+    name: "Profile",
+    icon: User,
     subItems: [
-      { name: "Overview", path: "/project-manager/dashboard/overview" },
-      { name: "Project Stats", path: "/project-manager/dashboard/stats" },
-      { name: "Task Progress", path: "/project-manager/dashboard/tasks" },
+      {
+        name: "Personal Details",
+        path: "/manager/personal-details",
+      },
     ],
   },
   {
-    name: "Projects",
-    icon: BriefcaseIcon,
+    name: "Interns",
+    icon: GraduationCap,
     subItems: [
-      { name: "All Projects", path: "/project-manager/projects" },
-      { name: "Project Reports", path: "/project-manager/projects/reports" },
+      {
+        name: "Interns List",
+        path: "/manager/interns-list",
+      },
+      {
+        name: "Attendance",
+        path: "/manager/interns-attendance",
+      },
     ],
   },
   {
-    name: "Tasks",
-    icon: FileTextIcon,
+    name: "Project",
+    icon: GanttChart,
     subItems: [
-      { name: "My Tasks", path: "/project-manager/tasks" },
-      { name: "Assign Tasks", path: "/project-manager/tasks/assign" },
-      { name: "Task Reports", path: "/project-manager/tasks/reports" },
+      {
+        name: "Project Details",
+        path: "/manager/project-details",
+      },
+      {
+        name: "Weekly Task Report",
+        path: "/manager/weekly-tasks",
+      },
     ],
   },
   {
-    name: "Team",
-    icon: UsersIcon,
+    name: "Guidelines",
+    icon: BookOpen,
     subItems: [
-      { name: "Teams", path: "/project-manager/team" },
-      { name: "Attendance", path: "/project-manager/attendance" },
-    ],
-  },
-  {
-    name: "System Settings",
-    icon: SettingsIcon,
-    subItems: [
-      { name: "Profile", path: "/project-manager/profile" },
-      { name: "Notifications", path: "/project-manager/settings/notifications" },
-      { name: "Preferences", path: "/project-manager/settings/preferences" },
+      {
+        name: "Teams",
+        path: "/manager/guidelines",
+      },
     ],
   },
 ];
@@ -85,9 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsMobileMenuOpen,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
-  const [activeSubItem, setActiveSubItem] = useState<string>(
-    "/manager"
-  );
+  const [activeSubItem, setActiveSubItem] = useState<string>("/manager");
   const router = useRouter();
 
   useEffect(() => {

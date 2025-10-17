@@ -61,12 +61,10 @@ const StudentDashboardPage: React.FC = () => {
     },
   ];
 
-  
   const setSentinelRef = (el: HTMLDivElement | null, i: number) => {
     sentinelRefs.current[i] = el;
   };
 
-  
   useEffect(() => {
     const handleScroll = () => {
       let bestIndex = 0;
@@ -83,7 +81,6 @@ const StudentDashboardPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -91,7 +88,6 @@ const StudentDashboardPage: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -104,11 +100,9 @@ const StudentDashboardPage: React.FC = () => {
     }
   }, []);
 
-  const handleVerifyClick = () => router.push("/student/verify-form");
 
   return (
     <div className="flex-1 p-6 overflow-auto">
-      
       <div className="relative overflow-hidden bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 md:p-8 mb-8 border border-slate-200 dark:border-gray-800 max-w-7xl mx-auto">
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl"></div>
@@ -117,24 +111,12 @@ const StudentDashboardPage: React.FC = () => {
             Welcome, {user?.fullName || "Student"}!
           </h2>
           <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-2xl">
-            {user?.verified
-              ? "You’re all set! Explore internships, manage your applications, and stay updated."
-              : "Your account is not yet verified. Please complete the steps below to gain full access."}
+            You’re all set! Explore internships, manage your applications, and
+            stay updated.
           </p>
-
-          {!user?.verified && (
-            <button
-              onClick={handleVerifyClick}
-              className="mt-4 flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow transition-all duration-300"
-            >
-              <AlertCircle className="w-5 h-5" />
-              Verify Account
-            </button>
-          )}
         </div>
       </div>
 
-      
       {!user?.verified ? (
         <section className="py-16 max-w-4xl mx-auto relative space-y-16">
           <div className="absolute left-5 md:left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-700 hidden md:block" />
