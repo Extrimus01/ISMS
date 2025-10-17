@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Admin from "@/models/Admin";
 
-// 👉 POST method to fetch admin details by ID (sent in JSON body)
 export async function POST(req: NextRequest) {
   try {
     const { id } = await req.json();
@@ -21,11 +20,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(admin);
   } catch (error) {
     console.error("POST /api/admin/detail error:", error);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
 
-// 👉 PATCH method to update admin details
 export async function PATCH(req: NextRequest) {
   try {
     const { id, ...updateData } = await req.json();
@@ -48,6 +49,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(updatedAdmin);
   } catch (error) {
     console.error("PATCH /api/admin/detail error:", error);
-    return NextResponse.json({ error: "Failed to update admin" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update admin" },
+      { status: 500 }
+    );
   }
 }

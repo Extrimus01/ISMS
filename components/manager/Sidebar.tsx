@@ -86,13 +86,13 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
   const [activeSubItem, setActiveSubItem] = useState<string>(
-    "/project-manager/dashboard/overview"
+    "/manager"
   );
   const router = useRouter();
 
   useEffect(() => {
     const handleHashChange = () => {
-      setActiveSubItem(window.location.hash || "/project-manager/dashboard/overview");
+      setActiveSubItem(window.location.hash || "/manager");
     };
     window.addEventListener("hashchange", handleHashChange);
     handleHashChange();

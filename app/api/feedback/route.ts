@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Feedback from "@/models/Feedback";
 
-// POST — Submit feedback
 export async function POST(req: Request) {
   try {
     await dbConnect();
@@ -31,7 +30,6 @@ export async function POST(req: Request) {
   }
 }
 
-// GET — Fetch all feedback (optional)
 export async function GET() {
   try {
     await dbConnect();

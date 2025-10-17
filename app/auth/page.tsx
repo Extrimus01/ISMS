@@ -237,7 +237,6 @@ export default function AuthPage() {
           return;
         }
 
-        // Redirect immediately based on role
         switch (user.role) {
           case "admin":
             router.replace("/admin");
@@ -295,11 +294,9 @@ export default function AuthPage() {
       const data = await res.json();
 
       if (res.ok && data.user?.role) {
-        // Save user and token
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
 
-        // Dynamic redirect based on role
         switch (data.user.role) {
           case "admin":
             router.push("/admin");
@@ -311,7 +308,7 @@ export default function AuthPage() {
             router.push("/intern");
             break;
           default:
-            router.push("/"); // fallback
+            router.push("/");
         }
       } else {
         showToast(data.error || "Invalid email or password", "error");

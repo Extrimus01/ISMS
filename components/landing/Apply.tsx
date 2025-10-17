@@ -109,7 +109,6 @@ export default function Contact() {
     }
   };
 
-  // Example list of holidays
   const holidays = [new Date("2025-10-20"), new Date("2025-10-25")];
 
   const isWeekday = (date: Date) => {
@@ -160,7 +159,6 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      // Helper to convert file to Base64
       const fileToBase64 = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -168,7 +166,6 @@ export default function Contact() {
           reader.onload = () => {
             if (typeof reader.result === "string")
               resolve(reader.result.split(",")[1]);
-            // remove "data:application/pdf;base64,"
             else reject("Failed to convert file");
           };
           reader.onerror = (error) => reject(error);
@@ -233,7 +230,10 @@ export default function Contact() {
   };
 
   return (
-    <section id="register" className="bg-[var(--background)] text-[var(--foreground)] py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section
+      id="register"
+      className="bg-[var(--background)] text-[var(--foreground)] py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+    >
       {toast && (
         <div
           className={`fixed top-6 right-6 px-6 py-3 rounded-xl shadow-lg font-medium text-white z-50 ${
@@ -403,7 +403,7 @@ export default function Contact() {
                       selected={interview}
                       onChange={(date) => setInterview(date)}
                       showTimeSelect
-                      timeIntervals={60} // 1-hour intervals
+                      timeIntervals={60}
                       minTime={setHours(setMinutes(new Date(), 0), 9)}
                       maxTime={setHours(setMinutes(new Date(), 0), 18)}
                       minDate={new Date()}

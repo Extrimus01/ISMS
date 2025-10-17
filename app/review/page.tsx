@@ -76,7 +76,6 @@ export default function ReviewPage() {
 
       <main className="flex flex-col items-center space-y-6 no-scrollbar">
         <main className="pt-10 bg-[var(--background)] text-[var(--foreground)] min-h-screen">
-          {/* Hero Section */}
           <section className="py-16 px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-[var(--accent)]">
               We Value Your Feedback
@@ -87,9 +86,7 @@ export default function ReviewPage() {
             </p>
           </section>
 
-          {/* Grid Layout: Feedback Form + FAQ */}
           <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Feedback Form */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -160,7 +157,6 @@ export default function ReviewPage() {
               )}
             </motion.div>
 
-            {/* FAQ Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

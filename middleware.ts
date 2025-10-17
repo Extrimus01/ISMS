@@ -25,7 +25,6 @@ export async function middleware(req: NextRequest) {
 
   const role = decoded.role as string;
 
-  // Role-based restrictions
   if (pathname.startsWith("/admin") && role !== "admin") {
     return NextResponse.redirect(new URL("/", req.url));
   }

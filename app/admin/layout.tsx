@@ -56,21 +56,18 @@ export default function AdminLayout({
   return (
     <Providers>
       <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-950 dark:to-gray-900 transition-colors">
-        {/* Sidebar */}
         <Sidebar
           isMobile={isMobile}
           isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
 
-        {/* Main content area */}
         <div
           className="flex-1 flex flex-col transition-all duration-300"
           style={{
             marginLeft: !isMobile ? `${sidebarWidth}rem` : "0",
           }}
         >
-          {/* Top Bar (visible only on mobile) */}
           {isMobile && (
             <header className="flex items-center justify-between h-16 px-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
               <div className="flex items-center">
@@ -87,11 +84,8 @@ export default function AdminLayout({
             </header>
           )}
 
-          {/* Main Content */}
           <main className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-6xl mx-auto ">
-              {children}
-            </div>
+            <div className="max-w-6xl mx-auto ">{children}</div>
           </main>
         </div>
       </div>

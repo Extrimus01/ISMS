@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
     let user: any = null;
     let role = "";
 
-    // Find user in all collections
     for (const { model, role: r } of collections) {
       const found = await model.findOne({ email });
       if (found) {
@@ -41,7 +40,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // 🚨 Intern must be active
     if (role === "Intern" && !user.isActive) {
       return NextResponse.json(
         {
@@ -52,7 +50,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -61,7 +58,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hash and set new password
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;
     await user.save();

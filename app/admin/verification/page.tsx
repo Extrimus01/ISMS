@@ -40,7 +40,6 @@ export default function PendingInternsPage() {
 
   const openPdf = (base64Data: string, fileName: string) => {
     try {
-      // Ensure it’s a valid base64 PDF
       const byteCharacters = atob(base64Data.split(",")[1] || base64Data);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -50,12 +49,10 @@ export default function PendingInternsPage() {
       const blob = new Blob([byteArray], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
-      // Open PDF in a new tab
       const newWindow = window.open(url, "_blank");
       if (!newWindow)
         alert("Popup blocked! Please allow popups to view the PDF.");
 
-      // Optional: clean up the blob URL after 2 minutes
       setTimeout(() => URL.revokeObjectURL(url), 120000);
     } catch (err) {
       console.error("Error opening PDF:", err);

@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 
 const { Types } = mongoose;
 
-// --- Subschemas ---
 const attendanceSchema = new Schema(
   {
     date: { type: Date, required: true },
@@ -44,7 +43,6 @@ const projectAssignmentSchema = new Schema(
   { _id: false }
 );
 
-// --- Main Intern Schema ---
 export interface IIntern {
   fullName: string;
   college: string;
@@ -64,10 +62,10 @@ export interface IIntern {
   role: "intern";
   isEmailVerified: boolean;
   verifiedAt?: Date;
-  projectsAssigned: typeof projectAssignmentSchema[];
+  projectsAssigned: (typeof projectAssignmentSchema)[];
   mentor?: mongoose.Types.ObjectId;
-  attendance: typeof attendanceSchema[];
-  documents: typeof documentSchema[];
+  attendance: (typeof attendanceSchema)[];
+  documents: (typeof documentSchema)[];
   applicationStatus: "unverified" | "verified" | "rejected";
   interviewSlot?: Date;
   isActive: boolean;
@@ -112,7 +110,6 @@ const internSchema = new Schema<IIntern>(
   { timestamps: true }
 );
 
-// --- Pre-save hook for password ---
 internSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   const salt = await bcrypt.genSalt(10);
@@ -120,9 +117,10 @@ internSchema.pre("save", async function (next) {
   next();
 });
 
-// --- Methods ---
-internSchema.methods.comparePassword = async function (candidatePassword: string) {
-  if (!this.password) return false; // Password not set yet
+internSchema.methods.comparePassword = async function (
+  candidatePassword: string
+) {
+  if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -132,5 +130,4 @@ internSchema.methods.verifyEmail = async function () {
   return this.save();
 };
 
-// --- Export Model ---
 export default mongoose.models.Intern || mongoose.model("Intern", internSchema);

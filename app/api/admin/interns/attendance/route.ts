@@ -6,17 +6,21 @@ export async function GET() {
   try {
     await dbConnect();
 
-    // Find all active interns and populate project details
     const interns = await Intern.find({ isActive: true })
       .populate("projectsAssigned.project", "name description")
       .populate("mentor", "fullName email");
 
-    // Calculate attendance summary
     const data = interns.map((intern) => {
       const attendance = intern.attendance || [];
-      const present = attendance.filter((a: any) => a.status === "present").length;
-      const absent = attendance.filter((a: any) => a.status === "absent").length;
-      const pending = attendance.filter((a: any) => a.status === "pending").length;
+      const present = attendance.filter(
+        (a: any) => a.status === "present"
+      ).length;
+      const absent = attendance.filter(
+        (a: any) => a.status === "absent"
+      ).length;
+      const pending = attendance.filter(
+        (a: any) => a.status === "pending"
+      ).length;
 
       return {
         id: intern._id,
@@ -34,6 +38,9 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching attendance summary:", error);
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 }
+    );
   }
 }

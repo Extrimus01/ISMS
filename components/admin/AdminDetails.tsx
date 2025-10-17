@@ -114,7 +114,6 @@ export default function PersonalDetails() {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Editable Fields */}
         {[
           { label: "Full Name", name: "fullName", type: "text" },
           { label: "Company Name", name: "companyName", type: "text" },
@@ -135,7 +134,6 @@ export default function PersonalDetails() {
           </div>
         ))}
 
-        {/* Read-only info (spans both columns) */}
         <div className="md:col-span-2 mt-4 text-gray-600 dark:text-gray-300 space-y-1">
           {admin.lastLogin && (
             <p>
@@ -152,13 +150,11 @@ export default function PersonalDetails() {
         </div>
       </div>
 
-      {/* Error / Success messages */}
       <div className="mt-6 text-center">
         {error && <p className="text-red-500">{error}</p>}
         {success && <p className="text-green-500">{success}</p>}
       </div>
 
-      {/* Save Button */}
       <div className="mt-8 flex justify-center">
         <button
           onClick={handleSave}

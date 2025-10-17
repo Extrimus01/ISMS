@@ -2,15 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  BarChart3Icon,
-  BriefcaseIcon,
   ChevronDownIcon,
-  FileTextIcon,
-  LibraryIcon,
+  ClipboardListIcon,
+  Clock3Icon,
   LogOutIcon,
-  SearchIcon,
-  SettingsIcon,
-  UsersIcon,
+  MegaphoneIcon,
+  MessageSquareIcon,
+  UserIcon,
 } from "lucide-react";
 import ThemeToggle from "../global/ThemeToggle";
 import { useRouter } from "next/navigation";
@@ -29,30 +27,45 @@ export interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    name: "Dashboard Types",
-    icon: BarChart3Icon,
+    name: "Profile",
+
+    icon: UserIcon,
     subItems: [
-      { name: "Overview", path: "#" },
-      { name: "Executive Summary", path: "#" },
-      { name: "Operations", path: "#" },
-      { name: "Financial", path: "#" },
+      { name: "Personal Details", path: "/intern/personal-details" },
+      { name: "Documents", path: "/intern/docs" },
     ],
   },
   {
-    name: "Report Summaries",
-    icon: FileTextIcon,
+    name: "Attendance",
+
+    icon: Clock3Icon,
+    subItems: [{ name: "Mark Attendance", path: "/intern/attendance" }],
+  },
+  {
+    name: "Project",
+
+    icon: ClipboardListIcon,
     subItems: [
-      { name: "Weekly Reports", path: "#" },
-      { name: "Monthly Insights", path: "#" },
-      { name: "Quarterly Analysis", path: "#" },
+      { name: "Project Details", path: "/intern/project-details" },
+      { name: "Weekly Task", path: "/intern/weekly-task" },
     ],
   },
   {
-    name: "Settings",
-    icon: SettingsIcon,
+    name: "Chats",
+
+    icon: MessageSquareIcon,
     subItems: [
-      { name: "Profile", path: "/student/profile" },
-      { name: "Attendence", path: "/student/attendence" },
+      { name: "Group Chat", path: "/intern/group-chat" },
+      { name: "Chatbot", path: "/intern/chatbot" },
+    ],
+  },
+  {
+    name: "Notices and Directives",
+
+    icon: MegaphoneIcon,
+    subItems: [
+      { name: "Notifications", path: "/intern/profile" },
+      { name: "Guidelines", path: "/intern/attendence" },
     ],
   },
 ];
@@ -69,16 +82,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsMobileMenuOpen,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>("Dashboard");
-  const [activeSubItem, setActiveSubItem] = useState<string>(
-    "#/student/dashboard/overview"
-  );
+  const [activeSubItem, setActiveSubItem] = useState<string>("/intern");
   const router = useRouter();
 
   useEffect(() => {
     const handleHashChange = () => {
-      setActiveSubItem(
-        window.location.hash || "#/student/dashboard/overview"
-      );
+      setActiveSubItem(window.location.hash || "/intern");
     };
     window.addEventListener("hashchange", handleHashChange);
     handleHashChange();

@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Find intern by certificateId
     const intern = await Intern.findOne({ certificateId })
       .populate({
         path: "projectsAssigned.project",
@@ -33,7 +32,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get the last assigned project name (if exists)
     const lastProject =
       intern.projectsAssigned && intern.projectsAssigned.length > 0
         ? intern.projectsAssigned[intern.projectsAssigned.length - 1]?.project

@@ -36,7 +36,6 @@ const navigationItems: NavItem[] = [
     icon: Briefcase,
     subItems: [
       { name: "Verification", path: "/admin/verification" },
-      // { name: "Post Internship", path: "/admin/post-internship" },
     ],
   },
   {

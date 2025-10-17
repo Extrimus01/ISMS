@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
     const intern = await Intern.findById(internId);
     if (!intern) return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
-    // Add project assignment
     intern.projectsAssigned.push({
       project: projectId,
       startDate: new Date(startDate),

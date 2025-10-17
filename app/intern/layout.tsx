@@ -30,7 +30,7 @@ export default function StudentLayout({
     try {
       const user = JSON.parse(userData);
 
-      if (!user.role || user.role !== "student") {
+      if (!user.role || user.role !== "intern") {
         router.replace("/unauthorized");
         return;
       }

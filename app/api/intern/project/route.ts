@@ -14,7 +14,6 @@ export async function PATCH(req: NextRequest) {
     const intern = await Intern.findById(internId);
     if (!intern) return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
-    // Cast properly
     const assignments = intern.projectsAssigned as (typeof intern.projectsAssigned)[number][];
     const assignment = assignments.find((a) => a.project?.toString() === projectId);
 

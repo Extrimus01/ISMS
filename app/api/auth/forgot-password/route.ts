@@ -5,7 +5,6 @@ import Intern from "@/models/Intern";
 import nodemailer from "nodemailer";
 import dbConnect from "@/lib/dbConnect";
 
-// Setup email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,7 +13,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// HTML email template
 const generateTempPasswordEmail = (fullName: string, tempPassword: string) => `
   <html>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -38,7 +36,6 @@ const generateTempPasswordEmail = (fullName: string, tempPassword: string) => `
   </html>
 `;
 
-// Generate a random temporary password
 const generateTempPassword = (length = 10) => {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
@@ -57,7 +54,6 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
-    // Check all user types
     const collections = [
       { model: Admin, role: "Admin" },
       { model: Manager, role: "Manager" },
@@ -79,7 +75,6 @@ export async function POST(req: NextRequest) {
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // Intern-specific check
     if (role === "Intern" && !user.isActive) {
       return NextResponse.json(
         { error: "Your internship account is not yet active." },
@@ -87,14 +82,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate temp password
     const tempPassword = generateTempPassword();
 
-    // Save raw password; pre-save hook will hash it automatically
     user.password = tempPassword;
     await user.save();
 
-    // Send email with temp password
     await transporter.sendMail({
       from: `"ISMS Internship Portal" <${process.env.SMTP_USER}>`,
       to: email,

@@ -2,9 +2,8 @@
 import React from "react";
 import { motion, Transition } from "framer-motion";
 
-// ✅ Explicitly type the transition as Transition
 const transition: Transition = {
-  type: "spring", // ✅ This is now accepted
+  type: "spring",
   mass: 0.5,
   damping: 11.5,
   stiffness: 100,

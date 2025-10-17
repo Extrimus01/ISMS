@@ -53,7 +53,6 @@ export default function VerificationPage() {
 
       <main className="flex flex-col items-center space-y-6 no-scrollbar">
         <main className="min-h-screen flex flex-col items-center justify-center text-white relative overflow-hidden px-4 sm:px-6 lg:px-8 ">
-          {/* Background Glow */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.25 }}
@@ -67,7 +66,6 @@ export default function VerificationPage() {
              sm:bg-white/10 sm:backdrop-blur-lg sm:border sm:border-white/20 sm:shadow-lg
              rounded-full p-0  "
           >
-            {/* Input wrapper with icon */}
             <div className="relative w-full sm:flex-1">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -82,7 +80,6 @@ export default function VerificationPage() {
               />
             </div>
 
-            {/* Button */}
             <button
               type="submit"
               disabled={loading}
@@ -96,10 +93,8 @@ export default function VerificationPage() {
             </button>
           </form>
 
-          {/* Results Section */}
           <div className="w-full max-w-2xl mt-8 sm:mt-10 px-2 sm:px-0">
             <AnimatePresence mode="wait">
-              {/* Error Message */}
               {error && (
                 <motion.div
                   key="error"
@@ -113,7 +108,6 @@ export default function VerificationPage() {
                 </motion.div>
               )}
 
-              {/* Verified Certificate Card */}
               {result && (
                 <motion.div
                   key="result"
@@ -181,7 +175,6 @@ export default function VerificationPage() {
                 </motion.div>
               )}
 
-              {/* Helper Text */}
               {!error && !result && (
                 <motion.p
                   key="helper"

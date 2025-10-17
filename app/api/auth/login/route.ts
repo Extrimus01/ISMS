@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TS-safe JWT signing using 'as any' to bypass typings
     const token = jwt.sign(
       {
         id: user._id,

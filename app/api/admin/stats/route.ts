@@ -1,4 +1,3 @@
-// app/api/admin/stats/route.ts
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Intern from "@/models/Intern";
@@ -11,9 +10,10 @@ export async function GET() {
     const totalInterns = await Intern.countDocuments();
     const activeInterns = await Intern.countDocuments({ status: "active" });
     const totalProjects = await Project.countDocuments();
-    const completedProjects = await Project.countDocuments({ status: "completed" });
+    const completedProjects = await Project.countDocuments({
+      status: "completed",
+    });
 
-    // Interns joined by month
     const internsByMonth = await Intern.aggregate([
       {
         $group: {
@@ -21,10 +21,9 @@ export async function GET() {
           count: { $sum: 1 },
         },
       },
-      { $sort: { "_id": 1 } },
+      { $sort: { _id: 1 } },
     ]);
 
-    // Project distribution
     const projectStatus = await Project.aggregate([
       {
         $group: {
@@ -44,6 +43,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Failed to fetch dashboard stats" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch dashboard stats" },
+      { status: 500 }
+    );
   }
 }

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ----------------- Shared Types -----------------
 interface Manager {
   _id: string;
   fullName: string;
@@ -18,14 +17,13 @@ export interface Project {
   _id: string;
   title: string;
   description: string;
-  manager: Manager; // populated
+  manager: Manager;
   interns: Intern[];
   startDate?: string;
   endDate?: string;
   isActive: boolean;
 }
 
-// ----------------- Toast Component -----------------
 interface ToastProps {
   message: string;
   type?: "success" | "error";
@@ -54,7 +52,6 @@ function Toast({ message, type = "success", onClose }: ToastProps) {
   );
 }
 
-// ----------------- Project Modal -----------------
 interface ProjectModalProps {
   project: Project | null;
   onClose: () => void;
@@ -70,7 +67,6 @@ function ProjectModal({ project, onClose, onSave }: ProjectModalProps) {
   const [loading, setLoading] = useState(false);
   const [managers, setManagers] = useState<Manager[]>([]);
 
-  // Fetch all managers for dropdown
   useEffect(() => {
     async function fetchManagers() {
       const res = await fetch("/api/manager");
@@ -173,7 +169,6 @@ function ProjectModal({ project, onClose, onSave }: ProjectModalProps) {
   );
 }
 
-// ----------------- Projects Page -----------------
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
