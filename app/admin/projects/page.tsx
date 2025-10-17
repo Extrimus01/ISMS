@@ -84,12 +84,13 @@ function ProjectModal({ project, onClose, onSave }: ProjectModalProps) {
     if (!title || !description || !managerId) return alert("Fill all fields");
     setLoading(true);
     try {
-      const url = project ? `/api/project?id=${project._id}` : "/api/project";
+      const url = "/api/project";
       const method = project ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          _id: project?._id,
           title,
           description,
           manager: managerId,
