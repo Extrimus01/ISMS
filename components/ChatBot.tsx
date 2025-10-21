@@ -2,10 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { useTheme } from "next-themes";
 
 type Message = { from: "bot" | "user"; text: string; category?: string };
 
 export default function Chatbot() {
+  const { theme } = useTheme();
+
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -78,33 +81,55 @@ export default function Chatbot() {
 
   const categoryEmoji = (cat?: string) => {
     switch (cat) {
-      case "About": return "🏢";
-      case "Internship": return "🎓";
-      case "ISMS": return "👩‍💻";
-      case "Documents": return "🧾";
-      case "Attendance": return "🕒";
-      case "Communication": return "💬";
-      case "Technical Help": return "🧠";
-      case "Contact": return "📞";
-      case "Welcome": return "👋";
-      case "Error": return "⚠️";
-      default: return "🤖";
+      case "About":
+        return "🏢";
+      case "Internship":
+        return "🎓";
+      case "ISMS":
+        return "👩‍💻";
+      case "Documents":
+        return "🧾";
+      case "Attendance":
+        return "🕒";
+      case "Communication":
+        return "💬";
+      case "Technical Help":
+        return "🧠";
+      case "Contact":
+        return "📞";
+      case "Welcome":
+        return "👋";
+      case "Error":
+        return "⚠️";
+      default:
+        return "🤖";
     }
   };
 
   const categoryColor = (cat?: string) => {
     switch (cat) {
-      case "About": return "bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200";
-      case "Internship": return "bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200";
-      case "ISMS": return "bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200";
-      case "Documents": return "bg-pink-200 dark:bg-pink-800 text-pink-800 dark:text-pink-200";
-      case "Attendance": return "bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200";
-      case "Communication": return "bg-teal-200 dark:bg-teal-800 text-teal-800 dark:text-teal-200";
-      case "Technical Help": return "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200";
-      case "Contact": return "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
-      case "Welcome": return "bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200";
-      case "Error": return "bg-red-300 dark:bg-red-900 text-red-900 dark:text-red-300";
-      default: return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100";
+      case "About":
+        return "bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200";
+      case "Internship":
+        return "bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200";
+      case "ISMS":
+        return "bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200";
+      case "Documents":
+        return "bg-pink-200 dark:bg-pink-800 text-pink-800 dark:text-pink-200";
+      case "Attendance":
+        return "bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200";
+      case "Communication":
+        return "bg-teal-200 dark:bg-teal-800 text-teal-800 dark:text-teal-200";
+      case "Technical Help":
+        return "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200";
+      case "Contact":
+        return "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+      case "Welcome":
+        return "bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200";
+      case "Error":
+        return "bg-red-300 dark:bg-red-900 text-red-900 dark:text-red-300";
+      default:
+        return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100";
     }
   };
 
@@ -122,7 +147,16 @@ export default function Chatbot() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-0 sm:p-3 space-y-2 text-sm bg-white">
+          <div
+            className="flex-1 overflow-y-auto p-0 sm:p-3 space-y-2 text-sm transition-colors duration-300"
+            style={{
+              backgroundColor: document.documentElement.classList.contains(
+                "dark"
+              )
+                ? "#ffffff"
+                : "#111827",
+            }}
+          >
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -134,7 +168,9 @@ export default function Chatbot() {
               >
                 {msg.from === "bot" && msg.category && (
                   <span
-                    className={`inline-block mr-1 px-2 py-0.5 text-xs rounded-full font-semibold ${categoryColor(msg.category)}`}
+                    className={`inline-block mr-1 px-2 py-0.5 text-xs rounded-full font-semibold ${categoryColor(
+                      msg.category
+                    )}`}
                   >
                     {categoryEmoji(msg.category)} {msg.category}
                   </span>

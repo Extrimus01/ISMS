@@ -2,6 +2,7 @@ import AppLayout from "@/components/AppLayout";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ReactNode } from "react";
+import Chatbot from "@/components/ChatBot";
 
 export const metadata = {
   title: "ISMS Portal",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <AppLayout>
             {children}
+            <Chatbot />
           </AppLayout>
         </Providers>
       </body>
