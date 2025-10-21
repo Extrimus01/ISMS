@@ -5,11 +5,11 @@ import Intern from "@/models/Intern";
 export async function POST(req: NextRequest) {
   try {
     const { id } = await req.json();
-    if (!id) return NextResponse.json({ error: "Missing intern ID" }, { status: 400 });
+    if (!id)
+      return NextResponse.json({ error: "Missing intern ID" }, { status: 400 });
 
     await dbConnect();
 
-    // Populate project details
     const intern = await Intern.findById(id)
       .select("projectsAssigned")
       .populate({
@@ -17,11 +17,15 @@ export async function POST(req: NextRequest) {
         select: "title description",
       });
 
-    if (!intern) return NextResponse.json({ error: "Intern not found" }, { status: 404 });
+    if (!intern)
+      return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
     return NextResponse.json({ projects: intern.projectsAssigned });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch projects" },
+      { status: 500 }
+    );
   }
 }
