@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Toast from "@/components/global/Toast";
+import { BouncingDots } from "@/components/global/Loader";
 
 interface IProject {
   _id: string;
@@ -19,9 +20,15 @@ interface IProjectAssignment {
 export default function ProjectDetailsPage() {
   const [projects, setProjects] = useState<IProjectAssignment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: "success" | "error";
+  } | null>(null);
 
-  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "{}") : null;
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "{}")
+      : null;
   const internId = user?._id;
 
   const fetchProjects = async () => {
@@ -54,13 +61,15 @@ export default function ProjectDetailsPage() {
       <h2 className="text-xl font-semibold">Assigned Projects</h2>
 
       {loading ? (
-        <p>Loading projects...</p>
+        <div className="p-6 space-y-8">
+          <BouncingDots />
+        </div>
       ) : projects.length === 0 ? (
         <p>No projects assigned yet.</p>
       ) : (
         <table className="w-full border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 text-black">
               <th className="border p-2">Project</th>
               <th className="border p-2">Start Date</th>
               <th className="border p-2">End Date</th>
@@ -72,19 +81,35 @@ export default function ProjectDetailsPage() {
             {projects.map((p, idx) => (
               <tr key={idx} className="hover:bg-gray-50">
                 <td className="border p-2">
-                  {typeof p.project === "string" ? p.project : p.project?.title ?? "-"}
+                  {typeof p.project === "string"
+                    ? p.project
+                    : p.project?.title ?? "-"}
                 </td>
-                <td className="border p-2">{new Date(p.startDate).toLocaleDateString()}</td>
-                <td className="border p-2">{new Date(p.endDate).toLocaleDateString()}</td>
+                <td className="border p-2">
+                  {new Date(p.startDate).toLocaleDateString()}
+                </td>
+                <td className="border p-2">
+                  {new Date(p.endDate).toLocaleDateString()}
+                </td>
                 <td className="border p-2">{p.status}</td>
-                <td className="border p-2">{typeof p.project === "object" ? p.project?.description ?? "-" : "-"}</td>
+                <td className="border p-2">
+                  {typeof p.project === "object"
+                    ? p.project?.description ?? "-"
+                    : "-"}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

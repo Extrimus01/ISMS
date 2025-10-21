@@ -2,6 +2,8 @@
 
 import Toast from "@/components/global/Toast";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BouncingDots } from "@/components/global/Loader";
 
 interface IProject {
   _id: string;
@@ -47,26 +49,44 @@ export default function PersonalDetailsPage() {
   } | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchIntern = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found. Redirecting to login.");
+        router.push("/auth");
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch("/api/intern/me", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        if (res.status === 401) {
+          console.error("Unauthorized. Token might be invalid or expired.");
+          localStorage.removeItem("token");
+          router.push("/auth");
+          return;
+        }
+
         if (!res.ok) throw new Error("Failed to fetch intern data");
+
         const data: IIntern = await res.json();
         setIntern(data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching intern data:", err);
+        setToast({ message: "Failed to load intern data", type: "error" });
       } finally {
         setLoading(false);
       }
     };
 
     fetchIntern();
-  }, []);
+  }, [router]);
 
   const handleChange = (field: keyof IIntern, value: string) => {
     if (!intern) return;
@@ -76,8 +96,18 @@ export default function PersonalDetailsPage() {
   const handleSave = async () => {
     if (!intern) return;
     setSaving(true);
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setToast({
+        message: "Token missing. Please login again.",
+        type: "error",
+      });
+      router.push("/auth");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("/api/intern/me", {
         method: "PATCH",
         headers: {
@@ -93,7 +123,9 @@ export default function PersonalDetailsPage() {
           phone: intern.phone,
         }),
       });
+
       if (!res.ok) throw new Error("Failed to update");
+
       const data: IIntern = await res.json();
       setIntern(data);
       setToast({ message: "Details updated successfully!", type: "success" });
@@ -105,14 +137,18 @@ export default function PersonalDetailsPage() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading)
+    return (
+      <div className="p-6 space-y-8">
+        <BouncingDots />
+      </div>
+    );
   if (!intern) return <p className="text-center mt-10">No data found.</p>;
 
   return (
     <div className="p-6 space-y-8">
       <div className="glass-card p-6 rounded shadow space-y-4">
         <h2 className="text-xl font-semibold">Personal Details</h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block font-medium">Full Name</label>
@@ -174,7 +210,7 @@ export default function PersonalDetailsPage() {
               type="text"
               value={intern.college}
               disabled
-              className="w-full border p-2 rounded "
+              className="w-full border p-2 rounded"
             />
           </div>
           <div>
@@ -183,11 +219,10 @@ export default function PersonalDetailsPage() {
               type="text"
               value={intern.email}
               disabled
-              className="w-full border p-2 rounded "
+              className="w-full border p-2 rounded"
             />
           </div>
         </div>
-
         <button
           onClick={handleSave}
           disabled={saving}
@@ -195,7 +230,7 @@ export default function PersonalDetailsPage() {
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
-      </div>{" "}
+      </div>
       {toast && (
         <Toast
           message={toast.message}

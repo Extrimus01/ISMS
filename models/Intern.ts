@@ -3,6 +3,37 @@ import bcrypt from "bcryptjs";
 
 const { Types } = mongoose;
 
+const internAssignmentSchema = new Schema(
+  {
+    intern: { type: Schema.Types.ObjectId, ref: "Intern", required: true },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "in-progress", "completed"],
+      default: "pending",
+    },
+    feedback: { type: String, trim: true },
+    assignedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
+const projectSchema = new Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true },
+    manager: { type: Schema.Types.ObjectId, ref: "Manager", required: true },
+    interns: [internAssignmentSchema],
+    startDate: { type: Date },
+    endDate: { type: Date },
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+
+mongoose.models.Project || mongoose.model("Project", projectSchema);
+
 const attendanceSchema = new Schema(
   {
     date: { type: Date, required: true },
@@ -28,7 +59,7 @@ const documentSchema = new Schema(
   { _id: false }
 );
 
-const projectAssignmentSchema = new Schema(
+const projectAssignmentSchema2 = new Schema(
   {
     project: { type: Schema.Types.ObjectId, ref: "Project" },
     startDate: { type: Date, required: true },
@@ -41,6 +72,34 @@ const projectAssignmentSchema = new Schema(
     assignedAt: { type: Date, default: Date.now },
   },
   { _id: false }
+);
+
+const weeklyTaskSchema = new Schema(
+  {
+    week: { type: Number, required: true },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    deadline: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "completed"],
+      default: "pending",
+    },
+    feedback: { type: String },
+    proofUrl: { type: String },
+    assignedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
+const notificationSchema = new Schema(
+  {
+    title: { type: String, required: true },
+    message: { type: String, required: true },
+    read: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { _id: true }
 );
 
 export interface IIntern {
@@ -62,10 +121,12 @@ export interface IIntern {
   role: "intern";
   isEmailVerified: boolean;
   verifiedAt?: Date;
-  projectsAssigned: (typeof projectAssignmentSchema)[];
+  projectsAssigned: (typeof projectAssignmentSchema2)[];
   mentor?: mongoose.Types.ObjectId;
   attendance: (typeof attendanceSchema)[];
   documents: (typeof documentSchema)[];
+  weeklyTasks: (typeof weeklyTaskSchema)[];
+  notifications: (typeof notificationSchema)[];
   applicationStatus: "unverified" | "verified" | "rejected";
   interviewSlot?: Date;
   isActive: boolean;
@@ -94,10 +155,12 @@ const internSchema = new Schema<IIntern>(
     role: { type: String, default: "intern", enum: ["intern"] },
     isEmailVerified: { type: Boolean, default: true },
     verifiedAt: { type: Date },
-    projectsAssigned: [projectAssignmentSchema],
+    projectsAssigned: [projectAssignmentSchema2],
     mentor: { type: Schema.Types.ObjectId, ref: "Manager" },
     attendance: [attendanceSchema],
     documents: [documentSchema],
+    weeklyTasks: [weeklyTaskSchema],
+    notifications: [notificationSchema],
     applicationStatus: {
       type: String,
       default: "unverified",

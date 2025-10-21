@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
+import Project from "@/models/Project";
 import Intern from "@/models/Intern";
 import jwt from "jsonwebtoken";
 
@@ -34,10 +35,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(intern);
   } catch (error) {
     console.error("POST /api/intern/me error:", error);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
-
 export async function PATCH(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -54,26 +57,37 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updateData = await req.json();
-    const allowedFields = ["fullName", "course", "department", "semester", "refNo", "phone"];
-    const filteredData: any = {};
-    allowedFields.forEach((f) => {
-      if (updateData[f] !== undefined) filteredData[f] = updateData[f];
-    });
 
     await dbConnect();
 
-    const updatedIntern = await Intern.findByIdAndUpdate(decoded.id, filteredData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
-    if (!updatedIntern) {
+    const intern = await Intern.findById(decoded.id);
+    if (!intern)
       return NextResponse.json({ error: "Intern not found" }, { status: 404 });
+
+    const simpleFields = [
+      "fullName",
+      "course",
+      "department",
+      "semester",
+      "refNo",
+      "phone",
+    ];
+    simpleFields.forEach((f) => {
+      if (updateData[f] !== undefined) intern[f] = updateData[f];
+    });
+
+    if (updateData.documents && Array.isArray(updateData.documents)) {
+      intern.documents = [...(intern.documents || []), ...updateData.documents];
     }
 
-    return NextResponse.json(updatedIntern);
+    await intern.save();
+
+    return NextResponse.json(intern);
   } catch (error) {
     console.error("PATCH /api/intern/me error:", error);
-    return NextResponse.json({ error: "Failed to update intern" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update intern" },
+      { status: 500 }
+    );
   }
 }

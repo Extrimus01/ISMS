@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Toast from "@/components/global/Toast";
+import { BouncingDots } from "@/components/global/Loader";
 
 interface IDocument {
   type: string;
@@ -22,6 +23,9 @@ export default function DocumentsPage() {
     message: string;
     type?: "success" | "error";
   } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [docType, setDocType] = useState("College ID");
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchIntern = async () => {
@@ -41,11 +45,65 @@ export default function DocumentsPage() {
         setLoading(false);
       }
     };
-
     fetchIntern();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  const viewDocument = (doc: IDocument) => {
+    const blob = new Blob(
+      [Uint8Array.from(atob(doc.data), (c) => c.charCodeAt(0))],
+      { type: "application/pdf" }
+    );
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
+  const handleUpload = async () => {
+    if (!file || !intern) return;
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(",")[1];
+        const newDoc: IDocument = {
+          type: docType,
+          data: base64,
+          uploadedAt: new Date().toISOString(),
+        };
+
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/intern/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ documents: [newDoc] }),
+        });
+
+        if (!res.ok) throw new Error("Failed to upload document");
+        const updatedIntern: IIntern = await res.json();
+        setIntern(updatedIntern);
+        setToast({
+          message: "Document uploaded successfully!",
+          type: "success",
+        });
+        setFile(null);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Upload failed", type: "error" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="p-6 space-y-8">
+        <BouncingDots />
+      </div>
+    );
   if (!intern) return <p className="text-center mt-10">No documents found.</p>;
 
   const allDocs: IDocument[] = [
@@ -70,18 +128,42 @@ export default function DocumentsPage() {
       : []),
   ];
 
-  const viewDocument = (doc: IDocument) => {
-    const blob = new Blob(
-      [Uint8Array.from(atob(doc.data), (c) => c.charCodeAt(0))],
-      { type: "application/pdf" }
-    );
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-  };
-
   return (
     <div className="p-6 space-y-6">
-      <h2 className="text-xl font-semibold">My Documents</h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h2 className="text-xl font-semibold">My Documents</h2>
+        <div className="w-full max-w-lg">
+          <label className="block font-medium mb-2">Upload Document</label>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value)}
+              className="px-3 py-2 border rounded sm:rounded-r-none sm:rounded-l focus:outline-none w-full sm:w-auto"
+            >
+              <option>College ID</option>
+              <option>LOR</option>
+              <option>Resume</option>
+              <option>Joining Letter</option>
+            </select>
+
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              className="px-3 py-2 border rounded sm:rounded-none focus:outline-none flex-1 w-full"
+            />
+
+            <button
+              onClick={handleUpload}
+              disabled={uploading || !file}
+              className="bg-blue-600 text-white px-4 py-2 rounded sm:rounded-l-none hover:bg-blue-700 w-full sm:w-auto"
+            >
+              {uploading ? "Uploading..." : "Upload Doc"}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {allDocs.length === 0 ? (
         <p>No documents available.</p>
       ) : (
@@ -107,6 +189,7 @@ export default function DocumentsPage() {
           ))}
         </div>
       )}
+
       {toast && (
         <Toast
           message={toast.message}

@@ -64,8 +64,8 @@ const navigationItems: NavItem[] = [
 
     icon: MegaphoneIcon,
     subItems: [
-      { name: "Notifications", path: "/intern/profile" },
-      { name: "Guidelines", path: "/intern/attendence" },
+      { name: "Notifications", path: "/intern/notifications" },
+      { name: "Guidelines", path: "/intern/guidelines" },
     ],
   },
 ];

@@ -1,6 +1,4 @@
-import mongoose from "mongoose";
-
-const { Schema } = mongoose;
+import mongoose, { Schema, Document } from "mongoose";
 
 const internAssignmentSchema = new Schema(
   {
@@ -18,13 +16,13 @@ const internAssignmentSchema = new Schema(
   { _id: false }
 );
 
-export interface IProject {
+export interface IProject extends Document {
   title: string;
   description: string;
   manager: mongoose.Types.ObjectId;
-  interns: (typeof internAssignmentSchema)[];
-  startDate?: string;
-  endDate?: string;   
+  interns: mongoose.Types.ObjectId[];
+  startDate?: Date;
+  endDate?: Date;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -43,5 +41,7 @@ const projectSchema = new Schema<IProject>(
   { timestamps: true }
 );
 
-export default mongoose.models.Project ||
-  mongoose.model("Project", projectSchema);
+const Project =
+  mongoose.models.Project || mongoose.model<IProject>("Project", projectSchema);
+
+export default Project;
