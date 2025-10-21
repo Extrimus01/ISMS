@@ -39,6 +39,20 @@ export default function Contact() {
   const [otpSending, setOtpSending] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [interview, setInterview] = useState<Date | null>(null);
+  const [collegeOptions, setCollegeOptions] = useState<{ name: string }[]>([]);
+
+  useEffect(() => {
+    async function fetchColleges() {
+      try {
+        const res = await fetch("/api/colleges");
+        const data = await res.json();
+        if (res.ok) setCollegeOptions(data);
+      } catch (err) {
+        console.error("Failed to fetch colleges", err);
+      }
+    }
+    fetchColleges();
+  }, []);
 
   const showToast = (
     message: string,
@@ -283,14 +297,22 @@ export default function Contact() {
                 required
                 className="input"
               />
-              <input
-                type="text"
-                placeholder="College"
+              <select
                 value={form.college}
-                onChange={handleInput("college")}
+                onChange={(e) => setForm({ ...form, college: e.target.value })}
                 required
                 className="input"
-              />
+              >
+                <option value="" disabled>
+                  Select your college
+                </option>
+                {collegeOptions.map((c, idx) => (
+                  <option key={idx} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+
               <input
                 type="text"
                 placeholder="Course"

@@ -23,6 +23,11 @@ export default function Header() {
     { href: "/verification", label: "Verification" },
     { href: "/review", label: "Review" },
   ];
+  const uploadColleges = async () => {
+    const res = await fetch("/api/colleges/upload", { method: "POST" });
+    const data = await res.json();
+    alert(data.message || data.error);
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white/20 dark:bg-[#111827]/40 backdrop-blur-lg border-b border-white/20 dark:border-gray-800 shadow-lg z-50">
@@ -59,6 +64,12 @@ export default function Header() {
           <Button variant="outline" asChild>
             <Link href="/auth">Login</Link>
           </Button>
+          {/* <button
+            onClick={uploadColleges}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            Upload College JSON
+          </button> */}
 
           <ThemeToggle />
         </div>
