@@ -102,7 +102,7 @@ const StudentDashboardPage: React.FC = () => {
 
 
   return (
-    <div className="flex-1 p-6 overflow-auto">
+    <div className="flex-1 p-6 overflow-auto scrollbar-hide">
       <div className="relative overflow-hidden bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 md:p-8 mb-8 border border-slate-200 dark:border-gray-800 max-w-7xl mx-auto">
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl"></div>
