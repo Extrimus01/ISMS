@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@layer base {
+/* @layer base {
   :root {
     --background: 240 25% 97%;
     --foreground: 220 25% 15%;
@@ -131,4 +131,4 @@
 .scrollbar-hide {
   -ms-overflow-style: none; 
   scrollbar-width: none; 
-}
+} */

@@ -3,8 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Intern from "@/models/Intern";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
-import path from "path";
-import fs from "fs/promises";
+import { convertToPdf } from "@/lib/offerLetter";
 
 export async function GET() {
   await dbConnect();
@@ -23,79 +22,6 @@ const generateTempPassword = (length = 10) => {
   }
   return password;
 };
-
-import fetch from "node-fetch";
-
-export async function convertToPdf(docxUrl: string): Promise<Buffer> {
-  try {
-    // Step 1: Start conversion
-    const response = await fetch("https://api.converthub.com/v2/convert", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.CONVERTHUB_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: [
-          {
-            type: "upload",
-            source: docxUrl, // Publicly accessible .docx URL
-          },
-        ],
-        output_format: "pdf",
-      }),
-    });
-
-    const convertJson = await response.json();
-
-    if (!convertJson.success) {
-      throw new Error(`Convert request failed: ${JSON.stringify(convertJson)}`);
-    }
-
-    // ✅ Fix: use top-level job_id (no .data)
-    const jobId = convertJson.job_id;
-    const statusUrl = `https://api.converthub.com/v2/jobs/${jobId}`;
-
-    // Step 2: Poll job status
-    let jobStatus = "processing";
-    let resultUrl = "";
-
-    while (jobStatus === "processing" || jobStatus === "queued") {
-      const statusResp = await fetch(statusUrl, {
-        headers: {
-          "Authorization": `Bearer ${process.env.CONVERTHUB_API_KEY}`,
-        },
-      });
-
-      const statusJson = await statusResp.json();
-      jobStatus = statusJson.status;
-
-      if (jobStatus === "completed") {
-        resultUrl = statusJson.result?.download_url;
-        break;
-      } else if (jobStatus === "failed") {
-        throw new Error(`ConvertHub job failed: ${JSON.stringify(statusJson)}`);
-      }
-
-      // Wait 2s before next poll
-      await new Promise((r) => setTimeout(r, 2000));
-    }
-
-    // Step 3: Download final PDF
-    if (!resultUrl) {
-      throw new Error("No download URL found in completed job result");
-    }
-
-    const pdfResponse = await fetch(resultUrl);
-    const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
-
-    return pdfBuffer;
-  } catch (error) {
-    console.error("Error converting DOCX to PDF:", error);
-    throw new Error("Error converting DOCX to PDF");
-  }
-}
-
 
 export async function PATCH(req: Request) {
   try {
@@ -116,9 +42,14 @@ export async function PATCH(req: Request) {
 
     try {
       const pdfBuffer = await convertToPdf();
-      intern.offerLetter = `data:application/pdf;base64,${pdfBuffer.toString(
-        "base64"
-      )}`;
+      intern.documents = [
+        ...(intern.documents || []),
+        {
+          type: "Offer Letter",
+          data: `data:application/pdf;base64,${pdfBuffer.toString("base64")}`,
+          uploadedAt: new Date().toISOString(),
+        },
+      ];
     } catch (err) {
       console.error("Error generating offer letter PDF:", err);
       return NextResponse.json(
@@ -128,6 +59,13 @@ export async function PATCH(req: Request) {
     }
 
     await intern.save();
+    const offerLetter = intern.documents.find(
+      (doc: any) => doc.type === "Offer Letter"
+    );
+
+    if (!offerLetter) {
+      throw new Error("Offer letter not found in intern documents");
+    }
 
     try {
       const transporter = nodemailer.createTransport({
@@ -141,23 +79,41 @@ export async function PATCH(req: Request) {
       });
 
       const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"ISMS Support Team" <${process.env.SMTP_FROM}>`,
         to: intern.email,
         subject: "Welcome to ISMS Internship Portal – Your Account Details",
         html: `
-          <p>Dear <strong>${intern.fullName}</strong>,</p>
-          <p>Warm greetings from the Maharashtra Remote Sensing Application Center (MRSAC).</p>
-          <p>Your account has been successfully created on the <strong>ISMS Internship Management System</strong>.</p>
-          <p><strong>Login Credentials:</strong><br/>
-          Email: ${intern.email}<br/>
-          Password: ${tempPassword}</p>
-          <p>Please find your <strong>Offer Letter</strong> attached.</p>
-          <p>Best regards,<br/>ISMS Support Team</p>
-        `,
+    <p>Dear <strong>${intern.fullName}</strong>,</p>
+    <p>Warm greetings from the <strong>Maharashtra Remote Sensing Application Center (MRSAC)</strong>.</p>
+
+    <p>
+      Your account has been successfully created on the 
+      <strong>ISMS Internship Management System</strong>, the official portal developed for MRSAC internship programs.
+      You can now log in, explore available roles within the company, apply for internships, and stay updated with important
+      alerts and notifications related to your application journey.
+    </p>
+
+    <h3>Login Credentials:</h3>
+    <p>
+      <strong>Email:</strong> ${intern.email}<br/>
+      <strong>Password:</strong> ${tempPassword}
+    </p>
+        <p>Please find your <strong>Offer Letter</strong> attached.</p>
+    <p>
+      Please use these details to access your profile. For your security, kindly update your password after your first login.
+    </p>
+
+    <p>
+      We look forward to supporting your internship journey and wish you success as you begin your experience with
+      MRSAC through the ISMS portal.
+    </p>
+
+    <p>Best regards,<br/><strong>ISMS Support Team</strong></p>
+  `,
         attachments: [
           {
             filename: "OfferLetter.pdf",
-            content: intern.offerLetter.split(",")[1],
+            content: intern.documents.split(",")[1],
             encoding: "base64",
           },
         ],

@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BouncingDots } from "@/components/global/Loader";
-import { MenuIcon } from "lucide-react";
 import Sidebar from "@/components/manager/Sidebar";
+import { MenuIcon } from "lucide-react";
+
+import type React from "react";
 
 export default function ManagerLayout({
   children,
@@ -19,6 +21,7 @@ export default function ManagerLayout({
   
   useEffect(() => {
     const userData = localStorage.getItem("user");
+
     if (!userData) {
       router.replace("/auth");
       return;
@@ -26,10 +29,12 @@ export default function ManagerLayout({
 
     try {
       const user = JSON.parse(userData);
+
       if (!user.role || user.role !== "manager") {
         router.replace("/unauthorized");
         return;
       }
+
       setLoading(false);
     } catch (err) {
       console.error("Invalid user data", err);
@@ -55,34 +60,33 @@ export default function ManagerLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      
-      <Sidebar
-        isMobile={isMobile}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-      />
+    <div className="flex">
+      <main className="flex-1 ml-0 md:ml-64 md:p-6 overscroll-none">
+        <div className="flex h-[90vh] overscroll-none">
+          <Sidebar
+            isMobile={isMobile}
+            isMobileMenuOpen={isMobileMenuOpen}
+            setIsMobileMenuOpen={setIsMobileMenuOpen}
+          />
 
-      
-      <div className="flex-1 flex flex-col">
-        
-        {isMobile && (
-          <div className="flex items-center h-16 px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <MenuIcon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-            </button>
-            <h1 className="ml-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Project Manager Dashboard
-            </h1>
+          <div className="flex-1 flex flex-col">
+            {isMobile && (
+              <div className="flex items-center h-16 p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <MenuIcon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+                </button>
+                <h1 className="ml-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
+                  Manager Dashboard
+                </h1>
+              </div>
+            )}
+            {children}
           </div>
-        )}
-
-        
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

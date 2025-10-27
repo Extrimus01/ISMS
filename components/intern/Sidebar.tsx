@@ -6,7 +6,7 @@ import {
   ClipboardListIcon,
   Clock3Icon,
   LogOutIcon,
-  MegaphoneIcon,
+  ShieldCheck,
   MessageSquareIcon,
   UserIcon,
 } from "lucide-react";
@@ -60,11 +60,10 @@ const navigationItems: NavItem[] = [
     ],
   },
   {
-    name: "Notices and Directives",
+    name: "Guidelines",
 
-    icon: MegaphoneIcon,
+    icon: ShieldCheck,
     subItems: [
-      { name: "Notifications", path: "/intern/notifications" },
       { name: "Guidelines", path: "/intern/guidelines" },
     ],
   },

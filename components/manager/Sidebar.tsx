@@ -74,7 +74,7 @@ export const navigationItems: NavItem[] = [
     icon: BookOpen,
     subItems: [
       {
-        name: "Teams",
+        name: "Guidelines",
         path: "/manager/guidelines",
       },
     ],

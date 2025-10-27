@@ -1,96 +1,147 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+} from "recharts";
 
-interface Student {
-  _id: string;
-  fullName: string;
-  email: string;
+interface Stats {
+  totalInterns: number;
+  activeInterns: number;
+  totalProjects: number;
+  completedProjects: number;
+  internsByMonth: { _id: number; count: number }[];
+  projectStatus: { _id: string; count: number }[];
 }
 
-interface Project {
-  _id: string;
-  name: string;
-  description: string;
-  deadline?: string;
-  status: string;
-  assignedStudents: Student[];
-}
-
-const ManagerProjectsPage: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState<string | null>(null);
+export default function ManagerDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (!userData) return;
-
-    try {
-      const user = JSON.parse(userData);
-      if (user.role === "project_manager") {
-        setEmail(user.email);
-      }
-    } catch (err) {
-      console.error("Invalid user data", err);
-    }
+    fetch("/api/admin/stats")
+      .then((res) => res.json())
+      .then((data) => setStats(data));
   }, []);
 
-  useEffect(() => {
-    if (!email) return;
+  if (!stats)
+    return (
+      <p className="text-center mt-20 text-gray-500">Loading dashboard...</p>
+    );
 
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch(`/api/project-manager/projects?email=${encodeURIComponent(email)}`);
-        const data = await res.json();
-        if (res.ok) setProjects(data);
-      } catch (err) {
-        console.error("Error fetching projects:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, [email]);
-
-  if (loading) return <p className="p-6 text-center">Loading projects...</p>;
-  if (!email) return <p className="p-6 text-center">Unable to determine manager email.</p>;
-  if (projects.length === 0) return <p className="p-6 text-center">No projects assigned.</p>;
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"];
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-200">
-        My Projects
-      </h2>
+    <div className="p-6 space-y-8">
+      <h1 className="text-3xl font-bold mb-4">Manager Dashboard</h1>
 
-      {projects.map((project) => (
-        <div key={project._id} className="mb-6 p-4 border rounded-md border-slate-300 dark:border-slate-700">
-          <h3 className="text-xl font-semibold mb-2 text-slate-800 dark:text-slate-200">{project.name}</h3>
-          <p className="mb-2 text-slate-600 dark:text-slate-300">{project.description}</p>
-          <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
-            Deadline: {project.deadline ? new Date(project.deadline).toLocaleDateString("en-GB") : "—"}
-          </p>
-          <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">Status: {project.status}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Interns</CardTitle>
+          </CardHeader>
+          <CardContent className="text-3xl font-bold">
+            {stats.totalInterns}
+          </CardContent>
+        </Card>
 
-          <div>
-            <strong className="text-slate-700 dark:text-slate-200">Assigned Students:</strong>
-            {project.assignedStudents.length > 0 ? (
-              <ul className="list-disc list-inside text-sm text-slate-600 dark:text-slate-300">
-                {project.assignedStudents.map((s) => (
-                  <li key={s._id}>
-                    {s.fullName} ({s.email})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No students assigned.</p>
-            )}
-          </div>
-        </div>
-      ))}
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Interns</CardTitle>
+          </CardHeader>
+          <CardContent className="text-3xl font-bold text-green-600">
+            {stats.activeInterns}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Projects</CardTitle>
+          </CardHeader>
+          <CardContent className="text-3xl font-bold">
+            {stats.totalProjects}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Completed Projects</CardTitle>
+          </CardHeader>
+          <CardContent className="text-3xl font-bold text-blue-600">
+            {stats.completedProjects}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Interns Joined (Monthly)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={stats.internsByMonth.map((m) => ({
+                  name: monthNames[m._id - 1],
+                  count: m.count,
+                }))}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Project Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={stats.projectStatus}
+                  dataKey="count"
+                  nameKey="_id"
+                  label
+                >
+                  {stats.projectStatus.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
-};
-
-export default ManagerProjectsPage;
+}
