@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import {
-  ChevronDown,
-  ChevronUp,
-  UserCheck,
-  FileText,
-  FileDown,
-} from "lucide-react";
+import { BouncingDots } from "@/components/global/Loader";
+import { FileText, FileDown, UserCheck, X } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface Intern {
   _id: string;
@@ -26,17 +21,57 @@ interface Intern {
 
 export default function PendingInternsPage() {
   const [interns, setInterns] = useState<Intern[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedIntern, setSelectedIntern] = useState<Intern | null>(null);
+  const [activatingId, setActivatingId] = useState<string | null>(null);
+
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
+
+  // College data state
+  const [collegeData, setCollegeData] = useState<string>("");
+  const [editing, setEditing] = useState(false);
+  const [collegeSaved, setCollegeSaved] = useState(false);
 
   useEffect(() => {
     const fetchInterns = async () => {
-      const res = await fetch("/api/admin/interns/pending");
-      const data = await res.json();
-      setInterns(data.interns || []);
+      try {
+        const res = await fetch("/api/admin/interns/pending");
+        const data = await res.json();
+        setInterns(data.interns || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchInterns();
   }, []);
+
+  // Fetch college data when selected intern changes
+  useEffect(() => {
+    if (!selectedIntern) return;
+
+    const fetchCollege = async () => {
+      try {
+        const res = await fetch("/api/colleges", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: selectedIntern.college }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCollegeData(data.nameData || "");
+        } else {
+          setCollegeData("");
+        }
+      } catch (err) {
+        console.error("Failed to fetch college data", err);
+        setCollegeData("");
+      }
+    };
+    fetchCollege();
+  }, [selectedIntern]);
 
   const openPdf = (base64Data: string, fileName: string) => {
     try {
@@ -48,11 +83,9 @@ export default function PendingInternsPage() {
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-
       const newWindow = window.open(url, "_blank");
       if (!newWindow)
         alert("Popup blocked! Please allow popups to view the PDF.");
-
       setTimeout(() => URL.revokeObjectURL(url), 120000);
     } catch (err) {
       console.error("Error opening PDF:", err);
@@ -61,113 +94,272 @@ export default function PendingInternsPage() {
   };
 
   const handleActivate = async (id: string) => {
-    setLoadingId(id);
-    const res = await fetch("/api/admin/interns/pending", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) {
-      setInterns((prev) => prev.filter((i) => i._id !== id));
+    setActivatingId(id);
+    try {
+      const res = await fetch("/api/admin/interns/pending", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) setInterns((prev) => prev.filter((i) => i._id !== id));
+      setSelectedIntern(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActivatingId(null);
     }
-    setLoadingId(null);
   };
 
-  const toggleExpand = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
+  const handleSaveCollegeData = async () => {
+    if (!selectedIntern) return;
+    try {
+      const res = await fetch("/api/colleges", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: selectedIntern.college,
+          nameData: collegeData,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save college data");
+      setEditing(false);
+      setCollegeSaved(true);
+      setTimeout(() => setCollegeSaved(false), 2000);
+    } catch (err) {
+      console.error(err);
+      alert("Error saving college data");
+    }
   };
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <BouncingDots />
+      </div>
+    );
 
   return (
-    <div className="min-h-screen p-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800 dark:text-gray-100">
+    <div className="min-h-screen p-8">
+      <h1 className="text-3xl font-semibold mb-6">
         Pending Intern Activations
       </h1>
 
       {interns.length === 0 ? (
         <p className="text-gray-500">✅ All interns are active.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-4">
           {interns.map((intern) => (
-            <motion.div
+            <div
               key={intern._id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-200 dark:border-gray-700"
+              onClick={() => setSelectedIntern(intern)}
+              className="cursor-pointer glass-card p-4 rounded-xl shadow hover:shadow-lg border border-gray-200 dark:border-gray-700 transition"
             >
-              <div
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => toggleExpand(intern._id)}
-              >
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                  {intern.fullName}
-                </h2>
-                {expandedId === intern._id ? (
-                  <ChevronUp className="text-gray-500" />
-                ) : (
-                  <ChevronDown className="text-gray-500" />
-                )}
-              </div>
-
-              {expandedId === intern._id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  className="mt-4 border-t pt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300"
-                >
-                  <div className="grid grid-cols-2 gap-3">
-                    <p>
-                      <strong>Email:</strong> {intern.email}
-                    </p>
-                    <p>
-                      <strong>Phone:</strong> {intern.phone}
-                    </p>
-                    <p>
-                      <strong>College:</strong> {intern.college}
-                    </p>
-                    <p>
-                      <strong>Course:</strong> {intern.course}
-                    </p>
-                    <p>
-                      <strong>Department:</strong> {intern.department}
-                    </p>
-                    <p>
-                      <strong>Semester:</strong> {intern.semester}
-                    </p>
-                    <p>
-                      <strong>Reference No:</strong> {intern.refNo}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-3 mt-3">
-                    <button
-                      onClick={() =>
-                        openPdf(intern.recommendation, "recommendation.pdf")
-                      }
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200"
-                    >
-                      <FileText size={18} /> View Recommendation
-                    </button>
-
-                    <button
-                      onClick={() => openPdf(intern.collegeId, "collegeId.pdf")}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200"
-                    >
-                      <FileDown size={18} /> View College ID
-                    </button>
-
-                    <button
-                      onClick={() => handleActivate(intern._id)}
-                      disabled={loadingId === intern._id}
-                      className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow"
-                    >
-                      <UserCheck size={18} />
-                      {loadingId === intern._id ? "Activating..." : "Activate"}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
+              <p className="text-lg font-semibold">{intern.fullName}</p>
+              <p className="text-sm">{intern.email}</p>
+              <p className="text-sm">{intern.college}</p>
+            </div>
           ))}
+        </div>
+      )}
+
+      {selectedIntern && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div
+            style={{
+              backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+              borderRadius: "1rem",
+              padding: "1.5rem",
+              width: "75%",
+              maxWidth: "42rem",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setSelectedIntern(null)}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1rem",
+                color: isDarkMode ? "#d1d5db" : "#4b5563",
+                cursor: "pointer",
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <h2
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 600,
+                marginBottom: "1rem",
+                color: isDarkMode ? "#f9fafb" : "#1f2937",
+              }}
+            >
+              {selectedIntern.fullName}
+            </h2>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "1rem",
+                fontSize: "0.875rem",
+                color: isDarkMode ? "#d1d5db" : "#374151",
+              }}
+            >
+              <p>
+                <strong>Email:</strong> {selectedIntern.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {selectedIntern.phone}
+              </p>
+              <p>
+                <strong>College:</strong> {selectedIntern.college}
+              </p>
+              <p>
+                <strong>Course:</strong> {selectedIntern.course}
+              </p>
+              <p>
+                <strong>Department:</strong> {selectedIntern.department}
+              </p>
+              <p>
+                <strong>Semester:</strong> {selectedIntern.semester}
+              </p>
+              <p>
+                <strong>Ref No:</strong> {selectedIntern.refNo}
+              </p>
+              <p>
+                <strong>College Data:</strong>{" "}
+                {collegeData && !editing ? (
+                  <span>
+                    {collegeData}{" "}
+                    <button
+                      onClick={() => setEditing(true)}
+                      style={{
+                        marginLeft: "0.5rem",
+                        cursor: "pointer",
+                        color: isDarkMode ? "#93c5fd" : "#1e40af",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    {collegeSaved && (
+                      <span style={{ marginLeft: "0.5rem", color: "#10b981" }}>
+                        Saved!
+                      </span>
+                    )}
+                  </span>
+                ) : !editing ? (
+                  <span>
+                    Not set{" "}
+                    <button
+                      onClick={() => setEditing(true)}
+                      style={{
+                        marginLeft: "0.5rem",
+                        cursor: "pointer",
+                        color: isDarkMode ? "#93c5fd" : "#1e40af",
+                      }}
+                    >
+                      Add
+                    </button>
+                  </span>
+                ) : (
+                  <span>
+                    <input
+                      autoFocus
+                      value={collegeData}
+                      onChange={(e) => setCollegeData(e.target.value)}
+                      style={{
+                        padding: "0.25rem",
+                        borderRadius: "0.25rem",
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                    <button
+                      onClick={handleSaveCollegeData}
+                      style={{
+                        marginLeft: "0.5rem",
+                        cursor: "pointer",
+                        color: isDarkMode ? "#f9fafb" : "#1f2937",
+                      }}
+                    >
+                      Save
+                    </button>
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.75rem",
+                marginTop: "1.5rem",
+              }}
+            >
+              <button
+                onClick={() =>
+                  openPdf(selectedIntern.recommendation, "recommendation.pdf")
+                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.5rem",
+                  backgroundColor: isDarkMode ? "#1e40af" : "#dbeafe",
+                  color: isDarkMode ? "#93c5fd" : "#1e3a8a",
+                  cursor: "pointer",
+                }}
+              >
+                <FileText size={18} /> Recommendation
+              </button>
+
+              <button
+                onClick={() =>
+                  openPdf(selectedIntern.collegeId, "collegeId.pdf")
+                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.5rem",
+                  backgroundColor: isDarkMode ? "#064e3b" : "#d1fae5",
+                  color: isDarkMode ? "#6ee7b7" : "#065f46",
+                  cursor: "pointer",
+                }}
+              >
+                <FileDown size={18} /> College ID
+              </button>
+
+              <button
+                onClick={() => handleActivate(selectedIntern._id)}
+                disabled={activatingId === selectedIntern._id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.5rem",
+                  backgroundColor: "#059669",
+                  color: "#ffffff",
+                  cursor:
+                    activatingId === selectedIntern._id
+                      ? "not-allowed"
+                      : "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                }}
+              >
+                <UserCheck size={18} />
+                {activatingId === selectedIntern._id
+                  ? "Activating..."
+                  : "Activate"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

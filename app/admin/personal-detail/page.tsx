@@ -1,9 +1,11 @@
 "use client";
 
+import Toast from "@/components/global/Toast";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { BouncingDots } from "@/components/global/Loader";
 
-interface AdminDetails {
+interface IAdmin {
   _id: string;
   fullName: string;
   companyName: string;
@@ -13,67 +15,97 @@ interface AdminDetails {
   createdAt?: string;
 }
 
-export default function AdminPage() {
-  const [admin, setAdmin] = useState<AdminDetails | null>(null);
+export default function AdminPersonalDetailsPage() {
+  const [admin, setAdmin] = useState<IAdmin | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: "success" | "error";
+  } | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const router = useRouter();
+
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      toast.error("No logged-in user found");
-      setLoading(false);
-      return;
-    }
+    const fetchAdmin = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found. Redirecting to login.");
+        router.push("/auth");
+        return;
+      }
 
-    const parsedUser = JSON.parse(storedUser);
-    const adminId = parsedUser._id;
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        setToast({ message: "No logged-in user found", type: "error" });
+        setLoading(false);
+        return;
+      }
 
-    if (!adminId) {
-      toast.error("Admin ID not found");
-      setLoading(false);
-      return;
-    }
+      const parsedUser = JSON.parse(storedUser);
+      const adminId = parsedUser._id;
 
-    async function fetchAdmin() {
+      if (!adminId) {
+        setToast({ message: "Admin ID not found", type: "error" });
+        setLoading(false);
+        return;
+      }
+
       try {
-        setLoading(true);
-        const res = await fetch(`/api/admin/detail`, {
+        const res = await fetch("/api/admin", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { Authorization: `Bearer ${token}` },
           body: JSON.stringify({ id: adminId }),
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Failed to load admin details");
+        if (res.status === 401) {
+          console.error("Unauthorized. Token might be invalid or expired.");
+          localStorage.removeItem("token");
+          router.push("/auth");
+          return;
         }
 
-        const data: AdminDetails = await res.json();
+        if (!res.ok) throw new Error("Failed to fetch admin data");
+
+        const data: IAdmin = await res.json();
         setAdmin(data);
-      } catch (err: any) {
-        toast.error(err.message || "Failed to fetch admin");
+      } catch (err) {
+        console.error("Error fetching admin data:", err);
+        setToast({ message: "Failed to load admin data", type: "error" });
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchAdmin();
-  }, []);
+  }, [router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setAdmin((prev) => (prev ? { ...prev, [name]: value } : prev));
+  const handleChange = (field: keyof IAdmin, value: string) => {
+    if (!admin) return;
+    setAdmin({ ...admin, [field]: value });
   };
 
   const handleSave = async () => {
     if (!admin) return;
     setSaving(true);
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setToast({
+        message: "Token missing. Please login again.",
+        type: "error",
+      });
+      router.push("/auth");
+      return;
+    }
+
     try {
-      const res = await fetch(`/api/admin/detail`, {
+      const res = await fetch("/api/admin", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           id: admin._id,
           fullName: admin.fullName,
@@ -83,16 +115,14 @@ export default function AdminPage() {
         }),
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to save changes");
-      }
+      if (!res.ok) throw new Error("Failed to update");
 
-      const updatedAdmin: AdminDetails = await res.json();
-      setAdmin(updatedAdmin);
-      toast.success("Details updated successfully!");
-    } catch (err: any) {
-      toast.error(err.message || "Error updating details");
+      const data: IAdmin = await res.json();
+      setAdmin(data);
+      setToast({ message: "Details updated successfully!", type: "success" });
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Failed to update details", type: "error" });
     } finally {
       setSaving(false);
     }
@@ -100,65 +130,86 @@ export default function AdminPage() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
       </div>
     );
 
-  if (!admin) return null;
+  if (!admin) return <p className="text-center mt-10">No data found.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 text-center">
-        Personal Details
-      </h2>
+    <div className="p-6 space-y-8">
+      <div className="glass-card p-6 rounded shadow space-y-4">
+        <h2 className="text-xl font-semibold">Personal Details</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {[
-          { label: "Full Name", name: "fullName", type: "text" },
-          { label: "Company Name", name: "companyName", type: "text" },
-          { label: "Email", name: "email", type: "email" },
-          { label: "Phone", name: "phone", type: "text" },
-        ].map((field) => (
-          <div key={field.name} className="flex flex-col">
-            <label className="font-medium text-gray-700 dark:text-gray-200 mb-2">
-              {field.label}
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium">Full Name</label>
             <input
-              type={field.type}
-              name={field.name}
-              value={admin[field.name as keyof AdminDetails] ?? ""}
-              onChange={handleChange}
-              className="p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="text"
+              value={admin.fullName}
+              onChange={(e) => handleChange("fullName", e.target.value)}
+              className="w-full border p-2 rounded"
             />
           </div>
-        ))}
-
-        <div className="md:col-span-2 mt-4 text-gray-600 dark:text-gray-300 space-y-1">
-          {admin.lastLogin && (
-            <p>
-              <span className="font-medium">Last Login:</span>{" "}
-              {new Date(admin.lastLogin).toLocaleString()}
-            </p>
-          )}
-          {admin.createdAt && (
-            <p>
-              <span className="font-medium">Joined On:</span>{" "}
-              {new Date(admin.createdAt).toLocaleDateString()}
-            </p>
-          )}
+          <div>
+            <label className="block font-medium">Company Name</label>
+            <input
+              type="text"
+              value={admin.companyName}
+              onChange={(e) => handleChange("companyName", e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+          <div>
+            <label className="block font-medium">Email</label>
+            <input
+              type="email"
+              value={admin.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+          <div>
+            <label className="block font-medium">Phone</label>
+            <input
+              type="text"
+              value={admin.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+          <div>
+            <label className="block font-medium">Joined On</label>
+            <input
+              type="text"
+              value={
+                admin.createdAt
+                  ? new Date(admin.createdAt).toLocaleDateString()
+                  : "N/A"
+              }
+              disabled
+              className="w-full border p-2 rounded bg-gray-100 text-gray-600"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-8 flex justify-center">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-50"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

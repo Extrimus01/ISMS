@@ -42,16 +42,44 @@ export default function Contact() {
   const [collegeOptions, setCollegeOptions] = useState<{ name: string }[]>([]);
 
   useEffect(() => {
-    async function fetchColleges() {
+    const controller = new AbortController();
+
+    async function fetchColleges(query: string) {
       try {
-        const res = await fetch("/api/colleges");
+        const res = await fetch(
+          `/api/colleges?search=${encodeURIComponent(query)}`,
+          {
+            signal: controller.signal,
+          }
+        );
         const data = await res.json();
         if (res.ok) setCollegeOptions(data);
-      } catch (err) {
-        console.error("Failed to fetch colleges", err);
+      } catch (err: any) {
+        if (err.name !== "AbortError")
+          console.error("Failed to fetch colleges", err);
       }
     }
-    fetchColleges();
+
+    const timeout = setTimeout(() => {
+      if (form.college.trim().length > 1) fetchColleges(form.college.trim());
+      else setCollegeOptions([]);
+    }, 400);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [form.college]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".college-autocomplete")) {
+        setCollegeOptions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const showToast = (
@@ -297,21 +325,37 @@ export default function Contact() {
                 required
                 className="input"
               />
-              <select
-                value={form.college}
-                onChange={(e) => setForm({ ...form, college: e.target.value })}
-                required
-                className="input"
-              >
-                <option value="" disabled>
-                  Select your college
-                </option>
-                {collegeOptions.map((c, idx) => (
-                  <option key={idx} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative college-autocomplete">
+                <input
+                  type="text"
+                  placeholder="Search College"
+                  value={form.college}
+                  onChange={(e) =>
+                    setForm({ ...form, college: e.target.value })
+                  }
+                  className="input"
+                  autoComplete="off"
+                  required
+                />
+
+                {collegeOptions.length > 0 &&
+                  form.college.trim().length > 1 && (
+                    <ul className="absolute z-50 mt-1 w-full bg-black-900 border border-[var(--border)] rounded-xl shadow-lg max-h-56 overflow-y-auto">
+                      {collegeOptions.map((c, idx) => (
+                        <li
+                          key={idx}
+                          onClick={() => {
+                            setForm({ ...form, college: c.name });
+                            setCollegeOptions([]);
+                          }}
+                          className="px-4 py-2 hover:bg-[var(--accent)] hover:text-blue cursor-pointer transition-colors"
+                        >
+                          {c.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+              </div>
 
               <input
                 type="text"
@@ -360,7 +404,7 @@ export default function Contact() {
                   type="button"
                   onClick={handleSendOtp}
                   disabled={otpCountdown > 0 || otpVerified || otpSending}
-                  className="bg-[var(--accent)] text-white px-4 sm:px-6 py-3 font-medium hover:bg-[var(--accent-hover)] transition-all w-full sm:w-auto"
+                  className="bg-[var(--accent)] text-blue px-4 sm:px-6 py-3 font-medium hover:bg-[var(--accent-hover)] transition-all w-full sm:w-auto"
                 >
                   {otpCountdown > 0
                     ? `Resend in ${otpCountdown}s`
@@ -386,7 +430,7 @@ export default function Contact() {
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={otpVerified}
-                  className="bg-[var(--accent)] text-white px-4 sm:px-6 py-3 font-medium hover:bg-[var(--accent-hover)] transition-all w-full sm:w-auto"
+                  className="bg-[var(--accent)] text-blue px-4 sm:px-6 py-3 font-medium hover:bg-[var(--accent-hover)] transition-all w-full sm:w-auto"
                 >
                   {otpVerified && (
                     <CheckCircle className="inline-block mr-2" size={18} />
