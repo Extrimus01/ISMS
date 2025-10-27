@@ -61,7 +61,7 @@ export default function Chatbot() {
 
   return (
     <div
-      className={`flex flex-col h-full max-h-[90vh] w-full md:w-3/4 lg:w-2/4 mx-auto rounded-xl shadow-lg border overflow-hidden transition-colors ${
+      className={`flex flex-col h-full max-h-[90vh] w-4/4 mx-auto rounded-xl shadow-lg border overflow-hidden transition-colors ${
         isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
       }`}
     >

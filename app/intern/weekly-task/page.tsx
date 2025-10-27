@@ -15,14 +15,61 @@ interface ITask {
   proofUrl?: string;
 }
 
+interface IProject {
+  _id: string;
+  title: string;
+  description?: string;
+}
+
+interface IProjectAssignment {
+  project?: IProject | string;
+  startDate: string;
+  endDate: string;
+  status: "assigned" | "in-progress" | "completed";
+}
 export default function WeeklyTaskPage() {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: "success" | "error";
+  } | null>(null);
+  const [projects, setProjects] = useState<IProjectAssignment[]>([]);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
+
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "{}")
+      : null;
+  const internId = user?._id;
+
+  const fetchProjects = async () => {
+    if (!internId) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/intern/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: internId }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch projects");
+
+      const data = await res.json();
+      setProjects(data.projects || []);
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Failed to load projects", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, [internId]);
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -100,7 +147,7 @@ export default function WeeklyTaskPage() {
 
   if (loading)
     return (
-      <div className="p-6 space-y-8">
+      <div className="flex items-center justify-center min-h-screen">
         <BouncingDots />
       </div>
     );
@@ -109,7 +156,9 @@ export default function WeeklyTaskPage() {
     <div className="p-6 space-y-8">
       <h2 className="text-xl font-semibold">Weekly Tasks</h2>
 
-      {Object.keys(groupedTasks).length === 0 ? (
+      {projects.length === 0 ? (
+        <p>No projects assigned yet.</p>
+      ) : Object.keys(groupedTasks).length === 0 ? (
         <p>No tasks assigned yet.</p>
       ) : (
         Object.entries(groupedTasks).map(([week, weekTasks]) => (

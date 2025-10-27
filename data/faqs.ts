@@ -1,5 +1,15 @@
 export const faqs = [
   {
+    category: "Greeting",
+    question: "Hello",
+    answer: "Hello",
+  },
+  {
+    category: "Greeting",
+    question: "Hii",
+    answer: "Hello",
+  },
+  {
     category: "About MRSAC",
     question: "What is MRSAC?",
     answer:

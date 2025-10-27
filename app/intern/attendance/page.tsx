@@ -4,6 +4,18 @@ import { useEffect, useState } from "react";
 import Toast from "@/components/global/Toast";
 import { BouncingDots } from "@/components/global/Loader";
 
+interface IProject {
+  _id: string;
+  title: string;
+  description?: string;
+}
+
+interface IProjectAssignment {
+  project?: IProject | string;
+  startDate: string;
+  endDate: string;
+  status: "assigned" | "in-progress" | "completed";
+}
 interface IAttendance {
   date: string;
   status: "pending" | "present" | "absent";
@@ -52,6 +64,32 @@ export default function AttendancePage() {
       setLoading(false);
     }
   };
+  const [projects, setProjects] = useState<IProjectAssignment[]>([]);
+
+  const fetchProjects = async () => {
+    if (!internId) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/intern/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: internId }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch projects");
+
+      const data = await res.json();
+      setProjects(data.projects || []);
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Failed to load projects", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, [internId]);
 
   const markToday = async () => {
     if (!internId) return;
@@ -155,7 +193,11 @@ export default function AttendancePage() {
       </div>
 
       {loading ? (
-        <BouncingDots />
+        <div className="flex items-center justify-center min-h-screen">
+          <BouncingDots />
+        </div>
+      ) : projects.length === 0 ? (
+        <p>No projects assigned yet.</p>
       ) : (
         <div className="grid grid-cols-7 gap-2">
           {[...Array(daysInMonth)].map((_, idx) => {
@@ -166,7 +208,7 @@ export default function AttendancePage() {
                 key={day}
                 className={`flex flex-col items-center justify-center p-2 rounded cursor-pointer ${getColor(
                   status
-                )} text-white`}
+                )} text-black`}
                 title={status}
               >
                 {day}

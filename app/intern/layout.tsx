@@ -61,17 +61,17 @@ export default function StudentLayout({
 
   return (
     <div className="flex">
-      <main className="flex-1 ml-0 md:ml-64 p-6 ">
-        <div className="flex h-screen">
+      <main className="flex-1 ml-0 md:ml-64 md:p-6 overscroll-none">
+        <div className="flex h-[90vh] overscroll-none">
           <Sidebar
             isMobile={isMobile}
             isMobileMenuOpen={isMobileMenuOpen}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
 
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col">
             {isMobile && (
-              <div className="flex items-center h-16 px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center h-16 p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

@@ -100,7 +100,7 @@ export default function DocumentsPage() {
 
   if (loading)
     return (
-      <div className="p-6 space-y-8">
+      <div className="flex items-center justify-center min-h-screen">
         <BouncingDots />
       </div>
     );
