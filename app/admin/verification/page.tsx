@@ -28,7 +28,6 @@ export default function PendingInternsPage() {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
 
-  // College data state
   const [collegeData, setCollegeData] = useState<string>("");
   const [editing, setEditing] = useState(false);
   const [collegeSaved, setCollegeSaved] = useState(false);
@@ -48,7 +47,6 @@ export default function PendingInternsPage() {
     fetchInterns();
   }, []);
 
-  // Fetch college data when selected intern changes
   useEffect(() => {
     if (!selectedIntern) return;
 

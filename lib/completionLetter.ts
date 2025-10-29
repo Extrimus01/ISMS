@@ -80,10 +80,12 @@ export async function convertToPdf(): Promise<Buffer> {
       return cursor;
     };
 
-    page.drawText(
-      "Ref. No.: MRSAC/Student-[College Name]/UG/[AutoGenerateNo8]/2025",
-      { x: margin, y: cursorY, size: 10, font: boldFont }
-    );
+    page.drawText("Ver: [16 digit no]", {
+      x: margin,
+      y: cursorY,
+      size: 10,
+      font: boldFont,
+    });
 
     page.drawText(`Date: ${formattedDate}`, {
       x: width - 150,
@@ -97,9 +99,10 @@ export async function convertToPdf(): Promise<Buffer> {
     const addressLines = [
       "To,",
       "{Name-Data}",
-      "Dean – Industry Relations,",
+      "Head of the Department,",
+      "[Computer Engineering],",
       "[College Name],",
-      "Nagpur [Address],",
+      "Nagpur-441108,",
     ];
 
     for (const line of addressLines) {
@@ -114,24 +117,15 @@ export async function convertToPdf(): Promise<Buffer> {
 
     cursorY -= 10;
 
-    cursorY = drawWrappedText(
-      "Permission for the internship and guidance to the students from [CourceName( Artificial Intelligence Engineering Department)](Sem (Seventh semester)) of [G.H.Raisoni College of Engineering, Nagpur] for partial fulfilment of their degree.",
-      margin,
-      cursorY,
-      width - margin * 2,
-      regularFont,
-      fontSizeNormal,
-      lineHeight
+    page.drawText(
+      "Subject: Completion of Internship Work by UG Student - Bachelor of Engineering in Computer Engineering",
+      {
+        x: margin,
+        y: cursorY,
+        size: fontSizeNormal,
+        font: boldFont,
+      }
     );
-
-    cursorY -= 10;
-
-    page.drawText("Ref: GHRCE/IIP/2024-25/AI/443 dated: 09/06/2025", {
-      x: margin,
-      y: cursorY,
-      size: fontSizeNormal,
-      font: regularFont,
-    });
     cursorY -= lineHeight * 2;
 
     page.drawText("Dear Sir/Madam,", {
@@ -143,7 +137,7 @@ export async function convertToPdf(): Promise<Buffer> {
     cursorY -= lineHeight * 1.5;
 
     cursorY = drawWrappedText(
-      "This is with the above reference letter, Student of [CourceName( Artificial Intelligence)] branch (Sem (Seventh semester)) of [G.H.Raisoni College of Engineering, Nagpur] is allowed to work at our centre as an intern from [16th June 2025 to 15th December 2025. ]",
+      "This is to certify that the internship project titled 'Secure Park' has been successfully completed by the following UG student of Bachelor of Engineering in Computer Engineering, College name, City at Maharashtra Remote Sensing Application Centre (MRSAC), Nagpur, during the period from January 2025 to May 2025:",
       margin,
       cursorY,
       width - margin * 2,
@@ -154,24 +148,27 @@ export async function convertToPdf(): Promise<Buffer> {
 
     cursorY -= 10;
 
-    page.drawText("1. Mr. Jass Dandare", {
+    page.drawText("Ms. Shruti Vijay Kanfade", {
       x: margin + 20,
       y: cursorY,
       size: fontSizeNormal,
       font: boldFont,
     });
-    cursorY -= lineHeight * 2;
+    cursorY -= lineHeight * 1.5;
 
-    page.drawText("Thanking You,", {
-      x: margin,
-      y: cursorY,
-      size: fontSizeNormal,
-      font: regularFont,
-    });
+    cursorY = drawWrappedText(
+      "She has contributed effectively to various modules of the Secure Park Project, including AI integration, machine learning implementation, web development, and user interface design. Her performance during the internship was sincere and commendable. We wish her all the best in her future endeavors.",
+      margin,
+      cursorY,
+      width - margin * 2,
+      regularFont,
+      fontSizeNormal,
+      lineHeight
+    );
     cursorY -= lineHeight * 3;
 
     const rightBlockX = width - 180;
-    page.drawText("Yours faithfully,", {
+    page.drawText("Regards,", {
       x: rightBlockX,
       y: cursorY,
       size: fontSizeNormal,
@@ -186,7 +183,7 @@ export async function convertToPdf(): Promise<Buffer> {
       font: boldFont,
     });
     cursorY -= lineHeight;
-    page.drawText("Associate Scientist", {
+    page.drawText("(Associate Scientist)", {
       x: rightBlockX,
       y: cursorY,
       size: fontSizeNormal,

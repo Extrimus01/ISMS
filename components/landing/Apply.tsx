@@ -298,7 +298,14 @@ export default function Contact() {
             Apply for Internship
           </h2>
           <div className="w-72 sm:w-96 h-72 sm:h-96">
-            <Lottie animationData={animationData} loop />
+            <Lottie
+              animationData={animationData}
+              loop={true}
+              style={{ width: "100%", height: "100%" }}
+              rendererSettings={{
+                preserveAspectRatio: "xMidYMid meet",
+              }}
+            />
           </div>
           <Link
             href="/auth"
@@ -317,14 +324,18 @@ export default function Contact() {
         >
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={form.fullName}
-                onChange={handleInput("fullName")}
-                required
-                className="input"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="fullName"
+                  placeholder="Full Name"
+                  value={form.fullName}
+                  onChange={handleInput("fullName")}
+                  required
+                  className="w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
+                />
+              </div>
+
               <div className="relative college-autocomplete">
                 <input
                   type="text"
@@ -333,7 +344,7 @@ export default function Contact() {
                   onChange={(e) =>
                     setForm({ ...form, college: e.target.value })
                   }
-                  className="input"
+                  className="input w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
                   autoComplete="off"
                   required
                 />
@@ -363,7 +374,7 @@ export default function Contact() {
                 value={form.course}
                 onChange={handleInput("course")}
                 required
-                className="input"
+                className="input w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
               />
               <input
                 type="text"
@@ -371,7 +382,7 @@ export default function Contact() {
                 value={form.department}
                 onChange={handleInput("department")}
                 required
-                className="input"
+                className="input w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
               />
               <input
                 type="text"
@@ -379,7 +390,7 @@ export default function Contact() {
                 value={form.semester}
                 onChange={handleInput("semester")}
                 required
-                className="input"
+                className="input w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
               />
               <input
                 type="text"
@@ -387,7 +398,7 @@ export default function Contact() {
                 value={form.refNo}
                 onChange={handleInput("refNo")}
                 required
-                className="input"
+                className="input w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
               />
 
               <div className="col-span-full flex flex-col sm:flex-row border border-[var(--border)] rounded-xl overflow-hidden bg-[var(--background)] focus-within:ring-2 focus-within:ring-[var(--accent)] transition-all">
@@ -512,9 +523,40 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading || !otpVerified}
-              className="btn-primary w-full mt-3"
+              className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--border)]
+    ${
+      loading || !otpVerified
+        ? "bg-[var(--accent)]/40 text-[var(--foreground-secondary)] cursor-not-allowed"
+        : "bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 hover:shadow-lg active:scale-[0.98]"
+    }`}
             >
-              {loading ? "Submitting..." : "Submit"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 11-8 8z"
+                    ></path>
+                  </svg>
+                  Submitting...
+                </span>
+              ) : (
+                "Submit"
+              )}
             </button>
           </form>
         </motion.div>
