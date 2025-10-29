@@ -40,13 +40,29 @@ export async function PATCH(req: Request) {
     intern.isActive = true;
     intern.password = hashedPassword;
 
+    let pdfBuffer: Buffer;
     try {
-      const pdfBuffer = await convertToPdf();
+      const { pdf, reference } = await convertToPdf({
+        collegeName: intern.college,
+        deanName: intern.recommendation?.deanName || "Dean",
+        addressLine: intern.collegeAddress || "",
+        department: intern.department,
+        semester: intern.semester,
+        refNo: intern.refNo || "",
+        internshipStart: intern.internshipStart || "",
+        internshipEnd: intern.internshipEnd || "",
+        studentName: intern.fullName,
+      });
+
+      pdfBuffer = pdf;
+
       intern.documents = [
         ...(intern.documents || []),
         {
           type: "Offer Letter",
-          data: `data:application/pdf;base64,${pdfBuffer.toString("base64")}`,
+          data: `data:application/pdf;base64,${Buffer.from(pdfBuffer).toString(
+            "base64"
+          )}`,
           uploadedAt: new Date().toISOString(),
         },
       ];
@@ -59,13 +75,19 @@ export async function PATCH(req: Request) {
     }
 
     await intern.save();
+
     const offerLetter = intern.documents.find(
       (doc: any) => doc.type === "Offer Letter"
     );
 
     if (!offerLetter) {
-      throw new Error("Offer letter not found in intern documents");
+      return NextResponse.json(
+        { error: "Offer letter not found after generation" },
+        { status: 500 }
+      );
     }
+
+    const base64Data = offerLetter.data.split(",")[1];
 
     try {
       const transporter = nodemailer.createTransport({
@@ -83,37 +105,33 @@ export async function PATCH(req: Request) {
         to: intern.email,
         subject: "Welcome to ISMS Internship Portal – Your Account Details",
         html: `
-    <p>Dear <strong>${intern.fullName}</strong>,</p>
-    <p>Warm greetings from the <strong>Maharashtra Remote Sensing Application Center (MRSAC)</strong>.</p>
+          <p>Dear <strong>${intern.fullName}</strong>,</p>
+          <p>Warm greetings from the <strong>Maharashtra Remote Sensing Application Center (MRSAC)</strong>.</p>
 
-    <p>
-      Your account has been successfully created on the 
-      <strong>ISMS Internship Management System</strong>, the official portal developed for MRSAC internship programs.
-      You can now log in, explore available roles within the company, apply for internships, and stay updated with important
-      alerts and notifications related to your application journey.
-    </p>
+          <p>
+            Your account has been successfully created on the
+            <strong>ISMS Internship Management System</strong>, the official portal developed for MRSAC internship programs.
+            You can now log in, explore available roles, apply for internships, and stay updated with important notifications.
+          </p>
 
-    <h3>Login Credentials:</h3>
-    <p>
-      <strong>Email:</strong> ${intern.email}<br/>
-      <strong>Password:</strong> ${tempPassword}
-    </p>
-        <p>Please find your <strong>Offer Letter</strong> attached.</p>
-    <p>
-      Please use these details to access your profile. For your security, kindly update your password after your first login.
-    </p>
+          <h3>Login Credentials:</h3>
+          <p>
+            <strong>Email:</strong> ${intern.email}<br/>
+            <strong>Password:</strong> ${tempPassword}
+          </p>
 
-    <p>
-      We look forward to supporting your internship journey and wish you success as you begin your experience with
-      MRSAC through the ISMS portal.
-    </p>
+          <p>Please find your <strong>Offer Letter</strong> attached.</p>
 
-    <p>Best regards,<br/><strong>ISMS Support Team</strong></p>
-  `,
+          <p>
+            Please use these details to access your profile. For your security, kindly update your password after your first login.
+          </p>
+
+          <p>Best regards,<br/><strong>ISMS Support Team</strong></p>
+        `,
         attachments: [
           {
             filename: "OfferLetter.pdf",
-            content: intern.documents.split(",")[1],
+            content: base64Data,
             encoding: "base64",
           },
         ],

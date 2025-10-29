@@ -1,10 +1,34 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-export async function convertToPdf(): Promise<Buffer> {
+
+interface PdfParams {
+  collegeName: string;
+  deanName: string;
+  addressLine?: string;
+  department: string;
+  semester: string;
+  refNo?: string;
+  internshipStart: string;
+  internshipEnd: string;
+  studentName: string;
+}
+
+export async function convertToPdf({
+  collegeName = "",
+  deanName = "",
+  addressLine = "",
+  department = "",
+  semester = "",
+  refNo = "",
+  internshipStart = "",
+  internshipEnd = "",
+  studentName = "",
+}: PdfParams): Promise<{ pdf: Buffer; reference: string }> {
   try {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]);
     const { height, width } = page.getSize();
-    // ---------- GET CURRENT DATE ----------
+    const randomRef = Math.floor(10000000 + Math.random() * 90000000);
+
     const today = new Date();
     const formattedDate = `${String(today.getDate()).padStart(2, "0")}-${String(
       today.getMonth() + 1
@@ -81,7 +105,7 @@ export async function convertToPdf(): Promise<Buffer> {
     };
 
     page.drawText(
-      "Ref. No.: MRSAC/Student-[College Name]/UG/[AutoGenerateNo8]/2025",
+      `Ref. No.: MRSAC/Student-${collegeName}/UG/${randomRef}/${new Date().getFullYear()}`,
       { x: margin, y: cursorY, size: 10, font: boldFont }
     );
 
@@ -96,10 +120,10 @@ export async function convertToPdf(): Promise<Buffer> {
 
     const addressLines = [
       "To,",
-      "{Name-Data}",
+      deanName,
       "Dean – Industry Relations,",
-      "[College Name],",
-      "Nagpur [Address],",
+      collegeName,
+      addressLine ? addressLine : "Nagpur",
     ];
 
     for (const line of addressLines) {
@@ -115,7 +139,7 @@ export async function convertToPdf(): Promise<Buffer> {
     cursorY -= 10;
 
     cursorY = drawWrappedText(
-      "Permission for the internship and guidance to the students from [CourceName( Artificial Intelligence Engineering Department)](Sem (Seventh semester)) of [G.H.Raisoni College of Engineering, Nagpur] for partial fulfilment of their degree.",
+      `Permission for the internship and guidance to the students from ${department} ${semester} SEM of ${collegeName} ${addressLine} for partial fulfilment of their degree.`,
       margin,
       cursorY,
       width - margin * 2,
@@ -126,7 +150,7 @@ export async function convertToPdf(): Promise<Buffer> {
 
     cursorY -= 10;
 
-    page.drawText("Ref: GHRCE/IIP/2024-25/AI/443 dated: 09/06/2025", {
+    page.drawText(`Ref: ${refNo}`, {
       x: margin,
       y: cursorY,
       size: fontSizeNormal,
@@ -143,7 +167,7 @@ export async function convertToPdf(): Promise<Buffer> {
     cursorY -= lineHeight * 1.5;
 
     cursorY = drawWrappedText(
-      "This is with the above reference letter, Student of [CourceName( Artificial Intelligence)] branch (Sem (Seventh semester)) of [G.H.Raisoni College of Engineering, Nagpur] is allowed to work at our centre as an intern from [16th June 2025 to 15th December 2025. ]",
+      `This is with the above reference letter, Student of ${department} branch ${semester} Sem of ${collegeName} is allowed to work at our centre as an intern from ${internshipStart} to ${internshipEnd}.`,
       margin,
       cursorY,
       width - margin * 2,
@@ -154,7 +178,7 @@ export async function convertToPdf(): Promise<Buffer> {
 
     cursorY -= 10;
 
-    page.drawText("1. Mr. Jass Dandare", {
+    page.drawText(studentName, {
       x: margin + 20,
       y: cursorY,
       size: fontSizeNormal,
@@ -206,7 +230,10 @@ export async function convertToPdf(): Promise<Buffer> {
     });
 
     const pdfBytes = await pdfDoc.save();
-    return Buffer.from(pdfBytes);
+    return {
+      pdf: Buffer.from(pdfBytes),
+      reference: randomRef.toString(),
+    };
   } catch (err) {
     console.error("Error converting DOCX to PDF:", err);
     throw err;
