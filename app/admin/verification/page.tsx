@@ -24,6 +24,8 @@ export default function PendingInternsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedIntern, setSelectedIntern] = useState<Intern | null>(null);
   const [activatingId, setActivatingId] = useState<string | null>(null);
+  const [internshipStart, setInternshipStart] = useState("");
+  const [internshipEnd, setInternshipEnd] = useState("");
 
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
@@ -92,15 +94,21 @@ export default function PendingInternsPage() {
   };
 
   const handleActivate = async (id: string) => {
+    if (!internshipStart || !internshipEnd) {
+      alert("Please select both start and end dates before activation.");
+      return;
+    }
     setActivatingId(id);
     try {
       const res = await fetch("/api/admin/interns/pending", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, internshipStart, internshipEnd }),
       });
       if (res.ok) setInterns((prev) => prev.filter((i) => i._id !== id));
       setSelectedIntern(null);
+      setInternshipStart("");
+      setInternshipEnd("");
     } catch (err) {
       console.error(err);
     } finally {
@@ -228,7 +236,7 @@ export default function PendingInternsPage() {
                 <strong>Ref No:</strong> {selectedIntern.refNo}
               </p>
               <p>
-                <strong>College Data:</strong>{" "}
+                <strong>College Dean:</strong>{" "}
                 {collegeData && !editing ? (
                   <span>
                     {collegeData}{" "}
@@ -287,6 +295,61 @@ export default function PendingInternsPage() {
                   </span>
                 )}
               </p>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "1rem",
+                flexWrap: "wrap",
+                marginTop: "1.5rem",
+              }}
+            >
+              <div>
+                <label
+                  style={{
+                    fontWeight: 500,
+                    display: "block",
+                    marginBottom: "0.25rem",
+                    color: isDarkMode ? "#f9fafb" : "#1f2937",
+                  }}
+                >
+                  Internship Start Date:
+                </label>
+                <input
+                  type="date"
+                  value={internshipStart}
+                  onChange={(e) => setInternshipStart(e.target.value)}
+                  style={{
+                    padding: "0.4rem 0.5rem",
+                    borderRadius: "0.5rem",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    fontWeight: 500,
+                    display: "block",
+                    marginBottom: "0.25rem",
+                    color: isDarkMode ? "#f9fafb" : "#1f2937",
+                  }}
+                >
+                  Internship End Date:
+                </label>
+                <input
+                  type="date"
+                  value={internshipEnd}
+                  onChange={(e) => setInternshipEnd(e.target.value)}
+                  style={{
+                    padding: "0.4rem 0.5rem",
+                    borderRadius: "0.5rem",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
             </div>
 
             <div

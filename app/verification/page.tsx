@@ -12,7 +12,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+import OfferLetter from "@/models/OfferLetter";
 
 export default function VerificationPage() {
   const [certificateId, setCertificateId] = useState("");
@@ -149,9 +149,9 @@ export default function VerificationPage() {
                       <Lightbulb className="text-cyan-400" size={18} />
                       <p>
                         <span className="font-semibold text-gray-300">
-                          Project Name:
+                          Department:
                         </span>{" "}
-                        {result.project}
+                        {result.department}
                       </p>
                     </div>
 
@@ -166,7 +166,23 @@ export default function VerificationPage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 sm:mt-6 pt-3 sm:pt-4 border-t border-white/10 text-xs sm:text-sm text-gray-400 text-center">
+                  <div className="mt-6 flex justify-center">
+                    <button
+                      onClick={() => {
+                        const pdfWindow = window.open();
+                        if (pdfWindow) {
+                          pdfWindow.document.write(
+                            `<iframe src="${result.pdfData}" width="100%" height="100%"></iframe>`
+                          );
+                        }
+                      }}
+                      className="bg-cyan-500 hover:bg-cyan-400 text-white px-6 py-3 rounded-full font-medium transition-all"
+                    >
+                      View Offer Letter
+                    </button>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-white/10 text-xs text-gray-400 text-center">
                     Certificate ID:{" "}
                     <span className="text-gray-200 font-medium">
                       {result.certificateId}

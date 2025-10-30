@@ -4,7 +4,6 @@ export async function convertToPdf(): Promise<Buffer> {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]);
     const { height, width } = page.getSize();
-    // ---------- GET CURRENT DATE ----------
     const today = new Date();
     const formattedDate = `${String(today.getDate()).padStart(2, "0")}-${String(
       today.getMonth() + 1

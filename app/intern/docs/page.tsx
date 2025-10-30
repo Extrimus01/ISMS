@@ -49,12 +49,27 @@ export default function DocumentsPage() {
   }, []);
 
   const viewDocument = (doc: IDocument) => {
-    const blob = new Blob(
-      [Uint8Array.from(atob(doc.data), (c) => c.charCodeAt(0))],
-      { type: "application/pdf" }
-    );
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+    try {
+      const base64Data = doc.data.split(",").pop()?.trim();
+
+      if (!base64Data) {
+        throw new Error("Invalid Base64 data");
+      }
+
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error("Error viewing document:", err);
+      alert("This file is corrupted or not a valid PDF.");
+    }
   };
 
   const handleUpload = async () => {

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Intern from "@/models/Intern";
+import College from "@/models/College";
 import nodemailer from "nodemailer";
-import bcrypt from "bcryptjs";
 import { convertToPdf } from "@/lib/offerLetter";
+import OfferLetter from "@/models/OfferLetter";
 
 export async function GET() {
   await dbConnect();
@@ -13,20 +14,10 @@ export async function GET() {
   return NextResponse.json({ interns });
 }
 
-const generateTempPassword = (length = 10) => {
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-};
-
 export async function PATCH(req: Request) {
   try {
     await dbConnect();
-    const { id } = await req.json();
+    const { id, internshipStart, internshipEnd } = await req.json();
 
     if (!id)
       return NextResponse.json({ error: "Missing intern ID" }, { status: 400 });
@@ -35,26 +26,36 @@ export async function PATCH(req: Request) {
     if (!intern)
       return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
-    const tempPassword = generateTempPassword();
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
     intern.isActive = true;
-    intern.password = hashedPassword;
+
+    let deanName = "Dean";
+    let collegeName = intern.college;
+
+    if (collegeName) {
+      const college = await College.findOne({ name: collegeName });
+      if (college) {
+        collegeName = college.name;
+        deanName = college.nameData || "Dean";
+      }
+    }
 
     let pdfBuffer: Buffer;
+    let reference: string;
     try {
-      const { pdf, reference } = await convertToPdf({
+      const { pdf, reference: ref } = await convertToPdf({
         collegeName: intern.college,
-        deanName: intern.recommendation?.deanName || "Dean",
+        deanName,
         addressLine: intern.collegeAddress || "",
         department: intern.department,
         semester: intern.semester,
         refNo: intern.refNo || "",
-        internshipStart: intern.internshipStart || "",
-        internshipEnd: intern.internshipEnd || "",
+        internshipStart: internshipStart || "",
+        internshipEnd: internshipEnd || "",
         studentName: intern.fullName,
       });
 
       pdfBuffer = pdf;
+      reference = ref;
 
       intern.documents = [
         ...(intern.documents || []),
@@ -75,6 +76,22 @@ export async function PATCH(req: Request) {
     }
 
     await intern.save();
+
+    try {
+      const offerLetterDoc = new OfferLetter({
+        intern: intern._id,
+        refNo: reference,
+        fullName: intern.fullName,
+        collegeName,
+        department: intern.department,
+        pdfData: `data:application/pdf;base64,${Buffer.from(pdfBuffer).toString(
+          "base64"
+        )}`,
+      });
+      await offerLetterDoc.save();
+    } catch (saveErr) {
+      console.error("Error saving offer letter to OfferLetter model:", saveErr);
+    }
 
     const offerLetter = intern.documents.find(
       (doc: any) => doc.type === "Offer Letter"
@@ -117,7 +134,7 @@ export async function PATCH(req: Request) {
           <h3>Login Credentials:</h3>
           <p>
             <strong>Email:</strong> ${intern.email}<br/>
-            <strong>Password:</strong> ${tempPassword}
+            <strong>Password:</strong> ${intern.password}
           </p>
 
           <p>Please find your <strong>Offer Letter</strong> attached.</p>

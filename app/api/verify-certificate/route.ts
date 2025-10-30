@@ -1,56 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/dbConnect";
-import Intern, { IIntern } from "@/models/Intern";
-import Project, { IProject } from "@/models/Project";
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/dbConnect";
+import OfferLetter from "@/models/OfferLetter";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    await connectDB();
+    await dbConnect();
 
     const { searchParams } = new URL(req.url);
-    const certificateId = searchParams.get("id");
+    const id = searchParams.get("id");
 
-    if (!certificateId) {
+    if (!id) {
       return NextResponse.json(
-        { error: "Certificate ID is required." },
+        { error: "Missing certificate ID" },
         { status: 400 }
       );
     }
 
-    const intern = await Intern.findOne({ certificateId })
-      .populate({
-        path: "projectsAssigned.project",
-        model: Project,
-        select: "title",
-      })
-      .lean<IIntern & { projectsAssigned: { project: IProject }[] }>();
+    const offerLetter = await OfferLetter.findOne({ refNo: id });
 
-    if (!intern) {
-      return NextResponse.json(
-        { error: "Invalid certificate ID. Please check and try again." },
-        { status: 404 }
-      );
+    if (!offerLetter) {
+      return NextResponse.json({}, { status: 404 });
     }
 
-    const lastProject =
-      intern.projectsAssigned && intern.projectsAssigned.length > 0
-        ? intern.projectsAssigned[intern.projectsAssigned.length - 1]?.project
-            ?.title || "N/A"
-        : "N/A";
-
-    const responseData = {
-      name: intern.fullName,
-      college: intern.college,
-      project: lastProject,
-      issueDate: intern.issueDate || "N/A",
-      certificateId: intern.certificateId,
-    };
-
-    return NextResponse.json(responseData);
+    return NextResponse.json({
+      name: offerLetter.fullName,
+      college: offerLetter.collegeName,
+      department: offerLetter.department,
+      issueDate: new Date(offerLetter.createdAt).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      certificateId: offerLetter.refNo,
+      pdfData: offerLetter.pdfData,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Verification API error:", error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again later." },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

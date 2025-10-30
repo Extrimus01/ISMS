@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 interface PdfParams {
@@ -36,9 +38,8 @@ export async function convertToPdf({
     const margin = 50;
     let cursorY = height - margin;
 
-    const headerBytes = await fetch("/images/head.png").then((r) =>
-      r.arrayBuffer()
-    );
+    const headerPath = path.join(process.cwd(), "public", "images", "head.png");
+    const headerBytes = fs.readFileSync(headerPath);
     const headerImage = await pdfDoc.embedPng(headerBytes);
     const headerDims = headerImage.scale(0.41);
 
@@ -103,11 +104,18 @@ export async function convertToPdf({
 
       return cursor;
     };
+    cursorY += 50;
 
-    page.drawText(
+    cursorY = drawWrappedText(
       `Ref. No.: MRSAC/Student-${collegeName}/UG/${randomRef}/${new Date().getFullYear()}`,
-      { x: margin, y: cursorY, size: 10, font: boldFont }
+      margin,
+      cursorY,
+      width - margin * 2,
+      boldFont,
+      10,
+      lineHeight
     );
+    cursorY -= 20;
 
     page.drawText(`Date: ${formattedDate}`, {
       x: width - 150,
@@ -216,10 +224,8 @@ export async function convertToPdf({
       size: fontSizeNormal,
       font: regularFont,
     });
-
-    const footerBytes = await fetch("/images/foot.png").then((r) =>
-      r.arrayBuffer()
-    );
+    const footerPath = path.join(process.cwd(), "public", "images", "foot.png");
+    const footerBytes = fs.readFileSync(footerPath);
     const footerImage = await pdfDoc.embedPng(footerBytes);
     const footerDims = footerImage.scale(0.41);
     page.drawImage(footerImage, {
