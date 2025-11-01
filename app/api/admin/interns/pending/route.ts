@@ -21,6 +21,7 @@ const generateTempPassword = (length = 10) => {
   for (let i = 0; i < length; i++) {
     password += chars.charAt(Math.floor(Math.random() * chars.length));
   }
+  console.log(password);
   return password;
 };
 
@@ -48,6 +49,7 @@ export async function PATCH(req: Request) {
         deanName = college.nameData || "Dean";
       }
     }
+    let tempPassword = "";
 
     let pdfBuffer: Buffer;
     let reference: string;
@@ -67,7 +69,7 @@ export async function PATCH(req: Request) {
       pdfBuffer = pdf;
       reference = ref;
 
-      const tempPassword = generateTempPassword();
+      tempPassword = generateTempPassword();
       intern.password = tempPassword;
 
       intern.documents = [
@@ -147,7 +149,7 @@ export async function PATCH(req: Request) {
           <h3>Login Credentials:</h3>
           <p>
             <strong>Email:</strong> ${intern.email}<br/>
-            <strong>Password:</strong> ${intern.password}
+            <strong>Password:</strong> ${tempPassword}
           </p>
 
           <p>Please find your <strong>Offer Letter</strong> attached.</p>
