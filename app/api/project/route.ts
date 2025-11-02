@@ -6,9 +6,11 @@ import Project from "@/models/Project";
 export async function GET() {
   try {
     await dbConnect();
+    console.log("Registered models:", Object.keys((await import("mongoose")).models));
+
     const projects = await Project.find({})
       .populate({
-        path: "manager",
+        path: "managers",
         select: "_id fullName",
         options: { strictPopulate: false },
       })

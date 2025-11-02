@@ -1,13 +1,13 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";
 import Message from "@/models/Message";
 
-export async function GET(req: NextRequest, context: { params: { projectId: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { projectId: string } }
+) {
   await connectDB();
 
-  
-  const params = await context.params;
   const projectId = params.projectId;
 
   try {
@@ -15,14 +15,19 @@ export async function GET(req: NextRequest, context: { params: { projectId: stri
     return NextResponse.json({ messages });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch messages" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest, context: { params: { projectId: string } }) {
+export async function POST(
+  req: NextRequest,
+  context: { params: { projectId: string } }
+) {
   await connectDB();
 
-  
   const params = await context.params;
   const projectId = params.projectId;
 
@@ -44,6 +49,9 @@ export async function POST(req: NextRequest, context: { params: { projectId: str
     return NextResponse.json({ message: newMessage }, { status: 201 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to send message" },
+      { status: 500 }
+    );
   }
 }

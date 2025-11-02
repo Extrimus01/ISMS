@@ -5,6 +5,78 @@ import { useTheme } from "next-themes";
 import { Pencil, Trash2, PlusCircle } from "lucide-react";
 import Toast from "@/components/global/Toast";
 
+interface ConfirmModalProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 100,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: isDark ? "#1f2937" : "#ffffff",
+          color: isDark ? "#e5e7eb" : "#111827",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: isDark
+            ? "0 4px 16px rgba(255,255,255,0.1)"
+            : "0 4px 16px rgba(0,0,0,0.15)",
+          width: "90%",
+          maxWidth: "400px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ marginBottom: "20px", fontSize: "16px", fontWeight: 500 }}>
+          {message}
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+          <button
+            onClick={onCancel}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              backgroundColor: isDark ? "#374151" : "#e5e7eb",
+              color: isDark ? "#fff" : "#111",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              backgroundColor: "#ef4444",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface Manager {
   _id: string;
   fullName: string;
@@ -30,6 +102,11 @@ export default function ManagerPage() {
   const [toast, setToast] = useState<{
     message: string;
     type?: "success" | "error";
+  } | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    id: string;
+    message: string;
   } | null>(null);
 
   useEffect(() => {
@@ -91,6 +168,7 @@ export default function ManagerPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this manager?")) return;
+
     const res = await fetch(`/api/manager/${id}`, { method: "DELETE" });
     if (res.ok) {
       await fetchManagers();
@@ -130,6 +208,16 @@ export default function ManagerPage() {
         transition: "background-color 0.3s ease, color 0.3s ease",
       }}
     >
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={() => {
+            handleDelete(confirmModal.id);
+            setConfirmModal(null);
+          }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
       <div
         style={{
           display: "flex",
@@ -302,7 +390,12 @@ export default function ManagerPage() {
                 </button>
 
                 <button
-                  onClick={() => handleDelete(manager._id)}
+                  onClick={() =>
+                    setConfirmModal({
+                      id: manager._id,
+                      message: "Are you sure you want to delete this project?",
+                    })
+                  }
                   style={{
                     color: "#ef4444",
                     background: "none",
