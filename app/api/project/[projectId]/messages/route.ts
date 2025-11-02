@@ -19,14 +19,11 @@ export async function GET(req: NextRequest, context: any) {
   }
 }
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { projectId: string } }
-) {
+
+export async function POST(req: NextRequest, context: any) {
   await connectDB();
 
-  const params = await context.params;
-  const projectId = params.projectId;
+  const projectId = context?.params?.projectId;
 
   try {
     const body = await req.json();
