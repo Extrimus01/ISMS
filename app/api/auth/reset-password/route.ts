@@ -1,17 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import dbConnect from "@/lib/dbConnect";
 import Admin from "@/models/Admin";
 import Manager from "@/models/Manager";
 import Intern from "@/models/Intern";
+import dbConnect from "@/lib/dbConnect";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const token = authHeader.replace("Bearer ", "");
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
     const { email, currentPassword, newPassword } = await req.json();
 
     if (!email || !currentPassword || !newPassword) {
       return NextResponse.json(
-        { error: "Email, current password, and new password are required." },
+        { error: "All fields are required" },
         { status: 400 }
       );
     }
@@ -36,40 +43,30 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found." }, { status: 404 });
-    }
-
-    if (role === "Intern" && !user.isActive) {
-      return NextResponse.json(
-        {
-          error:
-            "Your internship account is not yet active. Please contact your manager or admin.",
-        },
-        { status: 403 }
-      );
-    }
-
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
+
+    if (!isMatch)
       return NextResponse.json(
-        { error: "Current password is incorrect." },
+        { error: "Current password is incorrect" },
         { status: 401 }
       );
-    }
 
-    const hashed = await bcrypt.hash(newPassword, 10);
-    user.password = hashed;
+    user.password = newPassword;
     await user.save();
 
     return NextResponse.json({
       success: true,
-      message: "Password updated successfully. Please log in again.",
+      message: `Password updated successfully for ${role}.`,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Reset password error:", err);
+    if (err.name === "JsonWebTokenError") {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

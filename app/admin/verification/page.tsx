@@ -26,7 +26,6 @@ export default function PendingInternsPage() {
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [internshipStart, setInternshipStart] = useState("");
   const [internshipEnd, setInternshipEnd] = useState("");
-
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
 
@@ -51,7 +50,6 @@ export default function PendingInternsPage() {
 
   useEffect(() => {
     if (!selectedIntern) return;
-
     const fetchCollege = async () => {
       try {
         const res = await fetch("/api/colleges", {
@@ -62,11 +60,8 @@ export default function PendingInternsPage() {
         if (res.ok) {
           const data = await res.json();
           setCollegeData(data.nameData || "");
-        } else {
-          setCollegeData("");
-        }
-      } catch (err) {
-        console.error("Failed to fetch college data", err);
+        } else setCollegeData("");
+      } catch {
         setCollegeData("");
       }
     };
@@ -77,9 +72,8 @@ export default function PendingInternsPage() {
     try {
       const byteCharacters = atob(base64Data.split(",")[1] || base64Data);
       const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
+      for (let i = 0; i < byteCharacters.length; i++)
         byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
@@ -88,7 +82,6 @@ export default function PendingInternsPage() {
         alert("Popup blocked! Please allow popups to view the PDF.");
       setTimeout(() => URL.revokeObjectURL(url), 120000);
     } catch (err) {
-      console.error("Error opening PDF:", err);
       alert("Failed to open PDF file.");
     }
   };
@@ -109,8 +102,6 @@ export default function PendingInternsPage() {
       setSelectedIntern(null);
       setInternshipStart("");
       setInternshipEnd("");
-    } catch (err) {
-      console.error(err);
     } finally {
       setActivatingId(null);
     }
@@ -131,8 +122,7 @@ export default function PendingInternsPage() {
       setEditing(false);
       setCollegeSaved(true);
       setTimeout(() => setCollegeSaved(false), 2000);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Error saving college data");
     }
   };
@@ -145,39 +135,100 @@ export default function PendingInternsPage() {
     );
 
   return (
-    <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-semibold mb-6">
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "1rem",
+        maxWidth: "1200px",
+        margin: "0 auto",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "1.75rem",
+          fontWeight: 600,
+          marginBottom: "1rem",
+          color: isDarkMode ? "#f9fafb" : "#1f2937",
+          textAlign: "center",
+        }}
+      >
         Pending Intern Activations
       </h1>
 
       {interns.length === 0 ? (
-        <p className="text-gray-500">✅ All interns are active.</p>
+        <p style={{ textAlign: "center", color: "#6b7280" }}>
+          ✅ All interns are active.
+        </p>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1rem",
+          }}
+        >
           {interns.map((intern) => (
             <div
               key={intern._id}
               onClick={() => setSelectedIntern(intern)}
-              className="cursor-pointer glass-card p-4 rounded-xl shadow hover:shadow-lg border border-gray-200 dark:border-gray-700 transition"
+              style={{
+                cursor: "pointer",
+                backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                padding: "1rem",
+                borderRadius: "0.75rem",
+                border: isDarkMode ? "1px solid #374151" : "1px solid #e5e7eb",
+                boxShadow: isDarkMode
+                  ? "0 2px 6px rgba(0,0,0,0.4)"
+                  : "0 2px 6px rgba(0,0,0,0.1)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "scale(1.02)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
             >
-              <p className="text-lg font-semibold">{intern.fullName}</p>
-              <p className="text-sm">{intern.email}</p>
-              <p className="text-sm">{intern.college}</p>
+              <p style={{ fontSize: "1.1rem", fontWeight: 600 }}>
+                {intern.fullName}
+              </p>
+              <p style={{ fontSize: "0.9rem" }}>{intern.email}</p>
+              <p style={{ fontSize: "0.9rem" }}>{intern.college}</p>
             </div>
           ))}
         </div>
       )}
 
       {selectedIntern && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "stretch",
+            zIndex: 50,
+            overflow: "hidden",
+          }}
+        >
           <div
             style={{
-              backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-              borderRadius: "1rem",
+              backgroundColor: isDarkMode ? "#111827" : "#ffffff",
+              color: isDarkMode ? "#f9fafb" : "#1f2937",
+              width: "100%",
+              maxWidth: "30rem",
+              height: "100%",
+              overflowY: "auto",
               padding: "1.5rem",
-              width: "75%",
-              maxWidth: "42rem",
-              boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+              borderTopLeftRadius: "1rem",
+              borderBottomLeftRadius: "1rem",
+              boxShadow: isDarkMode
+                ? "0 0 25px rgba(0,0,0,0.6)"
+                : "0 0 25px rgba(0,0,0,0.2)",
+              transform: "translateX(0)",
+              transition: "transform 0.3s ease-in-out",
+              animation: "slideIn 0.3s forwards",
               position: "relative",
             }}
           >
@@ -189,54 +240,78 @@ export default function PendingInternsPage() {
                 right: "1rem",
                 color: isDarkMode ? "#d1d5db" : "#4b5563",
                 cursor: "pointer",
+                background: "transparent",
+                border: "none",
               }}
             >
-              <X size={20} />
+              <X size={22} />
             </button>
 
             <h2
               style={{
-                fontSize: "1.5rem",
-                fontWeight: 600,
+                fontSize: "1.6rem",
+                fontWeight: 700,
                 marginBottom: "1rem",
-                color: isDarkMode ? "#f9fafb" : "#1f2937",
+                textAlign: "center",
+                borderBottom: isDarkMode
+                  ? "1px solid #374151"
+                  : "1px solid #e5e7eb",
+                paddingBottom: "0.75rem",
               }}
             >
               {selectedIntern.fullName}
             </h2>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1rem",
-                fontSize: "0.875rem",
-                color: isDarkMode ? "#d1d5db" : "#374151",
-              }}
-            >
+            <div style={{ marginBottom: "1.25rem" }}>
+              <h3
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                  color: isDarkMode ? "#9ca3af" : "#6b7280",
+                  borderBottom: isDarkMode
+                    ? "1px solid #374151"
+                    : "1px solid #e5e7eb",
+                  paddingBottom: "0.25rem",
+                }}
+              >
+                Intern Details
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                  gap: "0.75rem",
+                  marginTop: "0.5rem",
+                }}
+              >
+                <p>
+                  <strong>Email:</strong> {selectedIntern.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedIntern.phone}
+                </p>
+                <p>
+                  <strong>College:</strong> {selectedIntern.college}
+                </p>
+                <p>
+                  <strong>Course:</strong> {selectedIntern.course}
+                </p>
+                <p>
+                  <strong>Department:</strong> {selectedIntern.department}
+                </p>
+                <p>
+                  <strong>Semester:</strong> {selectedIntern.semester}
+                </p>
+                <p>
+                  <strong>Ref No:</strong> {selectedIntern.refNo}
+                </p>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1rem" }}>
               <p>
-                <strong>Email:</strong> {selectedIntern.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {selectedIntern.phone}
-              </p>
-              <p>
-                <strong>College:</strong> {selectedIntern.college}
-              </p>
-              <p>
-                <strong>Course:</strong> {selectedIntern.course}
-              </p>
-              <p>
-                <strong>Department:</strong> {selectedIntern.department}
-              </p>
-              <p>
-                <strong>Semester:</strong> {selectedIntern.semester}
-              </p>
-              <p>
-                <strong>Ref No:</strong> {selectedIntern.refNo}
-              </p>
-              <p>
-                <strong>College Dean:</strong>{" "}
+                <strong>Internship Head:</strong>{" "}
                 {collegeData && !editing ? (
                   <span>
                     {collegeData}{" "}
@@ -246,6 +321,9 @@ export default function PendingInternsPage() {
                         marginLeft: "0.5rem",
                         cursor: "pointer",
                         color: isDarkMode ? "#93c5fd" : "#1e40af",
+                        background: "none",
+                        border: "none",
+                        fontWeight: 500,
                       }}
                     >
                       Edit
@@ -265,6 +343,9 @@ export default function PendingInternsPage() {
                         marginLeft: "0.5rem",
                         cursor: "pointer",
                         color: isDarkMode ? "#93c5fd" : "#1e40af",
+                        background: "none",
+                        border: "none",
+                        fontWeight: 500,
                       }}
                     >
                       Add
@@ -280,14 +361,18 @@ export default function PendingInternsPage() {
                         padding: "0.25rem",
                         borderRadius: "0.25rem",
                         border: "1px solid #ccc",
+                        marginRight: "0.5rem",
                       }}
                     />
                     <button
                       onClick={handleSaveCollegeData}
                       style={{
-                        marginLeft: "0.5rem",
                         cursor: "pointer",
                         color: isDarkMode ? "#f9fafb" : "#1f2937",
+                        backgroundColor: isDarkMode ? "#2563eb" : "#dbeafe",
+                        borderRadius: "0.25rem",
+                        border: "none",
+                        padding: "0.25rem 0.5rem",
                       }}
                     >
                       Save
@@ -297,122 +382,184 @@ export default function PendingInternsPage() {
               </p>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "1rem",
-                flexWrap: "wrap",
-                marginTop: "1.5rem",
-              }}
-            >
-              <div>
-                <label
-                  style={{
-                    fontWeight: 500,
-                    display: "block",
-                    marginBottom: "0.25rem",
-                    color: isDarkMode ? "#f9fafb" : "#1f2937",
-                  }}
-                >
-                  Internship Start Date:
-                </label>
-                <input
-                  type="date"
-                  value={internshipStart}
-                  onChange={(e) => setInternshipStart(e.target.value)}
-                  style={{
-                    padding: "0.4rem 0.5rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    fontWeight: 500,
-                    display: "block",
-                    marginBottom: "0.25rem",
-                    color: isDarkMode ? "#f9fafb" : "#1f2937",
-                  }}
-                >
-                  Internship End Date:
-                </label>
-                <input
-                  type="date"
-                  value={internshipEnd}
-                  onChange={(e) => setInternshipEnd(e.target.value)}
-                  style={{
-                    padding: "0.4rem 0.5rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #ccc",
-                  }}
-                />
+            <div style={{ marginBottom: "1.25rem" }}>
+              <h3
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                  color: isDarkMode ? "#9ca3af" : "#6b7280",
+                  borderBottom: isDarkMode
+                    ? "1px solid #374151"
+                    : "1px solid #e5e7eb",
+                  paddingBottom: "0.25rem",
+                }}
+              >
+                Internship Duration
+              </h3>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.8rem",
+                  marginTop: "0.5rem",
+                }}
+              >
+                <div>
+                  <label style={{ fontWeight: 500 }}>Start Date</label>
+                  <input
+                    type="date"
+                    value={internshipStart}
+                    onChange={(e) => setInternshipStart(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem",
+                      borderRadius: "0.5rem",
+                      border: isDarkMode
+                        ? "1px solid #374151"
+                        : "1px solid #d1d5db",
+                      backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
+                      color: isDarkMode ? "#e5e7eb" : "#111827",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontWeight: 500 }}>End Date</label>
+                  <input
+                    type="date"
+                    value={internshipEnd}
+                    onChange={(e) => setInternshipEnd(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem",
+                      borderRadius: "0.5rem",
+                      border: isDarkMode
+                        ? "1px solid #374151"
+                        : "1px solid #d1d5db",
+                      backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
+                      color: isDarkMode ? "#e5e7eb" : "#111827",
+                      outline: "none",
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.75rem",
-                marginTop: "1.5rem",
-              }}
-            >
-              <button
-                onClick={() =>
-                  openPdf(selectedIntern.recommendation, "recommendation.pdf")
-                }
+            <div style={{ marginBottom: "1.5rem" }}>
+              <h3
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "0.5rem",
-                  backgroundColor: isDarkMode ? "#1e40af" : "#dbeafe",
-                  color: isDarkMode ? "#93c5fd" : "#1e3a8a",
-                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                  color: isDarkMode ? "#9ca3af" : "#6b7280",
+                  borderBottom: isDarkMode
+                    ? "1px solid #374151"
+                    : "1px solid #e5e7eb",
+                  paddingBottom: "0.25rem",
                 }}
               >
-                <FileText size={18} /> Recommendation
-              </button>
-
-              <button
-                onClick={() =>
-                  openPdf(selectedIntern.collegeId, "collegeId.pdf")
-                }
+                Documents
+              </h3>
+              <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "0.5rem",
-                  backgroundColor: isDarkMode ? "#064e3b" : "#d1fae5",
-                  color: isDarkMode ? "#6ee7b7" : "#065f46",
-                  cursor: "pointer",
+                  flexWrap: "wrap",
+                  gap: "0.75rem",
+                  marginTop: "0.5rem",
                 }}
               >
-                <FileDown size={18} /> College ID
-              </button>
+                <button
+                  onClick={() =>
+                    openPdf(selectedIntern.recommendation, "recommendation.pdf")
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.6rem 1rem",
+                    borderRadius: "0.5rem",
+                    border: "none",
+                    backgroundColor: isDarkMode ? "#1e3a8a" : "#dbeafe",
+                    color: isDarkMode ? "#93c5fd" : "#1e3a8a",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = isDarkMode
+                      ? "#1d4ed8"
+                      : "#bfdbfe")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = isDarkMode
+                      ? "#1e3a8a"
+                      : "#dbeafe")
+                  }
+                >
+                  <FileText size={18} /> Recommendation
+                </button>
 
+                <button
+                  onClick={() =>
+                    openPdf(selectedIntern.collegeId, "collegeId.pdf")
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.6rem 1rem",
+                    borderRadius: "0.5rem",
+                    border: "none",
+                    backgroundColor: isDarkMode ? "#064e3b" : "#d1fae5",
+                    color: isDarkMode ? "#6ee7b7" : "#065f46",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = isDarkMode
+                      ? "#047857"
+                      : "#a7f3d0")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = isDarkMode
+                      ? "#064e3b"
+                      : "#d1fae5")
+                  }
+                >
+                  <FileDown size={18} /> College ID
+                </button>
+              </div>
+            </div>
+
+            <div style={{ textAlign: "center" }}>
               <button
                 onClick={() => handleActivate(selectedIntern._id)}
                 disabled={activatingId === selectedIntern._id}
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                   gap: "0.5rem",
-                  padding: "0.5rem 1rem",
+                  padding: "0.7rem 1.5rem",
                   borderRadius: "0.5rem",
                   backgroundColor: "#059669",
                   color: "#ffffff",
+                  border: "none",
                   cursor:
                     activatingId === selectedIntern._id
                       ? "not-allowed"
                       : "pointer",
                   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                  opacity: activatingId === selectedIntern._id ? 0.7 : 1,
+                  transition: "all 0.25s",
                 }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#047857")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#059669")
+                }
               >
                 <UserCheck size={18} />
                 {activatingId === selectedIntern._id
@@ -421,6 +568,17 @@ export default function PendingInternsPage() {
               </button>
             </div>
           </div>
+
+          <style jsx>{`
+            @keyframes slideIn {
+              from {
+                transform: translateX(100%);
+              }
+              to {
+                transform: translateX(0);
+              }
+            }
+          `}</style>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BouncingDots } from "../global/Loader";
 
 interface AdminDetails {
   _id: string;
@@ -58,8 +59,8 @@ export default function PersonalDetails() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
       </div>
     );
   if (error)

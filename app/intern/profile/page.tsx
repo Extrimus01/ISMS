@@ -1,5 +1,6 @@
 "use client";
 
+import { BouncingDots } from "@/components/global/Loader";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -23,7 +24,7 @@ interface Student {
   interviewDate?: string;
   interviewSlot?: string;
   internship?: Internship;
-  offerLetter?: string; 
+  offerLetter?: string;
 }
 
 const StudentProfilePage: React.FC = () => {
@@ -86,7 +87,12 @@ const StudentProfilePage: React.FC = () => {
     }
   };
 
-  if (loading) return <p className="p-6 text-center">Loading profile...</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
+      </div>
+    );
   if (!student) return <p className="p-6 text-center">Student not found.</p>;
 
   return (
@@ -96,7 +102,6 @@ const StudentProfilePage: React.FC = () => {
       </h2>
 
       <div className="space-y-4">
-        
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
             Full Name
@@ -146,7 +151,6 @@ const StudentProfilePage: React.FC = () => {
           />
         </div>
 
-        
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
             Old Password
@@ -182,7 +186,6 @@ const StudentProfilePage: React.FC = () => {
           </button>
         </div>
 
-        
         <div className="mt-6 space-y-1">
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Verified: {student.verified ? "Yes ✅" : "No ❌"}

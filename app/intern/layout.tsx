@@ -7,6 +7,7 @@ import Sidebar from "@/components/intern/Sidebar";
 import { MenuIcon } from "lucide-react";
 
 import type React from "react";
+import { useTheme } from "next-themes";
 
 export default function StudentLayout({
   children,
@@ -17,8 +18,8 @@ export default function StudentLayout({
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-  
   useEffect(() => {
     const userData = localStorage.getItem("user");
 
@@ -43,7 +44,6 @@ export default function StudentLayout({
     }
   }, [router]);
 
-  
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -61,7 +61,13 @@ export default function StudentLayout({
 
   return (
     <div className="flex">
-      <main className="flex-1 ml-0 md:ml-64 md:p-6 overscroll-none">
+      <main
+        className={`flex-1 ml-0 md:ml-64 md:p-6 overscroll-none  ${
+          theme === "dark"
+            ? "bg-[#0d1117] text-white"
+            : "bg-gray-50 text-gray-900"
+        }`}
+      >
         <div className="flex h-[90vh] overscroll-none">
           <Sidebar
             isMobile={isMobile}

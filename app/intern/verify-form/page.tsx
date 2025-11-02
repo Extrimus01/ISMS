@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BouncingDots } from "@/components/global/Loader";
 
 const availableSlots = [
   "10:00 AM - 11:00 AM",
@@ -159,8 +160,8 @@ const StudentVerifyForm: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-700 dark:text-gray-200">
-        Loading...
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
       </div>
     );
   }

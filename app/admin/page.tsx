@@ -14,6 +14,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
+import { BouncingDots } from "@/components/global/Loader";
 
 interface Stats {
   totalInterns: number;
@@ -35,7 +36,9 @@ export default function AdminDashboard() {
 
   if (!stats)
     return (
-      <p className="text-center mt-20 text-gray-500">Loading dashboard...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
+      </div>
     );
 
   const monthNames = [

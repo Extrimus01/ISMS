@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface Project {
   _id: string;
@@ -21,6 +24,9 @@ interface Intern {
 }
 
 export default function InternProjectDashboard() {
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
+
   const [interns, setInterns] = useState<Intern[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,7 +57,7 @@ export default function InternProjectDashboard() {
 
   const handleAssign = async () => {
     if (!selectedIntern || !selectedProject || !startDate || !endDate)
-      return alert("Fill all fields");
+      return toast.error("Please fill all fields");
 
     setLoading(true);
     try {
@@ -68,14 +74,14 @@ export default function InternProjectDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to assign project");
 
-      alert("Project assigned successfully");
+      toast.success("Project assigned successfully");
       setSelectedIntern("");
       setSelectedProject("");
       setStartDate("");
       setEndDate("");
       fetchInterns();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -99,11 +105,11 @@ export default function InternProjectDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update assignment");
 
-      alert("Assignment updated");
+      toast.success("Assignment updated successfully");
       setEditAssignment(null);
       fetchInterns();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -111,7 +117,7 @@ export default function InternProjectDashboard() {
     internId: string,
     projectId: string
   ) => {
-    if (!confirm("Are you sure to remove this assignment?")) return;
+    if (!confirm("Are you sure you want to remove this assignment?")) return;
     try {
       const res = await fetch("/api/intern/project", {
         method: "DELETE",
@@ -121,124 +127,270 @@ export default function InternProjectDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete assignment");
 
-      alert("Assignment removed");
+      toast.success("Assignment removed");
       fetchInterns();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Intern Project Management</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        padding: "1.5rem",
+        maxWidth: "1100px",
+        margin: "0 auto",
+        color: isDarkMode ? "#f3f4f6" : "#1f2937",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "1.75rem",
+          fontWeight: "600",
+          marginBottom: "1rem",
+          textAlign: "center",
+        }}
+      >
+        Intern Project Management
+      </h1>
 
-      <div className="p-4 border rounded space-y-2">
-        <h2 className="font-semibold">Assign New Project</h2>
-        <select
-          value={selectedIntern}
-          onChange={(e) => setSelectedIntern(e.target.value)}
-          className="p-2 border rounded w-full"
-        >
-          <option value="">Select Intern</option>
-          {interns.map((i) => (
-            <option key={i._id} value={i._id}>
-              {i.fullName}
-            </option>
-          ))}
-        </select>
-        <select
-          value={selectedProject}
-          onChange={(e) => setSelectedProject(e.target.value)}
-          className="p-2 border rounded w-full"
-        >
-          <option value="">Select Project</option>
-          {projects.map((p) => (
-            <option key={p._id} value={p._id}>
-              {p.title}
-            </option>
-          ))}
-        </select>
-        <div className="flex gap-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 border rounded w-1/2"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="p-2 border rounded w-1/2"
-          />
+      {/* Assign Project */}
+      <div
+        style={{
+          background: isDarkMode ? "#1f2937" : "#ffffff",
+          border: `1px solid ${isDarkMode ? "#374151" : "#e5e7eb"}`,
+          borderRadius: "1rem",
+          padding: "1.5rem",
+          boxShadow: isDarkMode
+            ? "0 2px 6px rgba(0,0,0,0.4)"
+            : "0 2px 8px rgba(0,0,0,0.1)",
+          marginBottom: "2rem",
+        }}
+      >
+        <h2 style={{ fontWeight: "600", marginBottom: "1rem" }}>
+          Assign New Project
+        </h2>
+
+        <div style={{ display: "grid", gap: "0.75rem" }}>
+          <select
+            value={selectedIntern}
+            onChange={(e) => setSelectedIntern(e.target.value)}
+            style={{
+              padding: "0.5rem",
+              borderRadius: "0.5rem",
+              border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+              background: isDarkMode ? "#374151" : "#f9fafb",
+              color: isDarkMode ? "#f3f4f6" : "#1f2937",
+            }}
+          >
+            <option value="">Select Intern</option>
+            {interns.map((i) => (
+              <option key={i._id} value={i._id}>
+                {i.fullName}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            style={{
+              padding: "0.5rem",
+              borderRadius: "0.5rem",
+              border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+              background: isDarkMode ? "#374151" : "#f9fafb",
+              color: isDarkMode ? "#f3f4f6" : "#1f2937",
+            }}
+          >
+            <option value="">Select Project</option>
+            {projects.map((p) => (
+              <option key={p._id} value={p._id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+                border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+              }}
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+                border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+              }}
+            />
+          </div>
+
+          <button
+            onClick={handleAssign}
+            disabled={loading}
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+              border: "none",
+              cursor: "pointer",
+              marginTop: "0.5rem",
+            }}
+          >
+            {loading ? "Assigning..." : "Assign Project"}
+          </button>
         </div>
-        <button
-          onClick={handleAssign}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          {loading ? "Assigning..." : "Assign Project"}
-        </button>
       </div>
 
-      <table className="w-full border rounded">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border text-black">Intern</th>
-            <th className="p-2 border text-black">Project</th>
-            <th className="p-2 border text-black">Start</th>
-            <th className="p-2 border text-black">End</th>
-            <th className="p-2 border text-black">Status</th>
-            <th className="p-2 border text-black">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {interns.map((i) =>
-            i.projectsAssigned.map((a) => (
-              <tr
-                key={`${i._id}-${a.project._id}`}
-                className="hover:bg-gray-50"
-              >
-                <td className="p-2 border">{i.fullName}</td>
-                <td className="p-2 border">{a.project.title}</td>
-                <td className="p-2 border">
-                  {new Date(a.startDate).toLocaleDateString()}
-                </td>
-                <td className="p-2 border">
-                  {new Date(a.endDate).toLocaleDateString()}
-                </td>
-                <td className="p-2 border">{a.status}</td>
-                <td className="p-2 border flex gap-2">
-                  <button
-                    className="px-2 py-1 bg-yellow-500 text-white rounded"
-                    onClick={() => {
-                      setSelectedIntern(i._id);
-                      setEditAssignment(a);
+      {/* Assignments Table */}
+      <div style={{ overflowX: "auto" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            minWidth: "700px",
+          }}
+        >
+          <thead
+            style={{
+              background: isDarkMode ? "#111827" : "#f3f4f6",
+              color: isDarkMode ? "#e5e7eb" : "#111827",
+            }}
+          >
+            <tr>
+              {["Intern", "Project", "Start", "End", "Status", "Actions"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    style={{
+                      padding: "0.75rem",
+                      border: `1px solid ${isDarkMode ? "#374151" : "#e5e7eb"}`,
+                      textAlign: "left",
+                      fontWeight: "600",
                     }}
                   >
-                    Edit
-                  </button>
-                  <button
-                    className="px-2 py-1 bg-red-500 text-white rounded"
-                    onClick={() => handleDeleteAssignment(i._id, a.project._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                    {header}
+                  </th>
+                )
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {interns.flatMap((i) =>
+              i.projectsAssigned.map((a) => (
+                <tr
+                  key={`${i._id}-${a.project._id}`}
+                  style={{
+                    background: isDarkMode ? "#1f2937" : "#ffffff",
+                    borderBottom: `1px solid ${
+                      isDarkMode ? "#374151" : "#e5e7eb"
+                    }`,
+                    transition: "background 0.2s ease-in-out",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = isDarkMode
+                      ? "#374151"
+                      : "#f9fafb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = isDarkMode
+                      ? "#1f2937"
+                      : "#ffffff")
+                  }
+                >
+                  <td style={{ padding: "0.75rem" }}>{i.fullName}</td>
+                  <td style={{ padding: "0.75rem" }}>{a.project.title}</td>
+                  <td style={{ padding: "0.75rem" }}>
+                    {new Date(a.startDate).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: "0.75rem" }}>
+                    {new Date(a.endDate).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: "0.75rem" }}>{a.status}</td>
+                  <td style={{ padding: "0.75rem" }}>
+                    <button
+                      style={{
+                        background: "#facc15",
+                        color: "#000",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "0.25rem",
+                        marginRight: "0.5rem",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setSelectedIntern(i._id);
+                        setEditAssignment(a);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      style={{
+                        background: "#ef4444",
+                        color: "#fff",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "0.25rem",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        handleDeleteAssignment(i._id, a.project._id)
+                      }
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
+      {/* Edit Modal */}
       {editAssignment && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md space-y-3">
-            <h2 className="text-xl font-semibold">Edit Assignment</h2>
-            <p>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              background: isDarkMode ? "#1f2937" : "#ffffff",
+              color: isDarkMode ? "#f3f4f6" : "#1f2937",
+              padding: "1.5rem",
+              borderRadius: "0.75rem",
+              width: "100%",
+              maxWidth: "400px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+            }}
+          >
+            <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+              Edit Assignment
+            </h2>
+            <p style={{ margin: "0.5rem 0 1rem" }}>
               <strong>Project:</strong> {editAssignment.project.title}
             </p>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: "0.5rem" }}>
               <input
                 type="date"
                 value={editAssignment.startDate?.slice(0, 10)}
@@ -248,7 +400,12 @@ export default function InternProjectDashboard() {
                     startDate: e.target.value,
                   })
                 }
-                className="p-2 border rounded w-1/2"
+                style={{
+                  flex: 1,
+                  padding: "0.5rem",
+                  borderRadius: "0.5rem",
+                  border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+                }}
               />
               <input
                 type="date"
@@ -259,7 +416,12 @@ export default function InternProjectDashboard() {
                     endDate: e.target.value,
                   })
                 }
-                className="p-2 border rounded w-1/2"
+                style={{
+                  flex: 1,
+                  padding: "0.5rem",
+                  borderRadius: "0.5rem",
+                  border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+                }}
               />
             </div>
             <select
@@ -267,22 +429,46 @@ export default function InternProjectDashboard() {
               onChange={(e) =>
                 setEditAssignment({ ...editAssignment, status: e.target.value })
               }
-              className="p-2 border rounded w-full"
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+                border: `1px solid ${isDarkMode ? "#4b5563" : "#d1d5db"}`,
+                marginTop: "0.75rem",
+              }}
             >
               <option value="assigned">Assigned</option>
               <option value="in-progress">In Progress</option>
               <option value="completed">Completed</option>
             </select>
-            <div className="flex justify-end gap-2">
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
               <button
                 onClick={() => setEditAssignment(null)}
-                className="px-4 py-2 border rounded"
+                style={{
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #9ca3af",
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateAssignment}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "#2563eb",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "0.5rem",
+                }}
               >
                 Save
               </button>
@@ -290,6 +476,6 @@ export default function InternProjectDashboard() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -34,12 +34,10 @@ export default function GroupChat() {
   const userId = user?._id;
   const isDark = theme === "dark";
 
-  // Scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Fetch intern projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -51,7 +49,7 @@ export default function GroupChat() {
 
         const data = await res.json();
         if (res.ok && data.projects?.length > 0) {
-          setProjectId(data.projects[0].project._id); // take the first project
+          setProjectId(data.projects[0].project._id);
         } else {
           setToast({ message: "No assigned projects found", type: "error" });
         }
@@ -64,7 +62,6 @@ export default function GroupChat() {
     if (userId) fetchProjects();
   }, [userId]);
 
-  // Fetch messages periodically
   const fetchMessages = async () => {
     if (!projectId) return;
     try {
@@ -79,12 +76,11 @@ export default function GroupChat() {
   useEffect(() => {
     if (projectId) {
       fetchMessages();
-      const interval = setInterval(fetchMessages, 5000); // refresh every 5 sec
+      const interval = setInterval(fetchMessages, 5000);
       return () => clearInterval(interval);
     }
   }, [projectId]);
 
-  // Send message
   const sendMessage = async () => {
     if (!input.trim() || !projectId) return;
     setLoading(true);
@@ -113,7 +109,6 @@ export default function GroupChat() {
     if (e.key === "Enter") sendMessage();
   };
 
-  // 🟡 No project assigned
   if (!projectId) {
     return (
       <div
@@ -131,7 +126,6 @@ export default function GroupChat() {
     );
   }
 
-  // 🟢 Normal chat view
   return (
     <div
       className={`flex flex-col h-full max-h-[90vh] w-full mx-auto rounded-xl shadow-lg border overflow-hidden transition-colors ${

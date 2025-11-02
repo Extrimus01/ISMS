@@ -4,6 +4,7 @@ import Toast from "@/components/global/Toast";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BouncingDots } from "@/components/global/Loader";
+import { useTheme } from "next-themes";
 
 interface IAdmin {
   _id: string;
@@ -23,14 +24,15 @@ export default function AdminPersonalDetailsPage() {
     type?: "success" | "error";
   } | null>(null);
   const [saving, setSaving] = useState(false);
-
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const { theme } = useTheme();
   const router = useRouter();
 
   useEffect(() => {
     const fetchAdmin = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found. Redirecting to login.");
         router.push("/auth");
         return;
       }
@@ -42,9 +44,7 @@ export default function AdminPersonalDetailsPage() {
         return;
       }
 
-      const parsedUser = JSON.parse(storedUser);
-      const adminId = parsedUser._id;
-
+      const adminId = JSON.parse(storedUser)?._id;
       if (!adminId) {
         setToast({ message: "Admin ID not found", type: "error" });
         setLoading(false);
@@ -59,18 +59,16 @@ export default function AdminPersonalDetailsPage() {
         });
 
         if (res.status === 401) {
-          console.error("Unauthorized. Token might be invalid or expired.");
           localStorage.removeItem("token");
           router.push("/auth");
           return;
         }
 
         if (!res.ok) throw new Error("Failed to fetch admin data");
-
         const data: IAdmin = await res.json();
         setAdmin(data);
       } catch (err) {
-        console.error("Error fetching admin data:", err);
+        console.error(err);
         setToast({ message: "Failed to load admin data", type: "error" });
       } finally {
         setLoading(false);
@@ -80,19 +78,14 @@ export default function AdminPersonalDetailsPage() {
     fetchAdmin();
   }, [router]);
 
-  const handleChange = (field: keyof IAdmin, value: string) => {
-    if (!admin) return;
-    setAdmin({ ...admin, [field]: value });
-  };
-
-  const handleSave = async () => {
+  const handleUpdate = async () => {
     if (!admin) return;
     setSaving(true);
 
     const token = localStorage.getItem("token");
     if (!token) {
       setToast({
-        message: "Token missing. Please login again.",
+        message: "Session expired. Please login again.",
         type: "error",
       });
       router.push("/auth");
@@ -115,7 +108,7 @@ export default function AdminPersonalDetailsPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) throw new Error("Failed to update admin details");
 
       const data: IAdmin = await res.json();
       setAdmin(data);
@@ -123,6 +116,56 @@ export default function AdminPersonalDetailsPage() {
     } catch (err) {
       console.error(err);
       setToast({ message: "Failed to update details", type: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!admin) return;
+    if (!currentPassword || !newPassword) {
+      setToast({ message: "Please fill both password fields", type: "error" });
+      return;
+    }
+
+    setSaving(true);
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: admin.email,
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      if (res.status === 401) {
+        setToast({
+          message: "Session expired. Please login again.",
+          type: "error",
+        });
+        localStorage.removeItem("token");
+        router.push("/auth");
+        return;
+      }
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to update password");
+      }
+
+      setToast({ message: "Password updated successfully!", type: "success" });
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Failed to update password", type: "error" });
     } finally {
       setSaving(false);
     }
@@ -137,70 +180,113 @@ export default function AdminPersonalDetailsPage() {
 
   if (!admin) return <p className="text-center mt-10">No data found.</p>;
 
-  return (
-    <div className="p-6 space-y-8">
-      <div className="glass-card p-6 rounded shadow space-y-4">
-        <h2 className="text-xl font-semibold">Personal Details</h2>
+  const cardStyle = {
+    backgroundColor:
+      theme === "dark" ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.05)",
+    border: `1px solid ${
+      theme === "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)"
+    }`,
+    color: theme === "dark" ? "#e5e7eb" : "#111827",
+    backdropFilter: "blur(10px)",
+  };
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">Full Name</label>
-            <input
-              type="text"
-              value={admin.fullName}
-              onChange={(e) => handleChange("fullName", e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Company Name</label>
-            <input
-              type="text"
-              value={admin.companyName}
-              onChange={(e) => handleChange("companyName", e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Email</label>
-            <input
-              type="email"
-              value={admin.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Phone</label>
-            <input
-              type="text"
-              value={admin.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Joined On</label>
-            <input
-              type="text"
-              value={
-                admin.createdAt
+  const inputStyle = {
+    backgroundColor: theme === "dark" ? "#1f2937" : "#fff",
+    color: theme === "dark" ? "#f9fafb" : "#111827",
+    border: `1px solid ${theme === "dark" ? "#374151" : "#d1d5db"}`,
+  };
+
+  return (
+    <div className="p-6 md:p-10 min-h-screen transition-colors duration-300">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div
+          className="p-6 rounded-xl shadow-md transition-all duration-300"
+          style={cardStyle}
+        >
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">
+            👤 Personal Details
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              { label: "Full Name", value: admin.fullName },
+              { label: "Company Name", value: admin.companyName },
+              { label: "Email", value: admin.email },
+              { label: "Phone", value: admin.phone },
+              {
+                label: "Joined On",
+                value: admin.createdAt
                   ? new Date(admin.createdAt).toLocaleDateString()
-                  : "N/A"
-              }
-              disabled
-              className="w-full border p-2 rounded bg-gray-100 text-gray-600"
-            />
+                  : "N/A",
+              },
+            ].map((item) => (
+              <div key={item.label}>
+                <label className="block font-medium mb-1">{item.label}</label>
+                <input
+                  type="text"
+                  readOnly
+                  value={item.value}
+                  style={inputStyle}
+                  className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))}
           </div>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        <div
+          className="p-6 rounded-xl shadow-md transition-all duration-300"
+          style={cardStyle}
         >
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">
+            🔐 Reset Password
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium mb-1">Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoComplete="new-password"
+                name="current-password"
+                placeholder="Enter Current Password"
+                style={{
+                  ...inputStyle,
+                  backgroundColor: "transparent",
+                  color: "inherit",
+                }}
+                className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+                onFocus={(e) => e.target.removeAttribute("readonly")}
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter New Password"
+                style={inputStyle}
+                className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handlePasswordReset}
+            style={{
+              backgroundColor: theme === "dark" ? "#059669" : "#10b981",
+              color: "#fff",
+            }}
+            className="mt-6 px-5 py-2.5 rounded-md hover:opacity-90 transition-all duration-200"
+          >
+            Reset Password
+          </button>
+        </div>
       </div>
 
       {toast && (
