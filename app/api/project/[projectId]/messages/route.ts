@@ -2,13 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";
 import Message from "@/models/Message";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { projectId: string } }
-) {
+export async function GET(req: NextRequest, context: any) {
   await connectDB();
 
-  const projectId = params.projectId;
+  const projectId = context?.params?.projectId;
 
   try {
     const messages = await Message.find({ projectId }).sort({ createdAt: 1 });
