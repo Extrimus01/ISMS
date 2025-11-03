@@ -102,8 +102,9 @@ export async function convertToPdf({
 
       return cursor;
     };
+    cursorY += 50;
 
-    page.drawText("Ver: [16 digit no]", {
+    page.drawText(`Ver: ${randomRef}`, {
       x: margin,
       y: cursorY,
       size: 10,
@@ -121,11 +122,11 @@ export async function convertToPdf({
 
     const addressLines = [
       "To,",
-      "{Name-Data}",
+      deanName,
       "Head of the Department,",
-      "[Computer Engineering],",
-      "[College Name],",
-      "Nagpur-441108,",
+      department,
+      collegeName,
+      addressLine,
     ];
 
     for (const line of addressLines) {
@@ -140,15 +141,12 @@ export async function convertToPdf({
 
     cursorY -= 10;
 
-    page.drawText(
-      "Subject: Completion of Internship Work by UG Student - Bachelor of Engineering in Computer Engineering",
-      {
-        x: margin,
-        y: cursorY,
-        size: fontSizeNormal,
-        font: boldFont,
-      }
-    );
+    page.drawText("Subject: Completion of Internship Work by Student ", {
+      x: margin,
+      y: cursorY,
+      size: fontSizeNormal,
+      font: boldFont,
+    });
     cursorY -= lineHeight * 2;
 
     page.drawText("Dear Sir/Madam,", {
@@ -160,7 +158,7 @@ export async function convertToPdf({
     cursorY -= lineHeight * 1.5;
 
     cursorY = drawWrappedText(
-      "This is to certify that the internship project titled 'Secure Park' has been successfully completed by the following UG student of Bachelor of Engineering in Computer Engineering, College name, City at Maharashtra Remote Sensing Application Centre (MRSAC), Nagpur, during the period from January 2025 to May 2025:",
+      `This is to certify that the internship project has been successfully completed by ${studentName} of ${department} in ${collegeName}, ${addressLine} City at Maharashtra Remote Sensing Application Centre (MRSAC), Nagpur, during the period from ${internshipStart} to ${internshipEnd}`,
       margin,
       cursorY,
       width - margin * 2,
@@ -171,7 +169,7 @@ export async function convertToPdf({
 
     cursorY -= 10;
 
-    page.drawText("Ms. Shruti Vijay Kanfade", {
+    page.drawText(studentName, {
       x: margin + 20,
       y: cursorY,
       size: fontSizeNormal,
@@ -180,7 +178,7 @@ export async function convertToPdf({
     cursorY -= lineHeight * 1.5;
 
     cursorY = drawWrappedText(
-      "She has contributed effectively to various modules of the Secure Park Project, including AI integration, machine learning implementation, web development, and user interface design. Her performance during the internship was sincere and commendable. We wish her all the best in her future endeavors.",
+      "He/She has contributed effectively to various modules of the Project, including AI integration, machine learning implementation, web development, and user interface design. His/Her performance during the internship was sincere and commendable. We wish his/her all the best in his/her future endeavors.",
       margin,
       cursorY,
       width - margin * 2,
