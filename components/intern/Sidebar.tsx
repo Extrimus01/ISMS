@@ -45,7 +45,6 @@ const navigationItems: NavItem[] = [
     icon: ClipboardListIcon,
     subItems: [
       { name: "Project Details", path: "/intern/project-details" },
-      { name: "Weekly Task", path: "/intern/weekly-task" },
     ],
   },
   {

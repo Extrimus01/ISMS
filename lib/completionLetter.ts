@@ -1,9 +1,34 @@
+import path from "path";
+import fs from "fs";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-export async function convertToPdf(): Promise<Buffer> {
+interface PdfParams {
+  collegeName: string;
+  deanName: string;
+  addressLine?: string;
+  department: string;
+  semester: string;
+  refNo?: string;
+  internshipStart: string;
+  internshipEnd: string;
+  studentName: string;
+}
+
+export async function convertToPdf({
+  collegeName = "",
+  deanName = "",
+  addressLine = "",
+  department = "",
+  semester = "",
+  refNo = "",
+  internshipStart = "",
+  internshipEnd = "",
+  studentName = "",
+}: PdfParams): Promise<{ pdf: Buffer; reference: string }> {
   try {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]);
     const { height, width } = page.getSize();
+    const randomRef = Math.floor(10000000 + Math.random() * 90000000);
     const today = new Date();
     const formattedDate = `${String(today.getDate()).padStart(2, "0")}-${String(
       today.getMonth() + 1
@@ -11,9 +36,8 @@ export async function convertToPdf(): Promise<Buffer> {
     const margin = 50;
     let cursorY = height - margin;
 
-    const headerBytes = await fetch("/images/head.png").then((r) =>
-      r.arrayBuffer()
-    );
+    const headerPath = path.join(process.cwd(), "public", "images", "head.png");
+    const headerBytes = fs.readFileSync(headerPath);
     const headerImage = await pdfDoc.embedPng(headerBytes);
     const headerDims = headerImage.scale(0.41);
 
@@ -189,9 +213,8 @@ export async function convertToPdf(): Promise<Buffer> {
       font: regularFont,
     });
 
-    const footerBytes = await fetch("/images/foot.png").then((r) =>
-      r.arrayBuffer()
-    );
+    const footerPath = path.join(process.cwd(), "public", "images", "foot.png");
+    const footerBytes = fs.readFileSync(footerPath);
     const footerImage = await pdfDoc.embedPng(footerBytes);
     const footerDims = footerImage.scale(0.41);
     page.drawImage(footerImage, {
@@ -202,7 +225,10 @@ export async function convertToPdf(): Promise<Buffer> {
     });
 
     const pdfBytes = await pdfDoc.save();
-    return Buffer.from(pdfBytes);
+    return {
+      pdf: Buffer.from(pdfBytes),
+      reference: randomRef.toString(),
+    };
   } catch (err) {
     console.error("Error converting DOCX to PDF:", err);
     throw err;

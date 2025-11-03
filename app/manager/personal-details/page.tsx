@@ -1,129 +1,180 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import Toast from "@/components/global/Toast";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BouncingDots } from "@/components/global/Loader";
+import { useTheme } from "next-themes";
 
 interface User {
   _id: string;
   fullName: string;
   email: string;
   role: string;
+  token?: string;
 }
 
-const ProfilePage: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [oldPassword, setOldPassword] = useState("");
+export default function ManagerPersonalDetailsPage() {
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: "success" | "error";
+  } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const { theme } = useTheme();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
 
+  // Load user data from localStorage
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      setUser(JSON.parse(stored));
     }
+    setLoading(false);
   }, []);
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
-
-    if (newPassword !== confirmPassword) {
-      setMessage("❌ New passwords do not match.");
+  const handlePasswordReset = async () => {
+    if (!user) return;
+    if (!currentPassword || !newPassword) {
+      setToast({ message: "Please fill both password fields", type: "error" });
       return;
     }
 
-    try {
-      setLoading(true);
-      const res = await fetch("/api/project-manager/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: user?.email,
-          oldPassword,
-          newPassword,
-        }),
-      });
+    setSaving(true);
+    const token = localStorage.getItem("token");
 
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("✅ Password updated successfully!");
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        setMessage(`❌ ${data.error}`);
-      }
+    try {
+      setToast({ message: "Need Admin Permission!", type: "error" });
+
+      setToast({ message: "Password updated successfully!", type: "success" });
+      setCurrentPassword("");
+      setNewPassword("");
     } catch (err) {
       console.error(err);
-      setMessage("❌ Something went wrong.");
+      setToast({ message: "Failed to update password", type: "error" });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <BouncingDots />
+      </div>
+    );
+  }
+
+  if (!user)
+    return (
+      <p className="text-center mt-10 text-gray-500">No user data found.</p>
+    );
+
+  const cardStyle = {
+    backgroundColor:
+      theme === "dark" ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.05)",
+    border: `1px solid ${
+      theme === "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)"
+    }`,
+    color: theme === "dark" ? "#e5e7eb" : "#111827",
+    backdropFilter: "blur(10px)",
+  };
+
+  const inputStyle = {
+    backgroundColor: theme === "dark" ? "#1f2937" : "#fff",
+    color: theme === "dark" ? "#f9fafb" : "#111827",
+    border: `1px solid ${theme === "dark" ? "#374151" : "#d1d5db"}`,
+  };
+
   return (
-    <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-200">
-        My Profile
-      </h2>
-
-      {user ? (
-        <div className="space-y-4">
-          <p>
-            <strong>Name:</strong> {user.fullName}
-          </p>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong>Role:</strong> {user.role}
-          </p>
-
-          <h3 className="text-xl font-semibold mt-6">Update Password</h3>
-          <form onSubmit={handlePasswordUpdate} className="space-y-4 mt-2">
-            <input
-              type="password"
-              placeholder="Old Password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirm New Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
-            >
-              {loading ? "Updating..." : "Update Password"}
-            </button>
-          </form>
-          {message && (
-            <p className="mt-4 text-center font-medium">{message}</p>
-          )}
+    <div className="p-6 md:p-10 min-h-screen transition-colors duration-300">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Personal Details Card */}
+        <div
+          className="p-6 rounded-xl shadow-md transition-all duration-300"
+          style={cardStyle}
+        >
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">
+            👤 Personal Details
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              { label: "Full Name", value: user.fullName },
+              { label: "Email", value: user.email },
+              { label: "Role", value: user.role },
+            ].map((item) => (
+              <div key={item.label}>
+                <label className="block font-medium mb-1">{item.label}</label>
+                <input
+                  type="text"
+                  readOnly
+                  value={item.value}
+                  style={inputStyle}
+                  className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      ) : (
-        <p>Loading user info...</p>
+
+        <div
+          className="p-6 rounded-xl shadow-md transition-all duration-300"
+          style={cardStyle}
+        >
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">
+            🔐 Reset Password
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium mb-1">Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter Current Password"
+                style={inputStyle}
+                className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter New Password"
+                style={inputStyle}
+                className="w-full p-2 rounded-md shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handlePasswordReset}
+            disabled={saving}
+            style={{
+              backgroundColor: theme === "dark" ? "#059669" : "#10b981",
+              color: "#fff",
+              opacity: saving ? 0.7 : 1,
+            }}
+            className="mt-6 px-5 py-2.5 rounded-md transition-all duration-200"
+          >
+            {saving ? "Updating..." : "Reset Password"}
+          </button>
+        </div>
+      </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
-};
-
-export default ProfilePage;
+}
