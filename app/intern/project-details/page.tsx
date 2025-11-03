@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import Toast from "@/components/global/Toast";
 import { BouncingDots } from "@/components/global/Loader";
 
@@ -18,6 +19,7 @@ interface IProjectAssignment {
 }
 
 export default function ProjectDetailsPage() {
+  const { theme } = useTheme();
   const [projects, setProjects] = useState<IProjectAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
@@ -59,79 +61,181 @@ export default function ProjectDetailsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return {
+          backgroundColor: theme === "dark" ? "#14532d" : "#dcfce7",
+          color: theme === "dark" ? "#86efac" : "#166534",
+        };
       case "in-progress":
-        return "bg-yellow-100 text-yellow-800";
+        return {
+          backgroundColor: theme === "dark" ? "#78350f" : "#fef9c3",
+          color: theme === "dark" ? "#facc15" : "#854d0e",
+        };
       case "assigned":
-        return "bg-blue-100 text-blue-800";
+        return {
+          backgroundColor: theme === "dark" ? "#1e3a8a" : "#dbeafe",
+          color: theme === "dark" ? "#93c5fd" : "#1e40af",
+        };
       default:
-        return "bg-gray-100 text-gray-800";
+        return {
+          backgroundColor: theme === "dark" ? "#374151" : "#f3f4f6",
+          color: theme === "dark" ? "#d1d5db" : "#111827",
+        };
     }
   };
 
+  const tableStyle: React.CSSProperties = {
+    width: "100%",
+    borderCollapse: "collapse",
+    border: `1px solid ${theme === "dark" ? "#374151" : "#d1d5db"}`,
+    backgroundColor: theme === "dark" ? "#111827" : "#ffffff",
+    color: theme === "dark" ? "#f9fafb" : "#111827",
+  };
+
+  const cellStyle: React.CSSProperties = {
+    border: `1px solid ${theme === "dark" ? "#374151" : "#d1d5db"}`,
+    padding: "10px",
+    fontSize: "0.95rem",
+  };
+
+  const headerStyle: React.CSSProperties = {
+    backgroundColor: theme === "dark" ? "#1f2937" : "#f3f4f6",
+    color: theme === "dark" ? "#e5e7eb" : "#111827",
+    fontWeight: 600,
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-xl font-semibold">Assigned Projects</h2>
+    <div
+      className="p-6 space-y-6 min-h-screen transition-all duration-300"
+      style={{
+        backgroundColor: theme === "dark" ? "#0f172a" : "#f9fafb",
+        color: theme === "dark" ? "#f9fafb" : "#111827",
+      }}
+    >
+      <h2 className="text-xl font-semibold text-center md:text-left">
+        Assigned Projects
+      </h2>
 
       {loading ? (
-        <div className="p-6 space-y-8">
+        <div className="p-6 flex justify-center items-center">
           <BouncingDots />
         </div>
       ) : projects.length === 0 ? (
-        <p>No projects assigned yet.</p>
+        <p style={{ textAlign: "center", fontStyle: "italic" }}>
+          No projects assigned yet.
+        </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
-            <thead className="hidden md:table-header-group">
-              <tr className="bg-gray-100 text-black">
-                <th className="border p-2">Project</th>
-                <th className="border p-2">Start Date</th>
-                <th className="border p-2">End Date</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Description</th>
-              </tr>
-            </thead>
-            <tbody className="md:table-row-group">
-              {projects.map((p, idx) => (
-                <tr
-                  key={idx}
-                  className="block md:table-row border-b md:border-none  md:mb-0 p-4 rounded-lg shadow-sm md:shadow-none bg-white dark:bg-gray-900 md:bg-transparent"
+        <>
+          <div className="block md:hidden space-y-4">
+            {projects.map((p, idx) => (
+              <div
+                key={idx}
+                style={{
+                  backgroundColor: theme === "dark" ? "#1e293b" : "#ffffff",
+                  border: `1px solid ${
+                    theme === "dark" ? "#334155" : "#e5e7eb"
+                  }`,
+                  borderRadius: "1rem",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  padding: "16px",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <h3
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "1.1rem",
+                    marginBottom: "0.5rem",
+                  }}
                 >
-                  <td className="block md:table-cell p-2">
-                    <span className="font-semibold md:hidden">Project: </span>
-                    {typeof p.project === "string"
-                      ? p.project
-                      : p.project?.title ?? "-"}
-                  </td>
-                  <td className="block md:table-cell p-2">
-                    <span className="font-semibold md:hidden">Start Date: </span>
-                    {new Date(p.startDate).toLocaleDateString()}
-                  </td>
-                  <td className="block md:table-cell p-2">
-                    <span className="font-semibold md:hidden">End Date: </span>
-                    {new Date(p.endDate).toLocaleDateString()}
-                  </td>
-                  <td className="block md:table-cell p-2">
-                    <span className="font-semibold md:hidden">Status: </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-sm font-semibold ${getStatusBadge(
-                        p.status
-                      )}`}
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                  <td className="block md:table-cell p-2">
-                    <span className="font-semibold md:hidden">Description: </span>
-                    {typeof p.project === "object"
-                      ? p.project?.description ?? "-"
-                      : "-"}
-                  </td>
+                  {typeof p.project === "string"
+                    ? p.project
+                    : p.project?.title ?? "-"}
+                </h3>
+
+                <p>
+                  <strong>Start Date:</strong>{" "}
+                  {new Date(p.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>End Date:</strong>{" "}
+                  {new Date(p.endDate).toLocaleDateString()}
+                </p>
+
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span
+                    style={{
+                      ...getStatusBadge(p.status),
+                      padding: "4px 10px",
+                      borderRadius: "9999px",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {p.status}
+                  </span>
+                </p>
+
+                {p.project &&
+                  typeof p.project === "object" &&
+                  p.project.description && (
+                    <p style={{ marginTop: "0.5rem" }}>
+                      <strong>Description:</strong> {p.project.description}
+                    </p>
+                  )}
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto shadow-md rounded-2xl">
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={{ ...cellStyle, ...headerStyle }}>Project</th>
+                  <th style={{ ...cellStyle, ...headerStyle }}>Start Date</th>
+                  <th style={{ ...cellStyle, ...headerStyle }}>End Date</th>
+                  <th style={{ ...cellStyle, ...headerStyle }}>Status</th>
+                  <th style={{ ...cellStyle, ...headerStyle }}>Description</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {projects.map((p, idx) => (
+                  <tr key={idx}>
+                    <td style={cellStyle}>
+                      {typeof p.project === "string"
+                        ? p.project
+                        : p.project?.title ?? "-"}
+                    </td>
+                    <td style={cellStyle}>
+                      {new Date(p.startDate).toLocaleDateString()}
+                    </td>
+                    <td style={cellStyle}>
+                      {new Date(p.endDate).toLocaleDateString()}
+                    </td>
+                    <td style={cellStyle}>
+                      <span
+                        style={{
+                          ...getStatusBadge(p.status),
+                          padding: "4px 10px",
+                          borderRadius: "9999px",
+                          fontSize: "0.85rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {p.status}
+                      </span>
+                    </td>
+                    <td style={cellStyle}>
+                      {typeof p.project === "object"
+                        ? p.project?.description ?? "-"
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {toast && (

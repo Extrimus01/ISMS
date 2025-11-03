@@ -21,10 +21,17 @@ export default function Chatbot() {
     type?: "success" | "error";
   } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus();
+    }
+  }, [loading]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -78,8 +85,7 @@ export default function Chatbot() {
           Chatbot
         </h2>
       </div>
-
-      <div className="flex-1 p-4 overflow-y-auto space-y-3">
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[calc(100vh-200px)]">
         {messages.length === 0 && (
           <p className={`${isDark ? "text-gray-400" : "text-gray-500"}`}>
             Ask me anything...
@@ -116,6 +122,7 @@ export default function Chatbot() {
         }`}
       >
         <input
+          ref={inputRef}
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}

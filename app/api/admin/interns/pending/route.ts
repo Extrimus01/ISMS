@@ -54,9 +54,9 @@ export async function PATCH(req: Request) {
     let reference: string;
     try {
       const { pdf, reference: ref } = await convertToPdf({
-        collegeName: intern.college,
+        collegeName: intern.college.split(",")[0].trim(),
         deanName,
-        addressLine: intern.collegeAddress || "",
+        addressLine: intern.college.split(",").slice(1).join(",").trim() || "",
         department: intern.department,
         semester: intern.semester,
         refNo: intern.refNo || "",

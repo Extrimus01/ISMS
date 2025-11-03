@@ -5,12 +5,10 @@ import Intern from "@/models/Intern";
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("📦 PATCH body received:", body);
 
     const { internId, projectId, startDate, endDate, status } = body;
 
     if (!internId || !projectId) {
-      console.log("❌ Missing fields:", { internId, projectId });
       return NextResponse.json(
         { error: "Missing internId or projectId" },
         { status: 400 }
@@ -62,7 +60,6 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Intern not found" }, { status: 404 });
     }
 
-    // Filter out the assignment
     intern.projectsAssigned = intern.projectsAssigned.filter(
       (a: any) => a.project.toString() !== projectId.toString()
     );

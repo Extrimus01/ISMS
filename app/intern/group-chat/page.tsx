@@ -27,6 +27,7 @@ export default function GroupChat() {
     type?: "success" | "error";
   } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const user =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("user") || "{}")
@@ -80,6 +81,11 @@ export default function GroupChat() {
       return () => clearInterval(interval);
     }
   }, [projectId]);
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus();
+    }
+  }, [loading]);
 
   const sendMessage = async () => {
     if (!input.trim() || !projectId) return;
@@ -139,8 +145,7 @@ export default function GroupChat() {
       >
         <h2 className="text-lg font-semibold">Group Chat</h2>
       </div>
-
-      <div className="flex-1 p-4 overflow-y-auto space-y-3">
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[calc(100vh-200px)]">
         {messages.length === 0 && (
           <p className={`${isDark ? "text-gray-400" : "text-gray-500"}`}>
             No messages yet
@@ -187,6 +192,7 @@ export default function GroupChat() {
         }`}
       >
         <input
+          ref={inputRef}
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}

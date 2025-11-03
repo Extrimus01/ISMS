@@ -115,7 +115,7 @@ export async function convertToPdf({
       10,
       lineHeight
     );
-    cursorY -= 20;
+    cursorY -= 10;
 
     page.drawText(`Date: ${formattedDate}`, {
       x: width - 150,
@@ -200,7 +200,7 @@ export async function convertToPdf({
       size: fontSizeNormal,
       font: regularFont,
     });
-    cursorY -= lineHeight * 3;
+    cursorY -= lineHeight * 2;
 
     const rightBlockX = width - 180;
     page.drawText("Yours faithfully,", {
@@ -210,7 +210,7 @@ export async function convertToPdf({
       font: regularFont,
     });
 
-    cursorY -= lineHeight * 3;
+    cursorY -= lineHeight * 2;
     page.drawText("Sanjay Balamwar", {
       x: rightBlockX,
       y: cursorY,

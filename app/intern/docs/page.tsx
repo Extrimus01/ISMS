@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import Toast from "@/components/global/Toast";
 import { BouncingDots } from "@/components/global/Loader";
 
@@ -26,6 +27,7 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState(false);
   const [docType, setDocType] = useState("College ID");
   const [file, setFile] = useState<File | null>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchIntern = async () => {
@@ -51,19 +53,14 @@ export default function DocumentsPage() {
   const viewDocument = (doc: IDocument) => {
     try {
       const base64Data = doc.data.split(",").pop()?.trim();
-
-      if (!base64Data) {
-        throw new Error("Invalid Base64 data");
-      }
+      if (!base64Data) throw new Error("Invalid Base64 data");
 
       const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length)
-        .fill(0)
-        .map((_, i) => byteCharacters.charCodeAt(i));
-
+      const byteNumbers = Array.from(byteCharacters, (char) =>
+        char.charCodeAt(0)
+      );
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: "application/pdf" });
-
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
     } catch (err) {
@@ -119,6 +116,7 @@ export default function DocumentsPage() {
         <BouncingDots />
       </div>
     );
+
   if (!intern) return <p className="text-center mt-10">No documents found.</p>;
 
   const allDocs: IDocument[] = [
@@ -144,66 +142,134 @@ export default function DocumentsPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold">My Documents</h2>
-        <div className="w-full max-w-lg">
-          <label className="block font-medium mb-2">Upload Document</label>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <select
-              value={docType}
-              onChange={(e) => setDocType(e.target.value)}
-              className="px-3 py-2 border rounded sm:rounded-r-none sm:rounded-l focus:outline-none w-full sm:w-auto"
+    <div
+      className="min-h-screen transition-colors duration-500"
+      style={{
+        padding: "1.5rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+      }}
+    >
+      <div
+        className=" w-full max-w-6xl mx-auto"
+        style={{
+          padding: "2rem",
+        }}
+      >
+        <div className="flex flex-col gap-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <h2
+              className="text-2xl font-semibold tracking-tight"
+              style={{ color: theme === "dark" ? "#f8fafc" : "#0f172a" }}
             >
-              <option>College ID</option>
-              <option>LOR</option>
-              <option>Resume</option>
-              <option>Joining Letter</option>
-            </select>
+              My Documents
+            </h2>
 
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="px-3 py-2 border rounded sm:rounded-none focus:outline-none flex-1 w-full"
-            />
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
+              <select
+                value={docType}
+                onChange={(e) => setDocType(e.target.value)}
+                className="rounded-lg px-3 py-2 border focus:outline-none transition-all duration-200"
+                style={{
+                  borderColor: theme === "dark" ? "#475569" : "#cbd5e1",
+                  backgroundColor:
+                    theme === "dark" ? "rgba(30,41,59,0.7)" : "#ffffff",
+                  color: theme === "dark" ? "#f1f5f9" : "#0f172a",
+                }}
+              >
+                <option>NOC</option>
+                <option>Resume</option>
+                <option>Joining Letter</option>
+              </select>
 
-            <button
-              onClick={handleUpload}
-              disabled={uploading || !file}
-              className="bg-blue-600 text-white px-4 py-2 rounded sm:rounded-l-none hover:bg-blue-700 w-full sm:w-auto"
-            >
-              {uploading ? "Uploading..." : "Upload Doc"}
-            </button>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="rounded-lg px-3 py-2 border focus:outline-none flex-1 transition-all duration-200"
+                style={{
+                  borderColor: theme === "dark" ? "#475569" : "#cbd5e1",
+                  backgroundColor:
+                    theme === "dark" ? "rgba(30,41,59,0.7)" : "#ffffff",
+                  color: theme === "dark" ? "#f1f5f9" : "#0f172a",
+                }}
+              />
+
+              <button
+                onClick={handleUpload}
+                disabled={uploading || !file}
+                className="font-semibold rounded-lg shadow px-5 py-2 transition-all duration-200"
+                style={{
+                  backgroundColor:
+                    uploading || !file
+                      ? theme === "dark"
+                        ? "#1e3a8a"
+                        : "#93c5fd"
+                      : theme === "dark"
+                      ? "#2563eb"
+                      : "#1d4ed8",
+                  color: "white",
+                  cursor: uploading || !file ? "not-allowed" : "pointer",
+                  opacity: uploading || !file ? 0.7 : 1,
+                }}
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {allDocs.length === 0 ? (
-        <p>No documents available.</p>
-      ) : (
-        <div className="space-y-4">
+          <p
+            className="text-sm italic"
+            style={{ color: theme === "dark" ? "#94a3b8" : "#64748b" }}
+          >
+            Make sure the document clearly shows your credentials.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {allDocs.map((doc, idx) => (
             <div
               key={idx}
-              className="glass-card p-4 rounded shadow flex justify-between items-center"
+              className="rounded-xl shadow-md p-4 flex flex-col justify-between transition-all"
+              style={{
+                background:
+                  theme === "dark"
+                    ? "rgba(30,41,59,0.7)"
+                    : "rgba(255,255,255,0.95)",
+                border:
+                  theme === "dark" ? "1px solid #1e293b" : "1px solid #e2e8f0",
+              }}
             >
-              <div>
-                <p className="font-medium">{doc.type}</p>
-                <p className="text-sm text-gray-500">
+              <div className="flex flex-col gap-1 mb-3">
+                <p
+                  className="font-medium text-base"
+                  style={{ color: theme === "dark" ? "#f1f5f9" : "#0f172a" }}
+                >
+                  {doc.type}
+                </p>
+                <p
+                  className="text-sm"
+                  style={{ color: theme === "dark" ? "#94a3b8" : "#475569" }}
+                >
                   {new Date(doc.uploadedAt).toLocaleDateString()}
                 </p>
               </div>
+
               <button
                 onClick={() => viewDocument(doc)}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="rounded-md font-medium transition-all px-4 py-2"
+                style={{
+                  backgroundColor: theme === "dark" ? "#2563eb" : "#1d4ed8",
+                  color: "white",
+                }}
               >
                 View PDF
               </button>
             </div>
           ))}
         </div>
-      )}
+      </div>
 
       {toast && (
         <Toast

@@ -5,29 +5,42 @@ import Intern from "@/models/Intern";
 export async function POST(req: NextRequest) {
   try {
     const { id, action } = await req.json();
-    if (!id) return NextResponse.json({ error: "Missing intern ID" }, { status: 400 });
+    if (!id)
+      return NextResponse.json({ error: "Missing intern ID" }, { status: 400 });
 
     await dbConnect();
 
     const intern = await Intern.findById(id).select("attendance");
-    if (!intern) return NextResponse.json({ error: "Intern not found" }, { status: 404 });
+    if (!intern)
+      return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const nowUTC = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const nowIST = new Date(nowUTC.getTime() + istOffset);
+
+    const todayIST = new Date(
+      nowIST.getFullYear(),
+      nowIST.getMonth(),
+      nowIST.getDate()
+    );
 
     if (action === "mark") {
       const alreadyMarked = intern.attendance.find((a: any) => {
         const aDate = new Date(a.date);
         aDate.setHours(0, 0, 0, 0);
-        return aDate.getTime() === today.getTime();
+        return aDate.getTime() === todayIST.getTime();
       });
 
-      if (alreadyMarked) return NextResponse.json({ error: "Today already marked" }, { status: 400 });
+      if (alreadyMarked)
+        return NextResponse.json(
+          { error: "Today already marked" },
+          { status: 400 }
+        );
 
       intern.attendance.push({
-        date: new Date(),
+        date: todayIST,
         status: "pending",
-        requestedAt: new Date(),
+        requestedAt: nowIST,
       });
 
       await intern.save();
@@ -36,6 +49,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ attendance: intern.attendance });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to process attendance" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to process attendance" },
+      { status: 500 }
+    );
   }
 }

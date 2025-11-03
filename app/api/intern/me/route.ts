@@ -5,9 +5,31 @@ import Intern from "@/models/Intern";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-
 export async function POST(req: NextRequest) {
   try {
+    const body = await req.json();
+    const { id } = body;
+
+    await dbConnect();
+
+    if (id) {
+      const intern = await Intern.findById(id)
+        .populate("projectsAssigned.project")
+        .select("fullName email course department documents");
+
+      if (!intern)
+        return NextResponse.json(
+          { error: "Intern not found" },
+          { status: 404 }
+        );
+
+      return NextResponse.json({
+        documents: intern.documents || [],
+        fullName: intern.fullName,
+        email: intern.email,
+      });
+    }
+
     const authHeader = req.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,16 +43,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    await dbConnect();
-
     const intern = await Intern.findById(decoded.id)
       .populate("projectsAssigned.project")
-      .populate("attendance.project")
       .select("-password");
 
-    if (!intern) {
+    if (!intern)
       return NextResponse.json({ error: "Intern not found" }, { status: 404 });
-    }
 
     return NextResponse.json(intern);
   } catch (error) {

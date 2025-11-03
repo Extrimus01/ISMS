@@ -50,6 +50,7 @@ const navigationItems: NavItem[] = [
     icon: GraduationCap,
     subItems: [
       { name: "Student List", path: "/admin/students" },
+      { name: "Student Documents", path: "/admin/student-docs" },
       { name: "Assign Project", path: "/admin/assign-project" },
       { name: "Attendance", path: "/admin/student-attendance" },
     ],
