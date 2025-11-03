@@ -186,7 +186,7 @@ It provides a complete lifecycle — from **application and interview** to **pro
   course: String,
   department: String,
   semester: String,
-  status: String, // applied | interviewed | verified | assigned | completed
+  status: String,
   project: { type: ObjectId, ref: "Project" },
   manager: { type: ObjectId, ref: "Manager" },
   documents: [String],
