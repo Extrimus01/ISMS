@@ -23,7 +23,6 @@ async function uploadColleges() {
       }
     }
 
-    console.log("College data uploaded successfully!");
     process.exit(0);
   } catch (err) {
     console.error("Error uploading colleges:", err);

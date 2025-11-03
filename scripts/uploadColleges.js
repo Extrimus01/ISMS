@@ -73,7 +73,6 @@ function uploadColleges() {
                     _i++;
                     return [3 /*break*/, 2];
                 case 6:
-                    console.log("College data uploaded successfully!");
                     process.exit(0);
                     return [3 /*break*/, 8];
                 case 7:

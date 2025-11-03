@@ -57,7 +57,6 @@ export default function StudentAttendancePage() {
         Intern Attendance Overview
       </h1>
 
-      {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto rounded-lg">
         <table
           style={{
@@ -178,7 +177,6 @@ export default function StudentAttendancePage() {
         </table>
       </div>
 
-      {/* Mobile Card View */}
       <div
         className="md:hidden flex flex-col gap-4"
         style={{ marginTop: "1rem" }}

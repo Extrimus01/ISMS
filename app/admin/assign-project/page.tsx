@@ -157,7 +157,6 @@ export default function InternProjectDashboard() {
         Intern Project Management
       </h1>
 
-      {/* Assign Project */}
       <div
         style={{
           background: isDarkMode ? "#1f2937" : "#ffffff",
@@ -256,7 +255,6 @@ export default function InternProjectDashboard() {
         </div>
       </div>
 
-      {/* Assignments Table */}
       <div style={{ overflowX: "auto" }}>
         <table
           style={{
@@ -360,7 +358,6 @@ export default function InternProjectDashboard() {
         </table>
       </div>
 
-      {/* Edit Modal */}
       {editAssignment && (
         <div
           style={{

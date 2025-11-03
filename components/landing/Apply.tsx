@@ -226,7 +226,6 @@ export default function Contact() {
         collegeId: collegeIdBase64,
       };
 
-      console.log(payload);
 
       const res = await fetch("/api/auth/intern", {
         method: "POST",

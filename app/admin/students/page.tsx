@@ -123,7 +123,7 @@ export default function StudentPage() {
     if (num <= 2) return "1st";
     if (num <= 4) return "2nd";
     if (num <= 6) return "3rd";
-    return "4th Year";
+    return "4th";
   };
 
   const handleChange = (field: string, value: string) => {

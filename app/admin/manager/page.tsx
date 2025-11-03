@@ -167,7 +167,6 @@ export default function ManagerPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this manager?")) return;
 
     const res = await fetch(`/api/manager/${id}`, { method: "DELETE" });
     if (res.ok) {
