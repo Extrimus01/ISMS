@@ -40,7 +40,6 @@ export const navigationItems: NavItem[] = [
     icon: GraduationCap,
     subItems: [
       { name: "Interns List", path: "/manager/interns-list" },
-      { name: "Attendance", path: "/manager/interns-attendance" },
       { name: "Intern Documentss", path: "/manager/interns-docs" },
     ],
   },

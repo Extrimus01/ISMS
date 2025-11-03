@@ -42,16 +42,16 @@ export default function AttendancePage() {
   const handleConfirm = async (id: string, confirmed: boolean) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/manager/attendance", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id, confirmed }),
-      });
+    //   const res = await fetch("/api/manager/attendance", {
+    //     method: "PATCH",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify({ id, confirmed }),
+    //   });
 
-      if (!res.ok) throw new Error("Failed to update");
+    //   if (!res.ok) throw new Error("Failed to update");
 
       toast.success("Attendance updated");
       setRecords((prev) =>
