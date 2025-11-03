@@ -5,7 +5,12 @@ import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
-function ConfirmModal({ message, onConfirm, onCancel }: any) {
+interface ConfirmModalProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -74,7 +79,7 @@ export default function InternProjectDashboard() {
 
   useEffect(() => {
     async function fetchData() {
-      const internsRes = await fetch("/api/admin/interns");
+      const internsRes = await fetch("/api/admin/interns/project");
       const internsData: Intern[] = await internsRes.json();
       setInterns(internsData);
 
@@ -86,7 +91,7 @@ export default function InternProjectDashboard() {
   }, []);
 
   const fetchInterns = async () => {
-    const res = await fetch("/api/admin/interns");
+    const res = await fetch("/api/admin/interns/project");
     const data: Intern[] = await res.json();
     setInterns(data);
   };
@@ -132,7 +137,7 @@ export default function InternProjectDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           internId: selectedIntern,
-          projectId: editAssignment.project._id,
+          projectId: editAssignment.project._id || editAssignment.project,
           startDate: editAssignment.startDate,
           endDate: editAssignment.endDate,
           status: editAssignment.status,
@@ -151,14 +156,21 @@ export default function InternProjectDashboard() {
 
   const handleDeleteAssignment = async (
     internId: string,
-    projectId: string
+    projectId: string | { _id: string }
   ) => {
     try {
+      const finalProjectId =
+        typeof projectId === "string" ? projectId : projectId._id;
+
       const res = await fetch("/api/intern/project", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ internId, projectId }),
+        body: JSON.stringify({
+          internId,
+          projectId: finalProjectId,
+        }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete assignment");
 
@@ -182,8 +194,12 @@ export default function InternProjectDashboard() {
         <ConfirmModal
           message={confirmModal.message}
           onConfirm={() => {
-            handleDeleteAssignment(confirmModal.id, confirmModal.projectid);
-            setConfirmModal(null);
+            handleDeleteAssignment(
+              confirmModal.internId,
+              confirmModal.projectId
+            )
+              .then(() => setConfirmModal(null))
+              .catch((err) => console.error("Delete error:", err));
           }}
           onCancel={() => setConfirmModal(null)}
         />
@@ -351,10 +367,13 @@ export default function InternProjectDashboard() {
                     <button
                       onClick={() =>
                         setConfirmModal({
-                          id: i._id,
-                          projectid: a.project._id,
                           message:
                             "Are you sure you want to remove this assignment?",
+                          internId: i._id,
+                          projectId:
+                            typeof a.project === "string"
+                              ? a.project
+                              : a.project._id,
                         })
                       }
                       className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm"
