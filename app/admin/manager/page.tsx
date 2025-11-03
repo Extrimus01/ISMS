@@ -392,7 +392,7 @@ export default function ManagerPage() {
                   onClick={() =>
                     setConfirmModal({
                       id: manager._id,
-                      message: "Are you sure you want to delete this project?",
+                      message: "Are you sure you want to delete this?",
                     })
                   }
                   style={{

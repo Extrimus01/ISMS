@@ -392,8 +392,6 @@ export default function ProjectsPage() {
     <div
       style={{
         padding: "24px",
-        color: isDark ? "#f3f4f6" : "#111827",
-        backgroundColor: isDark ? "#111827" : "#f9fafb",
         minHeight: "100vh",
         transition: "background-color 0.3s ease, color 0.3s ease",
       }}

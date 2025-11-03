@@ -5,6 +5,78 @@ import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
+interface ConfirmModalProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 100,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: isDark ? "#1f2937" : "#ffffff",
+          color: isDark ? "#e5e7eb" : "#111827",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: isDark
+            ? "0 4px 16px rgba(255,255,255,0.1)"
+            : "0 4px 16px rgba(0,0,0,0.15)",
+          width: "90%",
+          maxWidth: "400px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ marginBottom: "20px", fontSize: "16px", fontWeight: 500 }}>
+          {message}
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+          <button
+            onClick={onCancel}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              backgroundColor: isDark ? "#374151" : "#e5e7eb",
+              color: isDark ? "#fff" : "#111",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              backgroundColor: "#ef4444",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface Project {
   _id: string;
   title: string;
@@ -35,6 +107,12 @@ export default function InternProjectDashboard() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [editAssignment, setEditAssignment] = useState<Assignment | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    id: string;
+    projectid: string;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -117,7 +195,6 @@ export default function InternProjectDashboard() {
     internId: string,
     projectId: string
   ) => {
-    if (!confirm("Are you sure you want to remove this assignment?")) return;
     try {
       const res = await fetch("/api/intern/project", {
         method: "DELETE",
@@ -146,6 +223,17 @@ export default function InternProjectDashboard() {
         color: isDarkMode ? "#f3f4f6" : "#1f2937",
       }}
     >
+      {" "}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={() => {
+            handleDeleteAssignment(confirmModal.id, confirmModal.projectid);
+            setConfirmModal(null);
+          }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
       <h1
         style={{
           fontSize: "1.75rem",
@@ -156,7 +244,6 @@ export default function InternProjectDashboard() {
       >
         Intern Project Management
       </h1>
-
       <div
         style={{
           background: isDarkMode ? "#1f2937" : "#ffffff",
@@ -254,7 +341,6 @@ export default function InternProjectDashboard() {
           </button>
         </div>
       </div>
-
       <div style={{ overflowX: "auto" }}>
         <table
           style={{
@@ -345,7 +431,12 @@ export default function InternProjectDashboard() {
                         cursor: "pointer",
                       }}
                       onClick={() =>
-                        handleDeleteAssignment(i._id, a.project._id)
+                        setConfirmModal({
+                          id: i._id,
+                          projectid: a.project._id,
+                          message:
+                            "Are you sure you want to remove this assignment?",
+                        })
                       }
                     >
                       Delete
@@ -357,7 +448,6 @@ export default function InternProjectDashboard() {
           </tbody>
         </table>
       </div>
-
       {editAssignment && (
         <div
           style={{

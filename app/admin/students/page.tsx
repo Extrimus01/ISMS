@@ -308,7 +308,7 @@ export default function StudentPage() {
                       setConfirmModal({
                         id: i._id,
                         message:
-                          "Are you sure you want to delete this project?",
+                          "Are you sure you want to delete this?",
                       })
                     }
                     style={{
