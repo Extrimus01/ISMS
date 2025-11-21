@@ -1,11 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  postcss: {
-    plugins: {
-      "@tailwindcss/postcss": {},
-    },
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
