@@ -97,10 +97,10 @@ export default function Contact() {
 
   const handleFileChange =
     (field: "recommendation" | "collegeId") =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0])
-        setFiles({ ...files, [field]: e.target.files[0] });
-    };
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0])
+          setFiles({ ...files, [field]: e.target.files[0] });
+      };
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -277,9 +277,8 @@ export default function Contact() {
     >
       {toast && (
         <div
-          className={`fixed top-6 right-6 px-6 py-3 rounded-xl shadow-lg font-medium text-white z-50 ${
-            toast.type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
+          className={`fixed top-6 right-6 px-6 py-3 rounded-xl shadow-lg font-medium text-white z-50 ${toast.type === "success" ? "bg-green-500" : "bg-red-500"
+            }`}
         >
           {toast.message}
         </div>
@@ -350,7 +349,7 @@ export default function Contact() {
 
                 {collegeOptions.length > 0 &&
                   form.college.trim().length > 1 && (
-                    <ul className="absolute z-50 mt-1 w-full bg-black-900 border border-[var(--border)] rounded-xl shadow-lg max-h-56 overflow-y-auto">
+                    <ul className="absolute z-50 mt-1 w-full bg-[hsl(var(--card))] border border-[var(--border)] rounded-xl shadow-xl max-h-56 overflow-y-auto">
                       {collegeOptions.map((c, idx) => (
                         <li
                           key={idx}
@@ -419,10 +418,10 @@ export default function Contact() {
                   {otpCountdown > 0
                     ? `Resend in ${otpCountdown}s`
                     : otpVerified
-                    ? "Verified"
-                    : otpSending
-                    ? "Sending..."
-                    : "Send OTP"}
+                      ? "Verified"
+                      : otpSending
+                        ? "Sending..."
+                        : "Send OTP"}
                 </button>
               </div>
 
@@ -523,11 +522,10 @@ export default function Contact() {
               type="submit"
               disabled={loading || !otpVerified}
               className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--border)]
-    ${
-      loading || !otpVerified
-        ? "bg-[var(--accent)]/40 text-[var(--foreground-secondary)] cursor-not-allowed"
-        : "bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 hover:shadow-lg active:scale-[0.98]"
-    }`}
+    ${loading || !otpVerified
+                  ? "bg-[var(--accent)]/40 text-[var(--foreground-secondary)] cursor-not-allowed"
+                  : "bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 hover:shadow-lg active:scale-[0.98]"
+                }`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

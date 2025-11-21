@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --card: 0 0% 100%;
+  }
+
+  .dark {
+    --card: 220 15% 15%;
+  }
+}
+
 /* @layer base {
   :root {
     --background: 240 25% 97%;
@@ -28,11 +38,9 @@
   html,
   body {
     @apply h-full w-full transition-colors duration-500 antialiased;
-    background: radial-gradient(
-        circle at 30% 30%,
+    background: radial-gradient(circle at 30% 30%,
         hsla(var(--accent) / 0.08),
-        transparent 50%
-      ),
+        transparent 50%),
       hsl(var(--background));
     color: hsl(var(--foreground));
     overflow-x: hidden;
@@ -50,11 +58,9 @@
 
 @layer components {
   .glass-card {
-    background: linear-gradient(
-        135deg,
+    background: linear-gradient(135deg,
         hsla(var(--card) / 0.65),
-        hsla(var(--card) / 0.45)
-      ),
+        hsla(var(--card) / 0.45)),
       hsla(var(--card) / 0.5);
     backdrop-filter: blur(var(--blur)) saturate(180%);
     border: 1px solid hsla(var(--border) / 0.5);
@@ -64,11 +70,9 @@
 
   .btn-primary {
     position: relative;
-    background: linear-gradient(
-      135deg,
-      hsl(var(--accent)) 0%,
-      hsl(var(--accent)) 100%
-    );
+    background: linear-gradient(135deg,
+        hsl(var(--accent)) 0%,
+        hsl(var(--accent)) 100%);
     color: white;
     box-shadow: 0 4px 20px hsla(var(--accent) / 0.5);
     @apply font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 active:scale-95 transition-all duration-300;
@@ -118,6 +122,7 @@
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -131,6 +136,6 @@
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 } */
