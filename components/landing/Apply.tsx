@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Globe, CheckCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import animationData from "@/public/animation/Learning.json";
+import animationData from "@/public/animation/Learninggg.json";
 import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
