@@ -1,14 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
 import { Globe, CheckCircle } from "lucide-react";
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useState, useEffect } from "react";
-import animationData from "@/public/animation/Learninggg.json";
 import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addMonths, setHours, setMinutes } from "date-fns";
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -297,11 +295,13 @@ export default function Contact() {
             Apply for Internship
           </h2>
           <div className="w-full max-w-[18rem] sm:max-w-[24rem] aspect-square">
-            <Lottie
-              animationData={animationData}
-              loop={true}
-              autoplay={true}
-              className="w-full h-full"
+            <Image
+              src="/images/internship-job-illustration.png"
+              alt="Internship Illustration"
+              width={500}
+              height={500}
+              className="w-full h-full object-contain"
+              priority
             />
           </div>
           <Link
