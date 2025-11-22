@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       );
     if (hours < 9 || hours >= 17)
       return NextResponse.json(
-        { error: "Interview time must be between 09:00 and 17:00" },
+        { error: "Interview time must be between 15:00 and 17:00" },
         { status: 400 }
       );
 
@@ -112,9 +112,9 @@ export async function POST(req: NextRequest) {
             <p>Your registration is successful. Here are your interview details:</p>
             <p><strong>Date:</strong> ${interviewDate.toDateString()}<br/>
             <strong>Time:</strong> ${interviewDate.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}<br/>
+            hour: "2-digit",
+            minute: "2-digit",
+          })}<br/>
             <strong>Mode:</strong> Offline<br/>
             <strong>Venue:</strong> MRSAC, VNIT Campus, S.A. Rd, Nagpur, Maharashtra, India - 440010</p>
             <p>Please contact [Support Email] for rescheduling or queries.</p>

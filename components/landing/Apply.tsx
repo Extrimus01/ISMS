@@ -190,7 +190,7 @@ export default function Contact() {
     if (isHoliday) return showToast("Selected date is a holiday", "error");
 
     if (hours < 9 || hours >= 17)
-      return showToast("Time must be between 13:00 and 17:00", "error");
+      return showToast("Time must be between 15:00 and 17:00", "error");
 
     if (files.recommendation && files.recommendation.type !== "application/pdf")
       return showToast("Recommendation must be a PDF", "error");
@@ -486,7 +486,7 @@ export default function Contact() {
                       maxDate={addMonths(new Date(), 1)}
                       filterDate={isWeekday}
                       dateFormat="yyyy-MM-dd HH:mm"
-                      placeholderText="Select date and time"
+                      placeholderText="Select date and time (15:00 to 17:00)"
                       className="bg-transparent outline-none w-full text-[var(--foreground)]"
                     />
                   </div>
