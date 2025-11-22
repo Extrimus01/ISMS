@@ -51,6 +51,11 @@ export const navigationItems: NavItem[] = [
     ],
   },
   {
+    name: "Attendance",
+    icon: BookOpen,
+    subItems: [{ name: "Intern Attendance", path: "/manager/interns-attendance" }],
+  },
+  {
     name: "Guidelines",
     icon: BookOpen,
     subItems: [{ name: "Guidelines", path: "/manager/guidelines" }],
@@ -98,12 +103,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   const lightModeStyle =
     theme === "light"
       ? {
-          background: "linear-gradient(145deg, #ffffff, #f3f4f6)",
-          boxShadow:
-            "0 4px 15px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
-          borderRight: "1px solid rgba(0, 0, 0, 0.08)",
-          color: "#111827",
-        }
+        background: "linear-gradient(145deg, #ffffff, #f3f4f6)",
+        boxShadow:
+          "0 4px 15px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
+        borderRight: "1px solid rgba(0, 0, 0, 0.08)",
+        color: "#111827",
+      }
       : {};
 
   return (
@@ -147,9 +152,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 {item.subItems && (
                   <ChevronDownIcon
-                    className={`w-4 h-4 transition-transform duration-300 ease-in-out ${
-                      openMenu === item.name ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-300 ease-in-out ${openMenu === item.name ? "rotate-180" : ""
+                      }`}
                   />
                 )}
               </button>
@@ -160,18 +164,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <a
                       key={subItem.name}
                       href={subItem.path}
-                      className={`relative flex items-center text-sm py-2 px-4 rounded-md transition-all duration-200 ${
-                        activeSubItem === subItem.path
-                          ? "text-sky-600 dark:text-sky-400 font-semibold bg-sky-100 dark:bg-sky-900/30 shadow-sm"
-                          : "text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
-                      }`}
+                      className={`relative flex items-center text-sm py-2 px-4 rounded-md transition-all duration-200 ${activeSubItem === subItem.path
+                        ? "text-sky-600 dark:text-sky-400 font-semibold bg-sky-100 dark:bg-sky-900/30 shadow-sm"
+                        : "text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
                     >
                       <span
-                        className={`absolute left-0 h-full w-1 rounded-r-full transition-all duration-200 ${
-                          activeSubItem === subItem.path
-                            ? "bg-sky-500"
-                            : "bg-transparent"
-                        }`}
+                        className={`absolute left-0 h-full w-1 rounded-r-full transition-all duration-200 ${activeSubItem === subItem.path
+                          ? "bg-sky-500"
+                          : "bg-transparent"
+                          }`}
                       />
                       {subItem.name}
                     </a>
