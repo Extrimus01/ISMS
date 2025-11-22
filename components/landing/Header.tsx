@@ -51,7 +51,7 @@ export default function Header() {
                   <NavigationMenuLink asChild>
                     <Link
                       href={href}
-                      className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 visited:text-purple-600 dark:visited:text-purple-400 transition-colors"
+                      className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 visited:text-yellow-600 dark:visited:text-yellow-400 transition-colors"
                     >
                       {label}
                     </Link>
@@ -92,7 +92,7 @@ export default function Header() {
                   key={href}
                   href={href}
                   onClick={() => setMenuOpen(false)}
-                  className="text-lg font-medium text-gray-800 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 visited:text-purple-600 dark:visited:text-purple-400 transition"
+                  className="text-lg font-medium text-gray-800 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 visited:text-yellow-600 dark:visited:text-yellow-400 transition"
                 >
                   {label}
                 </Link>
