@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Header from "@/components/landing/Header";
@@ -57,15 +58,18 @@ export default function ReviewPage() {
         body: JSON.stringify(formData),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setSubmitted(true);
         setFormData({ name: "", email: "", rating: 0, message: "" });
+        toast.success("Thank you for your feedback!");
       } else {
-        alert("Failed to submit feedback. Please try again.");
+        toast.error(data.error || "Failed to submit feedback. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -124,8 +128,8 @@ export default function ReviewPage() {
                       type="button"
                       onClick={() => setFormData({ ...formData, rating: star })}
                       className={`text-2xl transition-transform transform hover:scale-125 ${formData.rating >= star
-                          ? "text-yellow-400"
-                          : "text-[var(--foreground-secondary)]"
+                        ? "text-yellow-400"
+                        : "text-[var(--foreground-secondary)]"
                         }`}
                     >
                       ★
