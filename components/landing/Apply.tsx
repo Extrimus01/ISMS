@@ -179,6 +179,8 @@ export default function Contact() {
 
     const day = interview.getDay();
     const hours = interview.getHours();
+    console.log("Interview selection:", interview, "Hours:", hours);
+
     if (day === 0 || day === 6)
       return showToast("Weekends are not allowed", "error");
 
@@ -188,7 +190,7 @@ export default function Contact() {
     if (isHoliday) return showToast("Selected date is a holiday", "error");
 
     if (hours < 9 || hours >= 17)
-      return showToast("Time must be between 09:00 and 17:00", "error");
+      return showToast("Time must be between 13:00 and 17:00", "error");
 
     if (files.recommendation && files.recommendation.type !== "application/pdf")
       return showToast("Recommendation must be a PDF", "error");
@@ -478,8 +480,8 @@ export default function Contact() {
                       onChange={(date) => setInterview(date)}
                       showTimeSelect
                       timeIntervals={60}
-                      minTime={setHours(setMinutes(new Date(), 0), 9)}
-                      maxTime={setHours(setMinutes(new Date(), 0), 18)}
+                      minTime={setHours(setMinutes(interview || new Date(), 0), 9)}
+                      maxTime={setHours(setMinutes(interview || new Date(), 0), 18)}
                       minDate={new Date()}
                       maxDate={addMonths(new Date(), 1)}
                       filterDate={isWeekday}
