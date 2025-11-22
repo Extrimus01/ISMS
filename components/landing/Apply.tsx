@@ -151,7 +151,7 @@ export default function Contact() {
     }
   };
 
-  const holidays = [new Date("2025-10-20"), new Date("2025-10-25")];
+  const holidays = [new Date(2025, 9, 20), new Date(2025, 9, 25)];
 
   const isWeekday = (date: Date) => {
     const day = date.getDay();
@@ -177,7 +177,7 @@ export default function Contact() {
 
     if (!interview) return showToast("Select interview schedule", "error");
 
-    form.interview = interview.toISOString();
+    // form.interview = interview.toISOString();
 
     const day = interview.getDay();
     const hours = interview.getHours();
@@ -222,6 +222,7 @@ export default function Contact() {
 
       const payload = {
         ...form,
+        interview: interview.toISOString(),
         recommendation: recommendationBase64,
         collegeId: collegeIdBase64,
       };
@@ -299,11 +300,8 @@ export default function Contact() {
             <Lottie
               animationData={animationData}
               loop={true}
+              autoplay={true}
               className="w-full h-full"
-              style={{ width: "100%", height: "100%" }}
-              rendererSettings={{
-                preserveAspectRatio: "xMidYMid meet",
-              }}
             />
           </div>
           <Link
