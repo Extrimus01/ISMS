@@ -5,10 +5,14 @@
 @layer base {
   :root {
     --card: 0 0% 100%;
+    --link: #4a5568;
+    --subtn: white;
   }
 
   .dark {
     --card: 220 15% 15%;
+    --link: #edf2f7;
+    --subtn: black;
   }
 }
 

@@ -123,11 +123,10 @@ export default function ReviewPage() {
                       key={star}
                       type="button"
                       onClick={() => setFormData({ ...formData, rating: star })}
-                      className={`text-2xl transition-transform transform hover:scale-125 ${
-                        formData.rating >= star
+                      className={`text-2xl transition-transform transform hover:scale-125 ${formData.rating >= star
                           ? "text-yellow-400"
                           : "text-[var(--foreground-secondary)]"
-                      }`}
+                        }`}
                     >
                       ★
                     </button>
@@ -144,7 +143,7 @@ export default function ReviewPage() {
                 />
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[var(--accent)] text-white rounded-lg font-semibold hover:bg-[var(--accent-hover)] transition-colors duration-300"
+                  className="w-full py-3 bg-[var(--accent)] text-[subtn] rounded-lg font-semibold hover:bg-[var(--accent-hover)] transition-colors duration-300"
                 >
                   Submit Feedback
                 </button>
@@ -169,9 +168,8 @@ export default function ReviewPage() {
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className={`border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--card)] shadow-lg transition-all duration-300 ${
-                    isOpen ? "shadow-xl scale-[1.02]" : ""
-                  }`}
+                  className={`border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--card)] shadow-lg transition-all duration-300 ${isOpen ? "shadow-xl scale-[1.02]" : ""
+                    }`}
                 >
                   <button
                     onClick={() => setOpenIndex(isOpen ? null : i)}

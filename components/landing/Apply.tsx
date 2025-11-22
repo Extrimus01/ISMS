@@ -295,10 +295,11 @@ export default function Contact() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Apply for Internship
           </h2>
-          <div className="w-72 sm:w-96 h-72 sm:h-96">
+          <div className="w-full max-w-[18rem] sm:max-w-[24rem] aspect-square">
             <Lottie
               animationData={animationData}
               loop={true}
+              className="w-full h-full"
               style={{ width: "100%", height: "100%" }}
               rendererSettings={{
                 preserveAspectRatio: "xMidYMid meet",
