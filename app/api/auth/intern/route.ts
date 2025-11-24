@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
 
     const interviewDate = new Date(interview);
 
-    // Convert to IST for validation
     const istDateString = interviewDate.toLocaleString("en-US", {
       timeZone: "Asia/Kolkata",
     });
@@ -87,8 +86,6 @@ export async function POST(req: NextRequest) {
         { error: "Selected date is a holiday" },
         { status: 400 }
       );
-    console.log("date (IST):", istDate);
-    console.log("hours (IST):", hours);
     if (hours < 11 || hours >= 17)
       return NextResponse.json(
         { error: "Interview time must be between 11:00 and 17:00 IST" },
