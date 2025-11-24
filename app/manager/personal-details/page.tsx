@@ -27,7 +27,6 @@ export default function ManagerPersonalDetailsPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
 
-  // Load user data from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) {
@@ -76,9 +75,8 @@ export default function ManagerPersonalDetailsPage() {
   const cardStyle = {
     backgroundColor:
       theme === "dark" ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.05)",
-    border: `1px solid ${
-      theme === "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)"
-    }`,
+    border: `1px solid ${theme === "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)"
+      }`,
     color: theme === "dark" ? "#e5e7eb" : "#111827",
     backdropFilter: "blur(10px)",
   };
@@ -92,7 +90,7 @@ export default function ManagerPersonalDetailsPage() {
   return (
     <div className="p-6 md:p-10 min-h-screen transition-colors duration-300">
       <div className="max-w-5xl mx-auto space-y-8">
-        {/* Personal Details Card */}
+
         <div
           className="p-6 rounded-xl shadow-md transition-all duration-300"
           style={cardStyle}

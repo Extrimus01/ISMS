@@ -11,12 +11,10 @@ export async function POST(req: NextRequest) {
     if (!id)
       return NextResponse.json({ error: "Manager ID is required" }, { status: 400 });
 
-    // Verify that manager exists
     const managerExists = await Manager.findById(id);
     if (!managerExists)
       return NextResponse.json({ error: "Manager not found" }, { status: 404 });
 
-    // Fetch projects assigned to this manager
     const projects = await Project.find({ manager: id })
       .populate({
         path: "manager",
@@ -28,7 +26,6 @@ export async function POST(req: NextRequest) {
       })
       .lean();
 
-    // Format response to match frontend expectations
     const formattedProjects = projects.map((p) => ({
       project: {
         _id: p._id,
@@ -37,7 +34,7 @@ export async function POST(req: NextRequest) {
       },
       startDate: p.startDate,
       endDate: p.endDate,
-      status: p.isActive ? "in-progress" : "completed", // derived status
+      status: p.isActive ? "in-progress" : "completed",
       interns: p.interns?.map((i: any) => ({
         intern: i.intern,
         startDate: i.startDate,

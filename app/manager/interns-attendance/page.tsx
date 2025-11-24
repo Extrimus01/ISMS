@@ -42,21 +42,21 @@ export default function AttendancePage() {
   const handleConfirm = async (id: string, confirmed: boolean) => {
     try {
       const token = localStorage.getItem("token");
-    //   const res = await fetch("/api/manager/attendance", {
-    //     method: "PATCH",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify({ id, confirmed }),
-    //   });
+      const res = await fetch("/api/manager/attendance", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id, confirmed }),
+      });
 
-    //   if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) throw new Error("Failed to update");
 
       toast.success("Attendance updated");
       setRecords((prev) =>
         prev.map((r) =>
-          r._id === id ? { ...r, confirmedByManager: confirmed } : r
+          r._id === id ? { ...r, confirmedByManager: confirmed, status: confirmed ? "present" : "absent" } : r
         )
       );
     } catch {
@@ -77,21 +77,18 @@ export default function AttendancePage() {
 
   return (
     <div
-      className={`min-h-screen px-4 sm:px-6 py-4 transition-colors ${
-        isDark ? "bg-slate-900 text-slate-100" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`min-h-screen px-4 sm:px-6 py-4 transition-colors ${isDark ? "bg-slate-900 text-slate-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
       <h1 className="text-2xl font-semibold mb-6 text-center sm:text-left">
         Confirm Intern Attendance
       </h1>
 
-      {/* ✅ Desktop Table */}
       <div className="hidden md:block overflow-x-auto rounded-lg shadow border border-gray-300 dark:border-slate-700">
         <table className="w-full border-collapse">
           <thead
-            className={`${
-              isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-900"
-            }`}
+            className={`${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-900"
+              }`}
           >
             <tr>
               {["Name", "Department", "Date", "Status", "Confirmation"].map(
@@ -107,11 +104,10 @@ export default function AttendancePage() {
             {records.map((r) => (
               <tr
                 key={r._id}
-                className={`border-b ${
-                  isDark
-                    ? "border-slate-700 hover:bg-slate-800"
-                    : "border-gray-200 hover:bg-gray-100"
-                }`}
+                className={`border-b ${isDark
+                  ? "border-slate-700 hover:bg-slate-800"
+                  : "border-gray-200 hover:bg-gray-100"
+                  }`}
               >
                 <td className="p-3">{r.intern?.fullName}</td>
                 <td className="p-3">{r.intern?.department}</td>
@@ -120,11 +116,10 @@ export default function AttendancePage() {
                 <td className="p-3 flex gap-2">
                   <button
                     onClick={() => handleConfirm(r._id, true)}
-                    className={`px-3 py-1 rounded-md text-sm ${
-                      r.confirmedByManager
-                        ? "bg-green-600 text-white"
-                        : "bg-green-500 hover:bg-green-600 text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-md text-sm ${r.confirmedByManager
+                      ? "bg-green-600 text-white"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                      }`}
                   >
                     Confirm
                   </button>
@@ -141,14 +136,12 @@ export default function AttendancePage() {
         </table>
       </div>
 
-      {/* ✅ Mobile Cards */}
       <div className="md:hidden flex flex-col gap-4">
         {records.map((r) => (
           <div
             key={r._id}
-            className={`p-4 rounded-xl shadow ${
-              isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
-            }`}
+            className={`p-4 rounded-xl shadow ${isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+              }`}
           >
             <p>
               <strong>Name:</strong> {r.intern?.fullName}
@@ -166,11 +159,10 @@ export default function AttendancePage() {
             <div className="flex gap-2 mt-3">
               <button
                 onClick={() => handleConfirm(r._id, true)}
-                className={`flex-1 py-2 rounded-lg font-medium ${
-                  r.confirmedByManager
-                    ? "bg-green-600 text-white"
-                    : "bg-green-500 text-white hover:bg-green-600"
-                }`}
+                className={`flex-1 py-2 rounded-lg font-medium ${r.confirmedByManager
+                  ? "bg-green-600 text-white"
+                  : "bg-green-500 text-white hover:bg-green-600"
+                  }`}
               >
                 Confirm
               </button>

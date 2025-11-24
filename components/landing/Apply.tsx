@@ -175,7 +175,6 @@ export default function Contact() {
 
     if (!interview) return showToast("Select interview schedule", "error");
 
-    // form.interview = interview.toISOString();
 
     const day = interview.getDay();
     const hours = interview.getHours();
@@ -486,7 +485,7 @@ export default function Contact() {
                       maxDate={addMonths(new Date(), 1)}
                       filterDate={isWeekday}
                       dateFormat="yyyy-MM-dd HH:mm"
-                      placeholderText="Select date and time (15:00 to 17:00)"
+                      placeholderText="Select date and time (11:00 to 17:00)"
                       className="bg-transparent outline-none w-full text-[var(--foreground)]"
                     />
                   </div>

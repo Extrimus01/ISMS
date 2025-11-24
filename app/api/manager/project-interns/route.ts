@@ -14,12 +14,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
-    // ✅ Check manager existence efficiently
     const managerExists = await Manager.exists({ _id: managerId });
     if (!managerExists)
       return NextResponse.json({ error: "Manager not found" }, { status: 404 });
 
-    // ✅ Fetch all projects under this manager
     const projects = await Project.find({ manager: managerId })
       .populate({
         path: "interns.intern",
@@ -36,10 +34,9 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
 
-    // ✅ Flatten the nested interns for frontend ease
     const internsList = projects.flatMap((project) =>
       (project.interns || [])
-        .filter((a: any) => a.intern) // ensure intern populated
+        .filter((a: any) => a.intern)
         .map((a: any) => ({
           projectId: project._id,
           projectTitle: project.title,

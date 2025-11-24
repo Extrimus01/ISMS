@@ -51,45 +51,55 @@ export default function VerificationPage() {
     <>
       <Header />
 
-      <main className="flex flex-col items-center space-y-6 no-scrollbar">
-        <main className="min-h-screen flex flex-col items-center justify-center text-white relative overflow-hidden px-4 sm:px-6 lg:px-8 ">
+      <main
+        className="flex flex-col items-center space-y-6 no-scrollbar transition-colors duration-300"
+        style={{
+          background: "var(--verification-bg)",
+          color: "var(--verification-text)",
+        }}
+      >
+        <main
+          className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6 lg:px-8"
+          style={{ color: "var(--verification-text)" }}
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.25 }}
             transition={{ duration: 1.5 }}
-            className="absolute inset-0 "
+            className="absolute inset-0"
           />
 
           <form
             onSubmit={handleVerify}
-            className="relative w-full max-w-2xl flex flex-col sm:flex-row items-center 
-             sm:bg-white/10 sm:backdrop-blur-lg sm:border sm:border-white/20 sm:shadow-lg
-             rounded-full p-0  "
+            className="relative w-full max-w-2xl flex flex-col sm:flex-row items-center rounded-full p-0 transition-all duration-300 shadow-lg border"
+            style={{
+              background: "var(--verification-card-bg)",
+              borderColor: "var(--verification-card-border)",
+            }}
           >
             <div className="relative w-full sm:flex-1">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 size={20}
               />
+
               <input
                 type="text"
                 value={certificateId}
                 onChange={(e) => setCertificateId(e.target.value)}
                 placeholder="Search certificate ID..."
-                className="w-full pl-12 pr-4 py-3 sm:py-3 rounded-full bg-white/10 text-white placeholder-gray-400 border-none outline-none text-base sm:text-lg "
+                className="w-full pl-12 pr-4 py-3 sm:py-3 rounded-full bg-transparent border-none outline-none text-base sm:text-lg"
+                style={{ color: "var(--verification-text)" }}
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+              className="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto text-white px-6 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all disabled:opacity-50
+        bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500"
             >
-              {loading ? (
-                <Loader2 className="animate-spin mx-auto" />
-              ) : (
-                "Search"
-              )}
+              {loading ? <Loader2 className="animate-spin mx-auto" /> : "Search"}
             </button>
           </form>
 
@@ -101,7 +111,7 @@ export default function VerificationPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex flex-col sm:flex-row items-center justify-center gap-2 text-red-400 bg-red-400/10 border border-red-400/30 p-3 rounded-2xl text-center"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-2 text-red-500 bg-red-50 border border-red-200 p-3 rounded-2xl text-center"
                 >
                   <XCircle />
                   <span>{error}</span>
@@ -115,55 +125,31 @@ export default function VerificationPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -30 }}
                   transition={{ duration: 0.6 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-3xl p-5 sm:p-8 shadow-2xl text-white w-full"
+                  className="rounded-3xl p-5 sm:p-8 w-full shadow-xl border transition-all duration-300"
+                  style={{
+                    background: "var(--verification-card-bg)",
+                    borderColor: "var(--verification-card-border)",
+                    color: "var(--verification-text)",
+                  }}
                 >
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 mb-6 text-cyan-400">
+                  <h2 className="text-xl sm:text-2xl font-semibold mb-6 flex items-center gap-2 text-cyan-600">
                     <CheckCircle2 size={26} />
-                    <h2 className="text-xl sm:text-2xl font-semibold text-center sm:text-left">
-                      Certificate Verified
-                    </h2>
-                  </div>
+                    Certificate Verified
+                  </h2>
 
-                  <div className="space-y-4 sm:space-y-5 text-gray-100 text-sm sm:text-base">
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                      <GraduationCap className="text-cyan-400" size={18} />
-                      <p>
-                        <span className="font-semibold text-gray-300">
-                          Student Name:
-                        </span>{" "}
-                        {result.name}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                      <Building2 className="text-cyan-400" size={18} />
-                      <p>
-                        <span className="font-semibold text-gray-300">
-                          College Name:
-                        </span>{" "}
-                        {result.college}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                      <Lightbulb className="text-cyan-400" size={18} />
-                      <p>
-                        <span className="font-semibold text-gray-300">
-                          Department:
-                        </span>{" "}
-                        {result.department}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                      <CalendarDays className="text-cyan-400" size={18} />
-                      <p>
-                        <span className="font-semibold text-gray-300">
-                          Issued on:
-                        </span>{" "}
-                        {result.issueDate}
-                      </p>
-                    </div>
+                  <div className="space-y-4 sm:space-y-5">
+                    <p>
+                      <strong>Student Name:</strong> {result.name}
+                    </p>
+                    <p>
+                      <strong>College Name:</strong> {result.college}
+                    </p>
+                    <p>
+                      <strong>Department:</strong> {result.department}
+                    </p>
+                    <p>
+                      <strong>Issued On:</strong> {result.issueDate}
+                    </p>
                   </div>
 
                   <div className="mt-6 flex justify-center">
@@ -176,17 +162,17 @@ export default function VerificationPage() {
                           );
                         }
                       }}
-                      className="bg-cyan-500 hover:bg-cyan-400 text-white px-6 py-3 rounded-full font-medium transition-all"
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-full transition-all"
                     >
                       View Offer Letter
                     </button>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-white/10 text-xs text-gray-400 text-center">
-                    Certificate ID:{" "}
-                    <span className="text-gray-200 font-medium">
-                      {result.certificateId}
-                    </span>
+                  <div
+                    className="mt-5 pt-3 text-xs text-center border-t"
+                    style={{ borderColor: "var(--verification-card-border)" }}
+                  >
+                    Certificate ID: <strong>{result.certificateId}</strong>
                   </div>
                 </motion.div>
               )}
@@ -196,16 +182,17 @@ export default function VerificationPage() {
                   key="helper"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-gray-400 text-center mt-6 sm:mt-8 text-xs sm:text-sm px-2"
+                  className="text-center mt-6 sm:mt-8 text-xs sm:text-sm px-2"
+                  style={{ color: "var(--verification-text)" }}
                 >
-                  Type your certificate ID and press <strong>Enter</strong> to
-                  verify authenticity.
+                  Type your certificate ID and press <strong>Enter</strong> to verify.
                 </motion.p>
               )}
             </AnimatePresence>
           </div>
-        </main>{" "}
+        </main>
       </main>
+
     </>
   );
 }

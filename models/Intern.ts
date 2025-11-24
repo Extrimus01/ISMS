@@ -46,8 +46,7 @@ const attendanceSchema = new Schema(
     requestedAt: { type: Date, default: Date.now },
     approvedAt: { type: Date },
     approvedBy: { type: Schema.Types.ObjectId, ref: "Manager" },
-  },
-  { _id: false }
+  }
 );
 
 const documentSchema = new Schema(

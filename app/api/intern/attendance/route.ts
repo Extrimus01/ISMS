@@ -55,3 +55,44 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    await dbConnect();
+    const interns = await Intern.find({}).select(
+      "fullName college course projectsAssigned mentor attendance"
+    );
+
+    const data = interns.map((intern) => {
+      const present = intern.attendance.filter(
+        (a: any) => a.status === "present"
+      ).length;
+      const absent = intern.attendance.filter(
+        (a: any) => a.status === "absent"
+      ).length;
+      const pending = intern.attendance.filter(
+        (a: any) => a.status === "pending"
+      ).length;
+
+      return {
+        id: intern._id,
+        name: intern.fullName,
+        college: intern.college,
+        course: intern.course,
+        project: intern.projectsAssigned[0]?.project || "N/A",
+        mentor: intern.mentor || "Unassigned",
+        present,
+        absent,
+        pending,
+      };
+    });
+
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "Failed to fetch attendance summary" },
+      { status: 500 }
+    );
+  }
+}

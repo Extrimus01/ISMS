@@ -30,9 +30,8 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
       <div
-        className={`rounded-2xl p-6 w-full max-w-sm shadow-lg ${
-          isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
-        }`}
+        className={`rounded-2xl p-6 w-full max-w-sm shadow-lg ${isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+          }`}
       >
         <p className="text-center mb-6 text-base font-medium leading-relaxed">
           {message}
@@ -40,11 +39,10 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
         <div className="flex justify-center gap-3">
           <button
             onClick={onCancel}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              isDark
+            className={`px-4 py-2 rounded-lg font-medium ${isDark
                 ? "bg-slate-700 text-white hover:bg-slate-600"
                 : "bg-gray-200 text-black hover:bg-gray-300"
-            }`}
+              }`}
           >
             Cancel
           </button>
@@ -120,9 +118,8 @@ export default function ActiveInternsPage() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 px-3 sm:px-6 py-4 ${
-        isDark ? "bg-slate-900 text-slate-100" : "bg-gray-50 text-slate-900"
-      }`}
+      className={`min-h-screen transition-colors duration-300 px-3 sm:px-6 py-4 ${isDark ? "bg-slate-900 text-slate-100" : "bg-gray-50 text-slate-900"
+        }`}
     >
       <h1 className="text-xl sm:text-2xl font-semibold mb-5 sm:mb-6 text-center sm:text-left">
         Active Interns
@@ -139,13 +136,11 @@ export default function ActiveInternsPage() {
         />
       )}
 
-      {/* ✅ Desktop View */}
       <div className="hidden md:block overflow-x-auto rounded-lg shadow border border-gray-300 dark:border-slate-700">
         <table className="w-full border-collapse">
           <thead
-            className={`${
-              isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-900"
-            }`}
+            className={`${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-900"
+              }`}
           >
             <tr>
               {[
@@ -172,11 +167,10 @@ export default function ActiveInternsPage() {
             {interns.map((i) => (
               <tr
                 key={i._id}
-                className={`border-b ${
-                  isDark
+                className={`border-b ${isDark
                     ? "border-slate-700 hover:bg-slate-800"
                     : "border-gray-200 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 <td className="p-3">{i.fullName}</td>
                 <td className="p-3 whitespace-nowrap">{i.college}</td>
@@ -206,14 +200,12 @@ export default function ActiveInternsPage() {
         </table>
       </div>
 
-      {/* ✅ Mobile View */}
       <div className="md:hidden flex flex-col gap-4 mt-3 sm:mt-4">
         {interns.map((i) => (
           <div
             key={i._id}
-            className={`rounded-xl shadow-md p-4 ${
-              isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
-            }`}
+            className={`rounded-xl shadow-md p-4 ${isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+              }`}
           >
             <div className="space-y-2 text-sm sm:text-base">
               <p>
