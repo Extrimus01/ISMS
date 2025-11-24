@@ -7,12 +7,18 @@
     --card: 0 0% 100%;
     --link: #4a5568;
     --subtn: white;
+    --borderbtn: 220 10% 85%;
+    --accentbtn: 220 90% 60%;
+    --foreground-secondarybtn: 220 15% 20%;
   }
 
   .dark {
     --card: 220 15% 15%;
     --link: #edf2f7;
     --subtn: black;
+    --borderbtn: 220 10% 25%;
+    --accentbtn: 220 100% 70%;
+    --foreground-secondarybtn: 220 15% 90%;
   }
 }
 

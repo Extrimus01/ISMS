@@ -522,10 +522,10 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading || !otpVerified}
-              className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--border)]
+              className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--borderbtn)]
     ${loading || !otpVerified
-                  ? "bg-[var(--accent)]/40 text-[var(--foreground-secondary)] cursor-not-allowed"
-                  : "bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 hover:shadow-lg active:scale-[0.98]"
+                  ? "bg-[var(--accentbtn)]/40 text-[var(--foreground-secondarybtn)] cursor-not-allowed"
+                  : "bg-[var(--accentbtn)] text-white hover:bg-[var(--accentbtn)]/90 hover:shadow-lg active:scale-[0.98]"
                 }`}
             >
               {loading ? (
