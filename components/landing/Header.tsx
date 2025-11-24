@@ -30,7 +30,7 @@ export default function Header() {
   // };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white/20 dark:bg-[#111827]/40 backdrop-blur-lg border-b border-white/20 dark:border-gray-800 shadow-lg z-50">
+    <header className="fixed top-0 left-0 w-full bg-[var(--nav)] backdrop-blur-lg border-b border-white/20 dark:border-gray-800 shadow-lg z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
         <Link href="/" className="flex items-center space-x-3">
           <Image
