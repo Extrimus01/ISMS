@@ -189,8 +189,10 @@ export default function Contact() {
     );
     if (isHoliday) return showToast("Selected date is a holiday", "error");
 
-    if (hours < 9 || hours >= 17)
-      return showToast("Time must be between 15:00 and 17:00", "error");
+    console.log("Hours:", hours);
+
+    if (hours < 11 || hours >= 17)
+      return showToast("bTime must be between 11:00 and 17:00", "error");
 
     if (files.recommendation && files.recommendation.type !== "application/pdf")
       return showToast("Recommendation must be a PDF", "error");
@@ -480,8 +482,8 @@ export default function Contact() {
                       onChange={(date) => setInterview(date)}
                       showTimeSelect
                       timeIntervals={60}
-                      minTime={setHours(setMinutes(interview || new Date(), 0), 9)}
-                      maxTime={setHours(setMinutes(interview || new Date(), 0), 18)}
+                      minTime={setHours(setMinutes(interview || new Date(), 0), 11)}
+                      maxTime={setHours(setMinutes(interview || new Date(), 0), 16)}
                       minDate={new Date()}
                       maxDate={addMonths(new Date(), 1)}
                       filterDate={isWeekday}
@@ -525,7 +527,7 @@ export default function Contact() {
               className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--borderbtn)]
     ${loading || !otpVerified
                   ? "bg-[var(--accentbtn)]/40 text-[var(--foreground-secondarybtn)] cursor-not-allowed"
-                  : "bg-[var(--accentbtn)] text-white hover:bg-[var(--accentbtn)]/90 hover:shadow-lg active:scale-[0.98]"
+                  : "bg-[var(--accentbtn)] text-[var(--foreground-secondarybtn)] hover:bg-[var(--accentbtn)]/90 hover:shadow-lg active:scale-[0.98]"
                 }`}
             >
               {loading ? (
