@@ -63,11 +63,18 @@ export async function POST(req: NextRequest) {
       );
 
     const interviewDate = new Date(interview);
-    const day = interviewDate.getDay();
-    const hours = interviewDate.getHours();
+
+    // Convert to IST for validation
+    const istDateString = interviewDate.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    });
+    const istDate = new Date(istDateString);
+
+    const day = istDate.getDay();
+    const hours = istDate.getHours();
     const holidays = [new Date("2025-10-20"), new Date("2025-10-25")];
     const isHoliday = holidays.some(
-      (h) => h.toDateString() === interviewDate.toDateString()
+      (h) => h.toDateString() === istDate.toDateString()
     );
 
     if (day === 0 || day === 6)
@@ -80,11 +87,11 @@ export async function POST(req: NextRequest) {
         { error: "Selected date is a holiday" },
         { status: 400 }
       );
-    console.log("date:", interviewDate);
-    console.log("see:", hours);
+    console.log("date (IST):", istDate);
+    console.log("hours (IST):", hours);
     if (hours < 11 || hours >= 17)
       return NextResponse.json(
-        { error: "aInterview time must be between 11:00 and 17:00" },
+        { error: "Interview time must be between 11:00 and 17:00 IST" },
         { status: 400 }
       );
 
@@ -112,8 +119,18 @@ export async function POST(req: NextRequest) {
             <p>Dear ${fullName},</p>
             <p>Warm greetings from the Maharashtra Remote Sensing Application Center (MRSAC).</p>
             <p>Your registration is successful. Here are your interview details:</p>
-            <p><strong>Date:</strong> ${interviewDate.toDateString()}<br/>
-            <strong>Time:</strong> ${interviewDate.toLocaleTimeString([], {
+            <p><strong>Date:</strong> ${interviewDate.toLocaleDateString(
+            "en-US",
+            {
+              timeZone: "Asia/Kolkata",
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }
+          )}<br/>
+            <strong>Time:</strong> ${interviewDate.toLocaleTimeString("en-US", {
+            timeZone: "Asia/Kolkata",
             hour: "2-digit",
             minute: "2-digit",
           })}<br/>
