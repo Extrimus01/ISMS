@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         { error: "Selected date is a holiday" },
         { status: 400 }
       );
-    console.log(hours);
+    console.log("see:", hours);
     if (hours < 11 || hours >= 17)
       return NextResponse.json(
         { error: "aInterview time must be between 11:00 and 17:00" },

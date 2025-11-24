@@ -524,10 +524,10 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading || !otpVerified}
-              className={`relative w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 border border-[var(--borderbtn)]
+              className={`relative w-full mt-3 py-3 text-[var(--foreground-secondarybtn)] rounded-xl font-semibold transition-all duration-300 border border-[var(--borderbtn)]
     ${loading || !otpVerified
-                  ? "bg-[var(--accentbtn)]/40 text-[var(--foreground-secondarybtn)] cursor-not-allowed"
-                  : "bg-[var(--accentbtn)] text-[var(--foreground-secondarybtn)] hover:bg-[var(--accentbtn)]/90 hover:shadow-lg active:scale-[0.98]"
+                  ? "bg-[var(--accentbtn)]/40 cursor-not-allowed"
+                  : "bg-[var(--accentbtn)] hover:bg-[var(--accentbtn)]/90 hover:shadow-lg active:scale-[0.98]"
                 }`}
             >
               {loading ? (
