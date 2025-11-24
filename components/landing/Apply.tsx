@@ -189,7 +189,7 @@ export default function Contact() {
     );
     if (isHoliday) return showToast("Selected date is a holiday", "error");
 
-    console.log("Hours:", hours);
+    console.log("Date:", interview.toDateString());
 
     if (hours < 11 || hours >= 17)
       return showToast("bTime must be between 11:00 and 17:00", "error");
