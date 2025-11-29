@@ -1,12 +1,9 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { BouncingDots } from "@/components/global/Loader";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 export default function StudentAttendancePage() {
   const { theme } = useTheme();
@@ -14,7 +11,6 @@ export default function StudentAttendancePage() {
   const [interns, setInterns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch attendance data
   useEffect(() => {
     fetch("/api/intern/attendance")
       .then((res) => res.json())
@@ -25,21 +21,7 @@ export default function StudentAttendancePage() {
       .catch(() => setLoading(false));
   }, []);
 
-  // Generate PDF from the attendance table
-  const downloadPDF = async () => {
-    const table = document.querySelector("table");
-    if (!table) return;
-    const canvas = await html2canvas(table as HTMLElement);
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF();
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save("student_attendance.pdf");
-  };
-
-  if (loading) {
+  if (loading)
     return (
       <div
         style={{
@@ -53,7 +35,6 @@ export default function StudentAttendancePage() {
         <BouncingDots />
       </div>
     );
-  }
 
   return (
     <div
@@ -64,12 +45,6 @@ export default function StudentAttendancePage() {
         transition: "background 0.3s ease, color 0.3s ease",
       }}
     >
-      <button
-        onClick={downloadPDF}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Download PDF
-      </button>
       <h1
         style={{
           fontSize: "1.5rem",
@@ -82,7 +57,6 @@ export default function StudentAttendancePage() {
         Intern Attendance Overview
       </h1>
 
-      {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto rounded-lg">
         <table
           style={{
@@ -99,13 +73,21 @@ export default function StudentAttendancePage() {
                 color: isDarkMode ? "#f9fafb" : "#111827",
               }}
             >
-              {["Name", "College", "Course", "Project", "Mentor", "Attendance Progress"].map((col) => (
+              {[
+                "Name",
+                "College",
+                "Course",
+                "Project",
+                "Mentor",
+                "Attendance Progress",
+              ].map((col) => (
                 <th
                   key={col}
                   style={{
                     padding: "0.75rem",
                     textAlign: "left",
-                    borderBottom: `1px solid ${isDarkMode ? "#334155" : "#d1d5db"}`,
+                    borderBottom: `1px solid ${isDarkMode ? "#334155" : "#d1d5db"
+                      }`,
                     fontWeight: 500,
                   }}
                 >
@@ -120,6 +102,7 @@ export default function StudentAttendancePage() {
               const presentPct = total ? ((i.present / total) * 100).toFixed(0) : 0;
               const absentPct = total ? ((i.absent / total) * 100).toFixed(0) : 0;
               const pendingPct = total ? ((i.pending / total) * 100).toFixed(0) : 0;
+
               return (
                 <motion.tr
                   key={i.id}
@@ -127,7 +110,8 @@ export default function StudentAttendancePage() {
                   style={{
                     backgroundColor: isDarkMode ? "#1e293b" : "#ffffff",
                     color: isDarkMode ? "#f9fafb" : "#111827",
-                    borderBottom: `1px solid ${isDarkMode ? "#334155" : "#d1d5db"}`,
+                    borderBottom: `1px solid ${isDarkMode ? "#334155" : "#d1d5db"
+                      }`,
                     transition: "background 0.2s",
                   }}
                 >
@@ -155,13 +139,22 @@ export default function StudentAttendancePage() {
                         }}
                       >
                         <div
-                          style={{ width: `${presentPct}%`, background: "#22c55e" }}
+                          style={{
+                            width: `${presentPct}%`,
+                            background: "#22c55e",
+                          }}
                         />
                         <div
-                          style={{ width: `${absentPct}%`, background: "#ef4444" }}
+                          style={{
+                            width: `${absentPct}%`,
+                            background: "#ef4444",
+                          }}
                         />
                         <div
-                          style={{ width: `${pendingPct}%`, background: "#facc15" }}
+                          style={{
+                            width: `${pendingPct}%`,
+                            background: "#facc15",
+                          }}
                         />
                       </div>
                       <span
@@ -173,6 +166,41 @@ export default function StudentAttendancePage() {
                       >
                         {presentPct}% Present
                       </span>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(
+                              `/api/intern/attendance/${i.id}`
+                            );
+                            const data = await res.json();
+                            if (data.attendance) {
+                              const now = new Date();
+                              import("@/utils/generatePDF").then((mod) => {
+                                mod.generateAttendancePDF(
+                                  data.name,
+                                  data.attendance,
+                                  now.getMonth(),
+                                  now.getFullYear()
+                                );
+                              });
+                            }
+                          } catch (error) {
+                            console.error("Failed to download PDF", error);
+                          }
+                        }}
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          fontSize: "0.75rem",
+                          borderRadius: "0.25rem",
+                          backgroundColor: isDarkMode ? "#374151" : "#e5e7eb",
+                          color: isDarkMode ? "#f3f4f6" : "#111827",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        title="Download Monthly Report"
+                      >
+                        ⬇️
+                      </button>
                     </div>
                   </td>
                 </motion.tr>
@@ -182,13 +210,16 @@ export default function StudentAttendancePage() {
         </table>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="md:hidden flex flex-col gap-4" style={{ marginTop: "1rem" }}>
+      <div
+        className="md:hidden flex flex-col gap-4"
+        style={{ marginTop: "1rem" }}
+      >
         {interns.map((i) => {
           const total = i.present + i.absent + i.pending;
           const presentPct = total ? ((i.present / total) * 100).toFixed(0) : 0;
           const absentPct = total ? ((i.absent / total) * 100).toFixed(0) : 0;
           const pendingPct = total ? ((i.pending / total) * 100).toFixed(0) : 0;
+
           return (
             <motion.div
               key={i.id}
@@ -204,11 +235,21 @@ export default function StudentAttendancePage() {
                   : "0 1px 4px rgba(0,0,0,0.1)",
               }}
             >
-              <p><strong>Name:</strong> {i.name}</p>
-              <p><strong>College:</strong> {i.college}</p>
-              <p><strong>Course:</strong> {i.course}</p>
-              <p><strong>Project:</strong> {i.project}</p>
-              <p><strong>Mentor:</strong> {i.mentor}</p>
+              <p>
+                <strong>Name:</strong> {i.name}
+              </p>
+              <p>
+                <strong>College:</strong> {i.college}
+              </p>
+              <p>
+                <strong>Course:</strong> {i.course}
+              </p>
+              <p>
+                <strong>Project:</strong> {i.project}
+              </p>
+              <p>
+                <strong>Mentor:</strong> {i.mentor}
+              </p>
               <div style={{ marginTop: "0.75rem" }}>
                 <div
                   style={{
@@ -219,19 +260,69 @@ export default function StudentAttendancePage() {
                     overflow: "hidden",
                   }}
                 >
-                  <div style={{ width: `${presentPct}%`, background: "#22c55e" }} />
-                  <div style={{ width: `${absentPct}%`, background: "#ef4444" }} />
-                  <div style={{ width: `${pendingPct}%`, background: "#facc15" }} />
+                  <div
+                    style={{
+                      width: `${presentPct}%`,
+                      background: "#22c55e",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: `${absentPct}%`,
+                      background: "#ef4444",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: `${pendingPct}%`,
+                      background: "#facc15",
+                    }}
+                  />
                 </div>
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: isDarkMode ? "#9ca3af" : "#4b5563",
-                    marginTop: "0.25rem",
-                  }}
-                >
-                  {presentPct}% Present
-                </p>
+                <div className="flex items-center justify-between mt-1">
+                  <p
+                    style={{
+                      fontSize: "0.8rem",
+                      color: isDarkMode ? "#9ca3af" : "#4b5563",
+                    }}
+                  >
+                    {presentPct}% Present
+                  </p>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(
+                          `/api/intern/attendance/${i.id}`
+                        );
+                        const data = await res.json();
+                        if (data.attendance) {
+                          const now = new Date();
+                          import("@/utils/generatePDF").then((mod) => {
+                            mod.generateAttendancePDF(
+                              data.name,
+                              data.attendance,
+                              now.getMonth(),
+                              now.getFullYear()
+                            );
+                          });
+                        }
+                      } catch (error) {
+                        console.error("Failed to download PDF", error);
+                      }
+                    }}
+                    style={{
+                      padding: "0.25rem 0.5rem",
+                      fontSize: "0.75rem",
+                      borderRadius: "0.25rem",
+                      backgroundColor: isDarkMode ? "#374151" : "#e5e7eb",
+                      color: isDarkMode ? "#f3f4f6" : "#111827",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Download PDF
+                  </button>
+                </div>
               </div>
             </motion.div>
           );
