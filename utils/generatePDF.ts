@@ -9,13 +9,11 @@ export const generateAttendancePDF = (
 ) => {
     const doc = new jsPDF();
 
-    // Title
     doc.setFontSize(14);
     doc.text("MAHARASHTRA REMOTE SENSING APPLICATION CENTER", 105, 15, {
         align: "center",
     });
 
-    // Prepare data
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const rows = [];
     const days = [
@@ -33,7 +31,6 @@ export const generateAttendancePDF = (
         const dateStr = `${month + 1}/${i}/${year}`;
         const dayStr = days[date.getDay()];
 
-        // Find status
         const record = attendanceData.find((a) => {
             const d = new Date(a.date);
             return (
@@ -69,16 +66,15 @@ export const generateAttendancePDF = (
             halign: "center",
         },
         columnStyles: {
-            0: { cellWidth: 20 }, // SR.NO
-            1: { cellWidth: 40 }, // DATE
-            2: { cellWidth: 40 }, // DAY
-            3: { cellWidth: 80 }, // PRESENTE
+            0: { cellWidth: 20 }, 
+            1: { cellWidth: 40 }, 
+            2: { cellWidth: 40 },
+            3: { cellWidth: 80 },
         },
     });
 
     const finalY = (doc as any).lastAutoTable.finalY;
 
-    // Footer Table
     autoTable(doc, {
         body: [
             ["Name for Student", `Name of student(${internName})`, "", ""],
@@ -104,3 +100,4 @@ export const generateAttendancePDF = (
 
     doc.save(`${internName}_Attendance_${month + 1}_${year}.pdf`);
 };
+
