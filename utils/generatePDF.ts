@@ -77,8 +77,8 @@ export const generateAttendancePDF = (
 
     autoTable(doc, {
         body: [
-            ["Name for Student", `Name of student(${internName})`, "", ""],
-            ["", "", "Name of admin(Extrimus01)", ""],
+            ["Name for Student", internName, "", ""],
+            ["", "", "Extrimus01", ""],
             ["", "", "HR MRSAC", "Sign"],
         ],
         startY: finalY + 10,
@@ -100,4 +100,5 @@ export const generateAttendancePDF = (
 
     doc.save(`${internName}_Attendance_${month + 1}_${year}.pdf`);
 };
+
 
