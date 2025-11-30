@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Toast from "@/components/global/Toast";
 import { BouncingDots } from "@/components/global/Loader";
+import { generateAttendancePDF } from "@/utils/generatePDF";
 
 interface IProject {
   _id: string;
@@ -188,6 +189,24 @@ export default function AttendancePage() {
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             {saving ? "Marking..." : "Mark Today"}
+          </button>
+          <button
+            onClick={() => {
+              const internName =
+                user?.name ||
+                (user?.firstName && user?.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : "Intern");
+              generateAttendancePDF(
+                internName,
+                attendance,
+                currentMonth.month,
+                currentMonth.year
+              );
+            }}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Download PDF
           </button>
         </div>
       </div>
