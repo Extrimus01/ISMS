@@ -152,7 +152,7 @@ export default function VerificationPage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 flex justify-center">
+                  {/* <div className="mt-6 flex justify-center">
                     <button
                       onClick={() => {
                         const pdfWindow = window.open();
@@ -166,7 +166,7 @@ export default function VerificationPage() {
                     >
                       View Offer Letter
                     </button>
-                  </div>
+                  </div> */}
 
                   <div
                     className="mt-5 pt-3 text-xs text-center border-t"
