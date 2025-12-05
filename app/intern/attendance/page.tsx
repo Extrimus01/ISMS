@@ -105,7 +105,6 @@ export default function AttendancePage() {
       if (!res.ok) {
         if (data.error === "Today already marked") {
           setToast({ message: "Attendance already marked for today", type: "success" });
-          // Refresh attendance to ensure UI is in sync
           fetchAttendance();
           return;
         }

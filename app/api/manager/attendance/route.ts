@@ -3,10 +3,33 @@ import dbConnect from "@/lib/dbConnect";
 import Intern from "@/models/Intern";
 import { getToken } from "next-auth/jwt";
 
+import Project from "@/models/Project";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET!;
+
 export async function GET(req: NextRequest) {
     try {
         await dbConnect();
-        const interns = await Intern.find({}).select("fullName email department attendance");
+
+        const authHeader = req.headers.get("authorization");
+        if (!authHeader?.startsWith("Bearer ")) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const token = authHeader.split(" ")[1];
+        let decoded: any;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch {
+            return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        }
+        const managerId = decoded.id;
+        const projects = await Project.find({ manager: managerId }).select("_id");
+        const projectIds = projects.map((p) => p._id);
+
+        const interns = await Intern.find({
+            "projectsAssigned.project": { $in: projectIds },
+        }).select("fullName email department attendance");
 
         const attendanceRecords = interns.flatMap((intern) =>
             intern.attendance.map((record: any) => ({

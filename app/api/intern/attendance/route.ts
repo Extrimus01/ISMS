@@ -14,15 +14,11 @@ export async function POST(req: NextRequest) {
     if (!intern)
       return NextResponse.json({ error: "Intern not found" }, { status: 404 });
 
-    // Get current date in IST
     const now = new Date();
     const istDateString = now.toLocaleString("en-US", {
       timeZone: "Asia/Kolkata",
     });
     const istDate = new Date(istDateString);
-
-    // Create UTC midnight date for the IST date
-    // This ensures the date part matches YYYY-MM-DD regardless of timezone when split
     const todayUTC = new Date(
       Date.UTC(istDate.getFullYear(), istDate.getMonth(), istDate.getDate())
     );
@@ -30,7 +26,6 @@ export async function POST(req: NextRequest) {
     if (action === "mark") {
       const alreadyMarked = intern.attendance.find((a: any) => {
         const aDate = new Date(a.date);
-        // Compare timestamps of the midnight dates
         return aDate.getTime() === todayUTC.getTime();
       });
 

@@ -39,10 +39,15 @@ export default function StudentDocsPage() {
   const fetchInterns = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/interns");
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const res = await fetch("/api/manager/my-interns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: user._id }),
+      });
       if (!res.ok) throw new Error("Failed to fetch interns");
       const data = await res.json();
-      setInterns(data.interns || data || []);
+      setInterns(data.interns || []);
     } catch (err: any) {
       console.error(err);
       setToast({
@@ -81,21 +86,21 @@ export default function StudentDocsPage() {
         ...(intern.documents || []),
         ...(intern.recommendation
           ? [
-              {
-                type: "Recommendation",
-                data: intern.recommendation,
-                uploadedAt: new Date().toISOString(),
-              },
-            ]
+            {
+              type: "Recommendation",
+              data: intern.recommendation,
+              uploadedAt: new Date().toISOString(),
+            },
+          ]
           : []),
         ...(intern.collegeId
           ? [
-              {
-                type: "College ID",
-                data: intern.collegeId,
-                uploadedAt: new Date().toISOString(),
-              },
-            ]
+            {
+              type: "College ID",
+              data: intern.collegeId,
+              uploadedAt: new Date().toISOString(),
+            },
+          ]
           : []),
       ];
 
@@ -156,11 +161,10 @@ export default function StudentDocsPage() {
           {interns.map((student) => (
             <div
               key={student._id}
-              className={`rounded-lg shadow border transition-colors ${
-                isDark
+              className={`rounded-lg shadow border transition-colors ${isDark
                   ? "bg-gray-900 border-gray-700"
                   : "bg-white border-gray-200"
-              }`}
+                }`}
             >
               <div
                 className="flex justify-between items-center p-4 cursor-pointer"
@@ -189,22 +193,20 @@ export default function StudentDocsPage() {
 
               {expanded === student._id && (
                 <div
-                  className={`border-t transition-colors ${
-                    isDark
+                  className={`border-t transition-colors ${isDark
                       ? "border-gray-700 bg-gray-800"
                       : "border-gray-200 bg-gray-50"
-                  } p-4`}
+                    } p-4`}
                 >
                   {docs[student._id]?.length ? (
                     <ul className="space-y-2">
                       {docs[student._id].map((doc, idx) => (
                         <li
                           key={idx}
-                          className={`flex justify-between items-center p-3 rounded-md cursor-pointer transition-all ${
-                            isDark
+                          className={`flex justify-between items-center p-3 rounded-md cursor-pointer transition-all ${isDark
                               ? "bg-gray-700 hover:bg-gray-600"
                               : "bg-gray-100 hover:bg-gray-200"
-                          }`}
+                            }`}
                           onClick={() => viewDocument(doc)}
                         >
                           <span className="font-medium text-sm">

@@ -152,21 +152,6 @@ export default function VerificationPage() {
                     </p>
                   </div>
 
-                  {/* <div className="mt-6 flex justify-center">
-                    <button
-                      onClick={() => {
-                        const pdfWindow = window.open();
-                        if (pdfWindow) {
-                          pdfWindow.document.write(
-                            `<iframe src="${result.pdfData}" width="100%" height="100%"></iframe>`
-                          );
-                        }
-                      }}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-full transition-all"
-                    >
-                      View Offer Letter
-                    </button>
-                  </div> */}
 
                   <div
                     className="mt-5 pt-3 text-xs text-center border-t"

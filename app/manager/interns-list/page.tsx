@@ -71,9 +71,14 @@ export default function ActiveInternsPage() {
   useEffect(() => {
     const fetchInterns = async () => {
       try {
-        const res = await fetch("/api/admin/interns");
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const res = await fetch("/api/manager/my-interns", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: user._id }),
+        });
         const data = await res.json();
-        setInterns(data);
+        setInterns(data.interns || []);
       } catch (err: any) {
         toast.error(err.message || "Failed to fetch interns");
       } finally {

@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
     try {
       body = await req.json();
     } catch {
-      // Body is empty, proceed to check headers
     }
     const { id } = body;
 
