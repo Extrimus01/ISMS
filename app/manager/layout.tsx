@@ -56,11 +56,10 @@ export default function ManagerLayout({
 
   return (
     <div
-      className={`flex min-h-screen transition-colors duration-300 ${
-        theme === "dark"
+      className={`flex min-h-screen transition-colors duration-300 ${theme === "dark"
           ? "bg-[#0f172a] text-gray-100"
           : "bg-[#f9fafb] text-gray-900"
-      }`}
+        }`}
     >
       <Sidebar
         isMobile={isMobile}
@@ -69,19 +68,17 @@ export default function ManagerLayout({
       />
 
       <main
-        className={`flex-1 md:ml-64 relative overflow-y-auto transition-all duration-300 ${
-          theme === "dark"
+        className={`flex-1 md:ml-64 relative overflow-y-auto transition-all duration-300 ${theme === "dark"
             ? "bg-[#0f172a] text-gray-100"
             : "bg-[#f9fafb] text-gray-900"
-        }`}
+          }`}
       >
         {isMobile && (
           <header
-            className={`flex items-center justify-between h-16 px-4 sticky top-0 z-30 backdrop-blur-md border-b ${
-              theme === "dark"
+            className={`flex items-center justify-between h-16 px-4 sticky top-0 z-30 backdrop-blur-md border-b ${theme === "dark"
                 ? "bg-[#1e293b]/80 border-gray-800"
                 : "bg-white/70 border-gray-200"
-            }`}
+              }`}
           >
             <div className="flex items-center space-x-3">
               <button

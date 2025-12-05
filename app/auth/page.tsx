@@ -271,8 +271,8 @@ export default function AuthPage() {
 
   const handleInput =
     (field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm({ ...form, [field]: e.target.value });
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+        setForm({ ...form, [field]: e.target.value });
 
   const handleLogin = async () => {
     if (!form.loginUsername || !form.loginPassword) {

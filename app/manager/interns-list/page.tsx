@@ -40,8 +40,8 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
           <button
             onClick={onCancel}
             className={`px-4 py-2 rounded-lg font-medium ${isDark
-                ? "bg-slate-700 text-white hover:bg-slate-600"
-                : "bg-gray-200 text-black hover:bg-gray-300"
+              ? "bg-slate-700 text-white hover:bg-slate-600"
+              : "bg-gray-200 text-black hover:bg-gray-300"
               }`}
           >
             Cancel
@@ -168,8 +168,8 @@ export default function ActiveInternsPage() {
               <tr
                 key={i._id}
                 className={`border-b ${isDark
-                    ? "border-slate-700 hover:bg-slate-800"
-                    : "border-gray-200 hover:bg-gray-100"
+                  ? "border-slate-700 hover:bg-slate-800"
+                  : "border-gray-200 hover:bg-gray-100"
                   }`}
               >
                 <td className="p-3">{i.fullName}</td>

@@ -17,19 +17,17 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div
-        className={`w-[90%] max-w-sm rounded-xl p-6 shadow-lg text-center ${
-          isDark ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
-        }`}
+        className={`w-[90%] max-w-sm rounded-xl p-6 shadow-lg text-center ${isDark ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
+          }`}
       >
         <p className="mb-5 text-base font-medium">{message}</p>
         <div className="flex justify-center gap-3 flex-wrap">
           <button
             onClick={onCancel}
-            className={`px-4 py-2 rounded-lg ${
-              isDark
-                ? "bg-gray-600 hover:bg-gray-500"
-                : "bg-gray-200 hover:bg-gray-300"
-            } transition-colors`}
+            className={`px-4 py-2 rounded-lg ${isDark
+              ? "bg-gray-600 hover:bg-gray-500"
+              : "bg-gray-200 hover:bg-gray-300"
+              } transition-colors`}
           >
             Cancel
           </button>
@@ -137,7 +135,11 @@ export default function InternProjectDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           internId: selectedIntern,
-          projectId: editAssignment.project._id || editAssignment.project,
+          projectId: editAssignment.project
+            ? typeof editAssignment.project === "string"
+              ? editAssignment.project
+              : editAssignment.project._id
+            : "",
           startDate: editAssignment.startDate,
           endDate: editAssignment.endDate,
           status: editAssignment.status,
@@ -186,9 +188,8 @@ export default function InternProjectDashboard() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`px-4 sm:px-6 md:px-8 py-6 max-w-6xl mx-auto ${
-        isDarkMode ? "text-gray-100" : "text-gray-900"
-      }`}
+      className={`px-4 sm:px-6 md:px-8 py-6 max-w-6xl mx-auto ${isDarkMode ? "text-gray-100" : "text-gray-900"
+        }`}
     >
       {confirmModal && (
         <ConfirmModal
@@ -210,11 +211,10 @@ export default function InternProjectDashboard() {
       </h1>
 
       <div
-        className={`rounded-2xl p-6 mb-8 shadow-md border transition-colors ${
-          isDarkMode
-            ? "bg-gray-800 border-gray-700"
-            : "bg-white border-gray-200"
-        }`}
+        className={`rounded-2xl p-6 mb-8 shadow-md border transition-colors ${isDarkMode
+          ? "bg-gray-800 border-gray-700"
+          : "bg-white border-gray-200"
+          }`}
       >
         <h2 className="font-semibold text-lg mb-4">Assign New Project</h2>
 
@@ -317,9 +317,8 @@ export default function InternProjectDashboard() {
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
         <table className="min-w-full text-sm">
           <thead
-            className={`${
-              isDarkMode ? "bg-gray-900 text-gray-200" : "bg-gray-100"
-            }`}
+            className={`${isDarkMode ? "bg-gray-900 text-gray-200" : "bg-gray-100"
+              }`}
           >
             <tr>
               {["Intern", "Project", "Start", "End", "Status", "Actions"].map(
@@ -336,17 +335,18 @@ export default function InternProjectDashboard() {
           </thead>
           <tbody>
             {interns.flatMap((i) =>
-              i.projectsAssigned.map((a) => (
+              i.projectsAssigned.map((a, idx) => (
                 <tr
-                  key={`${i._id}-${a.project._id}`}
-                  className={`transition-colors ${
-                    isDarkMode
-                      ? "hover:bg-gray-700"
-                      : "hover:bg-gray-50 bg-white"
-                  }`}
+                  key={`${i._id}-${a.project?._id || idx}`}
+                  className={`transition-colors ${isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-50 bg-white"
+                    }`}
                 >
                   <td className="px-3 py-2">{i.fullName}</td>
-                  <td className="px-3 py-2">{a.project.title}</td>
+                  <td className="px-3 py-2">
+                    {a.project?.title || "Unknown Project"}
+                  </td>
                   <td className="px-3 py-2">
                     {new Date(a.startDate).toLocaleDateString()}
                   </td>
@@ -370,10 +370,11 @@ export default function InternProjectDashboard() {
                           message:
                             "Are you sure you want to remove this assignment?",
                           internId: i._id,
-                          projectId:
-                            typeof a.project === "string"
+                          projectId: a.project
+                            ? typeof a.project === "string"
                               ? a.project
-                              : a.project._id,
+                              : a.project._id
+                            : "",
                         })
                       }
                       className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm"
@@ -390,11 +391,10 @@ export default function InternProjectDashboard() {
       {editAssignment && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div
-            className={`w-[90%] max-w-sm rounded-xl p-6 shadow-lg ${
-              isDarkMode
-                ? "bg-gray-800 text-gray-100"
-                : "bg-white text-gray-900"
-            }`}
+            className={`w-[90%] max-w-sm rounded-xl p-6 shadow-lg ${isDarkMode
+              ? "bg-gray-800 text-gray-100"
+              : "bg-white text-gray-900"
+              }`}
           >
             <h2 className="text-lg font-semibold mb-4 text-center">
               Edit Assignment
@@ -458,11 +458,10 @@ export default function InternProjectDashboard() {
             <div className="flex justify-center gap-3 mt-5">
               <button
                 onClick={() => setEditAssignment(null)}
-                className={`px-4 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "bg-gray-600 hover:bg-gray-500"
-                    : "bg-gray-200 hover:bg-gray-300"
-                } transition-colors`}
+                className={`px-4 py-2 rounded-lg ${isDarkMode
+                  ? "bg-gray-600 hover:bg-gray-500"
+                  : "bg-gray-200 hover:bg-gray-300"
+                  } transition-colors`}
               >
                 Cancel
               </button>
