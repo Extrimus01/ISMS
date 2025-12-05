@@ -102,7 +102,15 @@ export default function AttendancePage() {
         body: JSON.stringify({ id: internId, action: "mark" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to mark attendance");
+      if (!res.ok) {
+        if (data.error === "Today already marked") {
+          setToast({ message: "Attendance already marked for today", type: "success" });
+          // Refresh attendance to ensure UI is in sync
+          fetchAttendance();
+          return;
+        }
+        throw new Error(data.error || "Failed to mark attendance");
+      }
 
       setAttendance(data.attendance || []);
       setToast({ message: "Attendance marked for today", type: "success" });
@@ -146,7 +154,9 @@ export default function AttendancePage() {
   });
 
   const getStatusForDate = (day: number) => {
-    const dateStr = new Date(year, month, day).toISOString().split("T")[0];
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+      day
+    ).padStart(2, "0")}`;
     const record = attendance.find((a) => a.date.split("T")[0] === dateStr);
     return record ? record.status : "none";
   };
@@ -162,6 +172,15 @@ export default function AttendancePage() {
       default:
         return "bg-gray-200";
     }
+  };
+
+  const isTodayMarked = () => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(now.getDate()).padStart(2, "0")}`;
+    return attendance.some((a) => a.date.split("T")[0] === todayStr);
   };
 
   return (
@@ -185,10 +204,13 @@ export default function AttendancePage() {
           </button>
           <button
             onClick={markToday}
-            disabled={saving}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={saving || isTodayMarked()}
+            className={`px-4 py-2 rounded text-white ${isTodayMarked()
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+              }`}
           >
-            {saving ? "Marking..." : "Mark Today"}
+            {saving ? "Marking..." : isTodayMarked() ? "Marked" : "Mark Today"}
           </button>
           <button
             onClick={() => {
