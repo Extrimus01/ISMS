@@ -6,8 +6,8 @@ import { ArrowUpIcon, LocationEdit, MailIcon, PhoneIcon } from "lucide-react";
 
 const Footer: React.FC = () => {
   const contactDetails = [
-    { icon: PhoneIcon, title: "Phone", info: "+91 955 298 4596" },
-    { icon: MailIcon, title: "E-mail", info: "extrimus01@gmail.com" },
+    { icon: PhoneIcon, title: "Phone", info: "+91 992 369 5871" },
+    { icon: MailIcon, title: "E-mail", info: "sanjaybalamwar.intern@gmail.com" },
     {
       icon: LocationEdit,
       title: "Location",

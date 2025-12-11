@@ -123,8 +123,7 @@ export async function convertToPdf({
     const addressLines = [
       "To,",
       deanName,
-      "Head of the Department,",
-      department,
+      "Head of the Training and Placement,",
       collegeName,
       addressLine,
     ];
